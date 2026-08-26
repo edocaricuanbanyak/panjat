@@ -1,0 +1,40 @@
+# Local development infrastructure for Panjat.
+# Credentials here are for local dev ONLY — production uses managed Postgres/Redis with secrets.
+services:
+  postgres:
+    image: postgres:16
+    container_name: panjat-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: panjat
+      POSTGRES_PASSWORD: panjat
+      POSTGRES_DB: panjat
+    # Host port 5433 (not 5432) to avoid clashing with a host Postgres install.
+    ports:
+      - "5433:5432"
+    volumes:
+      - panjat-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U panjat -d panjat"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: panjat-redis
+    restart: unless-stopped
+    # Host port 6380 (not 6379) to avoid clashing with a host Redis install.
+    ports:
+      - "6380:6379"
+    volumes:
+      - panjat-redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  panjat-pgdata:
+  panjat-redisdata:
