@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AmountSelector, type TargetChoice } from "@/components/AmountSelector";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
@@ -31,18 +31,23 @@ function markerHeight(rank: number): number {
 export function ManjatWizard({
   initialUrl,
   kategori,
+  initialKategori = "",
+  express = false,
   onClose,
 }: {
   initialUrl: string;
   kategori: Kategori[];
+  initialKategori?: string;
+  /** Front-page flow: start at position+pay, auto-preview, pay in one step. */
+  express?: boolean;
   /** When set, renders as a modal body (close button instead of a back link). */
   onClose?: () => void;
 }) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(express ? 2 : 1);
   const [url, setUrl] = useState(initialUrl);
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
-  const [kategoriSlug, setKategoriSlug] = useState("");
+  const [kategoriSlug, setKategoriSlug] = useState(initialKategori);
   const [deskripsi, setDeskripsi] = useState("");
 
   const [target, setTarget] = useState<TargetChoice | null>(null);
@@ -134,8 +139,15 @@ export function ManjatWizard({
     }
   }
 
+  // Auto-preview on open when a URL is already provided (Salip / express).
+  useEffect(() => {
+    if (initialUrl.trim()) void prefillFromUrl();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Only the URL is required; the rest is auto-filled and editable.
   const canStep1 = url.trim() !== "";
+  const onPayOrConfirm = () => (bigAmount ? setStep(3) : onPay());
   const bigAmount = (quote?.nominal ?? 0) > 200_000;
 
   return (
@@ -242,6 +254,16 @@ export function ManjatWizard({
 
       {step === 2 && (
         <div className="mt-6 flex flex-col gap-4">
+          {express && (
+            <div className="rounded-md bg-kertas-2 px-3 py-2 text-xs text-tinta-redup">
+              Manjat: <span className="text-tinta">{nama || url}</span>
+              {kategoriSlug && ` · ${kategori.find((k) => k.slug === kategoriSlug)?.nama ?? ""}`}
+              {" · "}
+              <button onClick={() => setStep(1)} className="text-merah hover:underline">
+                ubah detail
+              </button>
+            </div>
+          )}
           <p className="text-sm text-tinta-redup">Mau di posisi berapa? Sistem yang menghitung.</p>
           <div className="flex gap-4">
             <div className="flex-1">
@@ -289,11 +311,21 @@ export function ManjatWizard({
 
           <div className="flex gap-2">
             <Button variant="secondary" onClick={() => setStep(1)}>
-              Kembali
+              {express ? "Detail" : "Kembali"}
             </Button>
-            <Button className="flex-1" disabled={!quote} onClick={() => setStep(3)}>
-              Lanjut
-            </Button>
+            {express ? (
+              <Button
+                className="flex-1"
+                disabled={!quote || submitting}
+                onClick={onPayOrConfirm}
+              >
+                {submitting ? "Memproses…" : quote ? `Bayar ${formatRupiah(quote.nominal)}` : "Bayar"}
+              </Button>
+            ) : (
+              <Button className="flex-1" disabled={!quote} onClick={() => setStep(3)}>
+                Lanjut
+              </Button>
+            )}
           </div>
         </div>
       )}

@@ -1,6 +1,7 @@
 import { BoardLive } from "@/components/BoardLive";
 import { EmptyState } from "@/components/EmptyState";
 import { Footer } from "@/components/Footer";
+import { HeroManjat } from "@/components/HeroManjat";
 import { KakiTiang } from "@/components/KakiTiang";
 import { ManjatButton, ManjatProvider } from "@/components/ManjatModal";
 import { Nav } from "@/components/Nav";
@@ -57,6 +58,8 @@ export default async function Home() {
         <p className="mt-4 rounded-md bg-kertas-2 px-3 py-2 text-xs text-tinta-redup">
           Bayar untuk manjat · Tiangnya licin, semua merosot · Manjat lagi kalau mau bertahan
         </p>
+
+        <HeroManjat kategori={kats} />
       </header>
 
       {entries.length > 0 && (

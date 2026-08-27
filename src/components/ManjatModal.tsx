@@ -6,14 +6,20 @@ import { buttonClasses, type ButtonSize, type ButtonVariant } from "./Button";
 
 type Kategori = { slug: string; nama: string };
 
+interface OpenOpts {
+  url?: string;
+  kategoriSlug?: string;
+  /** Jump straight to the position+pay step (front-page express flow). */
+  express?: boolean;
+}
 interface ManjatCtx {
-  open: (url?: string) => void;
+  open: (opts?: OpenOpts) => void;
 }
 const Ctx = createContext<ManjatCtx>({
   // Fallback (no provider, e.g. kitchen-sink): navigate to the full page.
-  open: (url) => {
+  open: (opts) => {
     if (typeof window !== "undefined") {
-      window.location.href = url ? `/manjat?url=${encodeURIComponent(url)}` : "/manjat";
+      window.location.href = opts?.url ? `/manjat?url=${encodeURIComponent(opts.url)}` : "/manjat";
     }
   },
 });
@@ -24,7 +30,7 @@ export function useManjat() {
 
 /**
  * Manjat/Salip as a modal (no page navigation). Wraps the board; triggers call
- * useManjat().open(url) to prefill and show the wizard in a dialog.
+ * useManjat().open({url, kategoriSlug, express}) to prefill and show the wizard.
  */
 export function ManjatProvider({
   kategori,
@@ -33,12 +39,12 @@ export function ManjatProvider({
   kategori: Kategori[];
   children: React.ReactNode;
 }) {
-  const [url, setUrl] = useState<string | null>(null);
-  const openModal = url !== null;
+  const [state, setState] = useState<Required<OpenOpts> | null>(null);
+  const openModal = state !== null;
 
   useEffect(() => {
     if (!openModal) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setUrl(null);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setState(null);
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
@@ -48,18 +54,29 @@ export function ManjatProvider({
   }, [openModal]);
 
   return (
-    <Ctx.Provider value={{ open: (u) => setUrl(u ?? "") }}>
+    <Ctx.Provider
+      value={{
+        open: (o) =>
+          setState({ url: o?.url ?? "", kategoriSlug: o?.kategoriSlug ?? "", express: o?.express ?? false }),
+      }}
+    >
       {children}
-      {openModal && (
+      {state && (
         <div
           className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-tinta/40 p-4 sm:items-center"
-          onClick={() => setUrl(null)}
+          onClick={() => setState(null)}
         >
           <div
             className="w-full max-w-md rounded-lg border border-garis bg-kertas p-5 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
-            <ManjatWizard initialUrl={url} kategori={kategori} onClose={() => setUrl(null)} />
+            <ManjatWizard
+              initialUrl={state.url}
+              initialKategori={state.kategoriSlug}
+              express={state.express}
+              kategori={kategori}
+              onClose={() => setState(null)}
+            />
           </div>
         </div>
       )}
@@ -83,7 +100,7 @@ export function ManjatButton({
 }) {
   const { open } = useManjat();
   return (
-    <button onClick={() => open(url)} className={`${buttonClasses(variant, size)} ${className ?? ""}`}>
+    <button onClick={() => open({ url })} className={`${buttonClasses(variant, size)} ${className ?? ""}`}>
       {children}
     </button>
   );
