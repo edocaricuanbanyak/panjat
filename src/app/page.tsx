@@ -1,42 +1,54 @@
+import { cookies } from "next/headers";
 import { BoardLive } from "@/components/BoardLive";
 import { BoardTabs } from "@/components/BoardTabs";
 import { CaraMain } from "@/components/CaraMain";
 import { EmptyState } from "@/components/EmptyState";
 import { HeroManjat } from "@/components/HeroManjat";
 import { KakiTiang } from "@/components/KakiTiang";
+import { ListingCard } from "@/components/ListingCard";
 import { PageShell } from "@/components/PageShell";
+import { Pagination } from "@/components/Pagination";
 import { Spotlight } from "@/components/Spotlight";
-import { TebakJuara } from "@/components/TebakJuara";
+import { VoteFavorit } from "@/components/VoteFavorit";
 import { db } from "@/db";
 import { getBoard } from "@/domain/board";
 import { listCategories } from "@/domain/jelajah";
 import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
-import { guessStatus } from "@/domain/tebakan";
 import { currentAnon } from "@/lib/anon";
-import { formatRupiah } from "@/lib/format";
+import { favoritBoard, myFavorit } from "@/lib/favorit";
 import { pingVisitor, VID_COOKIE, visitorStats } from "@/lib/presence";
-import { cookies } from "next/headers";
 
 // Reads the DB per request; also keeps it out of the build-time prerender.
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
+const PER_PAGE = 20;
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ hal?: string }>;
+}) {
   const now = new Date();
   const anonId = await currentAnon();
   const vid = (await cookies()).get(VID_COOKIE)?.value;
   if (vid) await pingVisitor(vid);
 
   const { entries, max } = await getBoard(db);
-  const totalPegangan = entries.reduce((sum, e) => sum + e.pegangan, 0);
-  const [tebak, kakiTiang, sisaSorak, kats, visitor] = await Promise.all([
-    guessStatus(db, anonId, now),
+  const [kakiTiang, sisaSorak, kats, visitor, favorit, choice] = await Promise.all([
     getKakiTiang(db),
     sorakRemaining(db, anonId, now),
     listCategories(db),
     visitorStats(),
+    favoritBoard(db),
+    myFavorit(vid),
   ]);
 
+  const totalPages = Math.max(1, Math.ceil(entries.length / PER_PAGE));
+  const page = Math.min(Math.max(1, Number((await searchParams).hal) || 1), totalPages);
+  const pageEntries = entries.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
   const spotlightItems = entries.map((e) => ({ id: e.id, nama: e.nama, pegangan: e.pegangan }));
+  const voteEntries = entries.map((e) => ({ id: e.id, nama: e.nama }));
 
   return (
     <PageShell
@@ -57,14 +69,14 @@ export default async function Home() {
         <HeroManjat kategori={kats} />
         <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 font-mono tabular text-xs text-tinta-redup">
           <span className="inline-flex items-center gap-1.5">
-            <span className="inline-block size-1.5 rounded-full bg-merah" aria-hidden />
+            <span className="blink inline-block size-1.5 rounded-full bg-hidup" aria-hidden />
             <b className="text-tinta">{visitor.online}</b> online
           </span>
           <span>
-            <b className="text-tinta">{entries.length}</b> pemanjat
+            <b className="text-tinta">{visitor.total.toLocaleString("id-ID")}</b> visitor
           </span>
           <span>
-            <b className="text-tinta">{formatRupiah(totalPegangan)}</b> total pegangan
+            <b className="text-tinta">{entries.length}</b> peserta
           </span>
         </div>
       </section>
@@ -74,9 +86,19 @@ export default async function Home() {
         <BoardTabs active="sekarang" className="mb-5" />
         {entries.length === 0 ? (
           <EmptyState title="Belum ada yang manjat." message="Tiangnya masih kinclong." />
+        ) : page === 1 ? (
+          <BoardLive
+            initial={{ entries, max }}
+            middle={<VoteFavorit entries={voteEntries} leaderboard={favorit} myChoice={choice} />}
+          />
         ) : (
-          <BoardLive initial={{ entries, max }} />
+          <div className="flex flex-col gap-2.5">
+            {pageEntries.map((e) => (
+              <ListingCard key={e.id} entry={e} />
+            ))}
+          </div>
         )}
+        <Pagination page={page} totalPages={totalPages} />
       </section>
 
       {/* KAKI TIANG (gratis) */}
@@ -98,13 +120,6 @@ export default async function Home() {
         </h2>
         <CaraMain />
       </section>
-
-      {/* SEKUNDER — ritual */}
-      {entries.length > 0 && (
-        <div className="mt-14">
-          <TebakJuara status={tebak} />
-        </div>
-      )}
     </PageShell>
   );
 }

@@ -4,6 +4,13 @@ import { LencanaRow } from "./LencanaRow";
 import { LogoTile } from "./LogoTile";
 import { ManjatButton } from "./ManjatModal";
 
+// Top-3 podium medals: gold crown, silver, bronze (ribbon-style corner badge).
+const MEDALI: Record<1 | 2 | 3, { bg: string; icon: string; label: string }> = {
+  1: { bg: "bg-emas", icon: "👑", label: "Juara 1" },
+  2: { bg: "bg-perak", icon: "2", label: "Juara 2" },
+  3: { bg: "bg-perunggu", icon: "3", label: "Juara 3" },
+};
+
 /**
  * One climber, as an editorial row: #rank · logo · name · grip. On hover the row
  * lifts into focus and a Salip button floats in above-center (outbid-style);
@@ -22,11 +29,25 @@ export function ListingCard({
   const wdth = puncak ? Math.max(105, 130 - (entry.rank - 1) * 10) : 100;
   // Title is owner-editable; show the real URL host so the board stays honest.
   const host = entry.urlNormal.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  const medali = puncak
+    ? MEDALI[entry.rank as 1 | 2 | 3]
+    : undefined;
 
   return (
     <article
-      className={`group relative flex items-center gap-4 rounded-xl px-3 transition-all ease-panjat hover:z-10 ${puncak ? "py-3.5" : "py-3"}`}
+      className={`group relative flex items-center gap-4 rounded-xl px-4 transition-all ease-panjat hover:z-10 ${puncak ? "py-3.5" : "py-3"}`}
     >
+      {/* Podium ribbon — top-left, overlapping the corner (top-3 only). */}
+      {medali && (
+        <span
+          aria-label={medali.label}
+          title={medali.label}
+          className={`absolute -left-2 -top-2 z-20 grid size-6 place-items-center rounded-full text-xs font-bold leading-none text-kertas-1 shadow-kartu ring-2 ring-kertas-1 ${medali.bg}`}
+        >
+          {medali.icon}
+        </span>
+      )}
+
       {/* Above-center floating action, revealed on hover (pointer devices). */}
       <div className="pointer-events-none absolute -top-3.5 left-1/2 z-20 hidden -translate-x-1/2 opacity-0 transition-all ease-panjat group-hover:pointer-events-auto group-hover:-top-4 group-hover:opacity-100 md:block">
         <ManjatButton url={entry.urlNormal} size="sm">

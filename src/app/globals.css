@@ -19,6 +19,12 @@
   --color-licin: #b9c4c9; /* the slick sheen — the one cool note */
   --color-merah: #c93a2e; /* flag red — ONLY summit zone + primary action */
   --color-galat: #c2410c; /* error/danger — deliberately NOT the brand red */
+  --color-hidup: #2e9d5b; /* live/online status — green, status only */
+
+  /* Podium medals (top-3 ribbons only) */
+  --color-emas: #c99a2e;
+  --color-perak: #9aa0a6;
+  --color-perunggu: #b06a34;
 
   /* Fonts (bound in layout via next/font CSS variables) */
   --font-display: var(--font-anybody);
@@ -90,6 +96,15 @@ body {
 .reveal { opacity: 0; animation: puncak-rise 0.5s var(--ease-panjat) forwards; }
 .reveal-pop { opacity: 0; animation: puncak-pop 0.6s var(--ease-panjat) forwards; }
 .reveal-wave { animation: puncak-wave 0.8s var(--ease-panjat) 1s; }
+
+/* Live "online" pulse. */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+.blink {
+  animation: blink 1.4s var(--ease-panjat) infinite;
+}
 
 /* Spotlight ticker (running text) — duplicated track scrolls by half its width. */
 @keyframes ticker {

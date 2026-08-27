@@ -10,7 +10,14 @@ import { ListingCard } from "./ListingCard";
  * only, §9.6.4), disabled under prefers-reduced-motion. The board container is
  * aria-live="off"; a separate polite region summarizes changes (R20-e).
  */
-export function BoardLive({ initial }: { initial: Board }) {
+export function BoardLive({
+  initial,
+  middle,
+}: {
+  initial: Board;
+  /** Slot rendered between the top-3 podium and rank 4+ (e.g. Tebak Juara). */
+  middle?: React.ReactNode;
+}) {
   const [board, setBoard] = useState<Board>(initial);
   const [announce, setAnnounce] = useState("");
   const topRef = useRef<string | undefined>(initial.entries[0]?.id);
@@ -42,8 +49,10 @@ export function BoardLive({ initial }: { initial: Board }) {
     return () => es.close();
   }, []);
 
-  const puncak = board.entries.slice(0, 3);
-  const sisa = board.entries.slice(3);
+  // Page one shows at most 20; deeper ranks live on paginated (static) pages.
+  const shown = board.entries.slice(0, 20);
+  const puncak = shown.slice(0, 3);
+  const sisa = shown.slice(3);
 
   return (
     <div className="flex flex-1 flex-col gap-4">
@@ -61,6 +70,7 @@ export function BoardLive({ initial }: { initial: Board }) {
             </div>
           ))}
         </section>
+        {middle && <div className="my-5">{middle}</div>}
         {sisa.length > 0 && (
           <section className="mt-5 flex flex-col gap-2.5">
             {sisa.map((e) => (
