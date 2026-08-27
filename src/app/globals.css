@@ -148,6 +148,35 @@ body {
   animation-play-state: paused;
 }
 
+/* Dukung (Sorak) micro-interaction — a heart pop + a little burst of hearts and
+   a rising "+1" when a visitor cheers a Kaki Tiang listing. */
+@keyframes dukung-pop {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scale(1.4); }
+}
+@keyframes dukung-particle {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(0.4) rotate(0deg); }
+  25% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx)), var(--ty)) scale(1) rotate(var(--rot));
+  }
+}
+@keyframes dukung-plus {
+  0% { opacity: 0; transform: translate(-50%, 4px) scale(0.7); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -24px) scale(1); }
+}
+.dukung-pop {
+  animation: dukung-pop 400ms var(--ease-panjat);
+}
+.dukung-particle {
+  animation: dukung-particle 720ms var(--ease-panjat) forwards;
+}
+.dukung-plus {
+  animation: dukung-plus 720ms var(--ease-panjat) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

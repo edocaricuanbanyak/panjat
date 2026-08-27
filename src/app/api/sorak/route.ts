@@ -11,11 +11,19 @@ import { rateLimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
-/** POST /api/sorak (form: listingId) — one Sorak for a Kaki Tiang listing (R16). */
+/** POST /api/sorak (form: listingId) — one Sorak for a Kaki Tiang listing (R16).
+ *  Returns JSON when called via fetch (Accept: application/json) so the client can
+ *  animate + optimistically update; otherwise redirects (no-JS form fallback). */
 export async function POST(req: Request) {
+  const wantsJson = req.headers.get("accept")?.includes("application/json") ?? false;
+  const fail = (kind: string, status = 400) =>
+    wantsJson
+      ? NextResponse.json({ ok: false, error: kind }, { status })
+      : NextResponse.redirect(new URL(`/?sorak=${kind}#kaki-tiang`, req.url), { status: 303 });
+
   // Anti-abuse: a burst from one IP is dropped (§R16).
   const rl = await rateLimit(`sorak:${clientIp(req.headers)}`, 10, 60);
-  if (!rl.ok) return NextResponse.redirect(new URL("/?sorak=gagal", req.url), { status: 303 });
+  if (!rl.ok) return fail("gagal", 429);
 
   const form = await req.formData();
   const listingId = String(form.get("listingId") ?? "");
@@ -25,10 +33,8 @@ export async function POST(req: Request) {
   const setCookie = !anonId;
   if (!anonId) anonId = newAnonId();
 
-  const back = new URL("/", req.url);
   try {
     await recordSorak(db, anonId, listingId, new Date());
-    back.searchParams.set("sorak", "ok");
     const [l] = await db
       .select({ nama: listing.nama })
       .from(listing)
@@ -36,11 +42,17 @@ export async function POST(req: Request) {
       .limit(1);
     if (l) await pushAktivitas({ jenis: "dukung", nama: l.nama, id: listingId });
   } catch (err) {
-    back.searchParams.set("sorak", err instanceof SorakError ? "gagal" : "error");
+    const res = fail(err instanceof SorakError ? "gagal" : "error");
+    if (setCookie) res.cookies.set(ANON_COOKIE, signAnon(anonId), anonCookieOptions);
+    return res;
   }
-  back.hash = "kaki-tiang";
 
-  const res = NextResponse.redirect(back, { status: 303 });
+  const back = new URL("/", req.url);
+  back.searchParams.set("sorak", "ok");
+  back.hash = "kaki-tiang";
+  const res = wantsJson
+    ? NextResponse.json({ ok: true })
+    : NextResponse.redirect(back, { status: 303 });
   if (setCookie) res.cookies.set(ANON_COOKIE, signAnon(anonId), anonCookieOptions);
   return res;
 }
