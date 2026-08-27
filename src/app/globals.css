@@ -91,11 +91,30 @@ body {
 .reveal-pop { opacity: 0; animation: puncak-pop 0.6s var(--ease-panjat) forwards; }
 .reveal-wave { animation: puncak-wave 0.8s var(--ease-panjat) 1s; }
 
+/* Spotlight ticker (running text) — duplicated track scrolls by half its width. */
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.ticker-track {
+  animation: ticker 45s linear infinite;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+  .ticker-track {
+    animation: none;
   }
 }

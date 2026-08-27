@@ -30,15 +30,20 @@ export default async function Home() {
     listCategories(db),
   ]);
 
+  const spotlightItems = entries.map((e) => ({ id: e.id, nama: e.nama, pegangan: e.pegangan }));
+
   return (
-    <PageShell manjatKategori={kats}>
+    <PageShell
+      manjatKategori={kats}
+      topbar={spotlightItems.length > 0 ? <Spotlight items={spotlightItems} /> : undefined}
+    >
       {/* HERO — value + the one action */}
       <section className="pt-2 pb-8">
         <h1
           className="font-display text-5xl font-bold leading-[0.95] text-tinta sm:text-6xl"
           style={{ fontStretch: "130%" }}
         >
-          Sekuat peganganmu.
+          Panjat tenar? Di sini aja.
         </h1>
         <p className="mt-4 max-w-xl text-lg text-tinta-redup">
           Pegangan paling kuat duduk paling atas. Tiangnya licin — yang berhenti manjat, merosot.
@@ -84,11 +89,10 @@ export default async function Home() {
         <CaraMain />
       </section>
 
-      {/* SEKUNDER — ritual & sorotan */}
+      {/* SEKUNDER — ritual */}
       {entries.length > 0 && (
-        <div className="mt-14 flex flex-col gap-8">
+        <div className="mt-14">
           <TebakJuara status={tebak} />
-          <Spotlight items={entries.map((e) => ({ id: e.id, nama: e.nama, pegangan: e.pegangan }))} />
         </div>
       )}
     </PageShell>
