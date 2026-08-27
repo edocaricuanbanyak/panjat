@@ -142,7 +142,31 @@ export const copy = {
   },
 
   hariIni: {
+    judul: "Papan Hari Ini",
     sub: "Hanya pegangan yang dibayar sejak tengah malam. Uang kemarin tidak berlaku — siapa pun dengan Rp20.000 punya peluang jadi juara. Reset 00:00 WIB.",
+    metaTitle: "Papan Hari Ini — Panjat",
+    metaDesc: "Papan yang reset tiap tengah malam WIB. Siapa pun bisa juara hari ini.",
+  },
+
+  statistik: {
+    judul: "Statistik",
+    sub: "Angka publik, bersumber data first-party.",
+    metaTitle: "Statistik — Panjat",
+    metaDesc: "Angka publik Panjat: pengunjung online, total pengunjung, klik, pegangan.",
+    online: "Online sekarang",
+    totalPengunjung: "Total pengunjung",
+    sponsor: "Sponsor aktif",
+    klik: "Klik terkirim",
+    pegangan: "Total pegangan dibayar",
+    hari: "Hari diarsipkan",
+  },
+
+  arsip: {
+    judul: "Arsip Juara",
+    sub: "Posisi disewa, tapi sejarah permanen. Setiap juara harian tersimpan selamanya.",
+    metaTitle: "Arsip Juara — Panjat",
+    metaDesc: "Setiap juara harian, tersimpan permanen.",
+    kosong: "Belum ada juara yang diarsipkan.",
   },
 
   pasangGratis: {

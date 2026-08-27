@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import { desc, eq } from "drizzle-orm";
 import { LogoTile } from "@/components/LogoTile";
 import { PageShell } from "@/components/PageShell";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { juaraHarian, listing } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Arsip Juara — Panjat",
-  description: "Setiap juara harian, tersimpan permanen.",
+  title: copy.arsip.metaTitle,
+  description: copy.arsip.metaDesc,
 };
 
 export default async function ArsipPage() {
@@ -26,14 +27,12 @@ export default async function ArsipPage() {
         className="font-display text-3xl font-bold text-tinta sm:text-4xl"
         style={{ fontStretch: "125%" }}
       >
-        Arsip Juara
+        {copy.arsip.judul}
       </h1>
-      <p className="mt-2 max-w-xl text-tinta-redup">
-        Posisi disewa, tapi sejarah permanen. Setiap juara harian tersimpan selamanya.
-      </p>
+      <p className="mt-2 max-w-xl text-tinta-redup">{copy.arsip.sub}</p>
 
       {rows.length === 0 ? (
-        <p className="mt-6 text-sm text-tinta-redup">Belum ada juara yang diarsipkan.</p>
+        <p className="mt-6 text-sm text-tinta-redup">{copy.arsip.kosong}</p>
       ) : (
         <ul className="mt-6 divide-y divide-garis">
           {rows.map((r) => (
