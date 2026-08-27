@@ -1,0 +1,76 @@
+import type { Metadata } from "next";
+import { JelajahCard } from "@/components/JelajahCard";
+import { Nav } from "@/components/Nav";
+import { db } from "@/db";
+import { listCategories, searchListings } from "@/domain/jelajah";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Jelajah — Panjat",
+  description: "Cari produk, tools, dan jasa buatan Indonesia di Panjat.",
+};
+
+export default async function JelajahPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
+  const query = (q ?? "").trim();
+  const [results, cats] = await Promise.all([
+    query ? searchListings(db, query) : Promise.resolve([]),
+    listCategories(db),
+  ]);
+
+  return (
+    <main className="mx-auto w-full max-w-2xl px-4 py-8">
+      <Nav active="jelajah" />
+      <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+        Jelajah
+      </h1>
+      <p className="mt-1 text-sm text-tinta-redup">
+        Cari berdasarkan relevansi — bukan siapa yang bayar paling banyak.
+      </p>
+
+      <form action="/jelajah" method="get" className="mt-4 flex gap-2">
+        <input
+          name="q"
+          defaultValue={query}
+          placeholder="cari AI tools, jasa, game…"
+          className="h-11 flex-1 rounded-md border border-garis bg-kertas-1 px-3 text-base text-tinta focus-visible:outline-2 focus-visible:outline-merah"
+        />
+        <button className="h-11 rounded-md bg-merah px-4 text-sm font-medium text-kertas-1">
+          Cari
+        </button>
+      </form>
+
+      {query ? (
+        results.length === 0 ? (
+          <p className="mt-6 text-sm text-tinta-redup">Tidak ada hasil untuk “{query}”.</p>
+        ) : (
+          <div className="mt-6 flex flex-col gap-2">
+            {results.map((c) => (
+              <JelajahCard key={c.id} card={c} asal="pencarian" />
+            ))}
+          </div>
+        )
+      ) : (
+        <div className="mt-6">
+          <h2 className="mb-2 text-sm font-semibold text-tinta">Jelajahi per kategori</h2>
+          <div className="flex flex-wrap gap-2">
+            {cats.map((k) => (
+              <a
+                key={k.slug}
+                href={`/kategori/${k.slug}`}
+                className="inline-flex h-8 items-center rounded-full border border-garis bg-kertas-1 px-3 text-sm text-tinta-redup hover:bg-kertas-2"
+              >
+                {k.nama}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </main>
+  );
+}

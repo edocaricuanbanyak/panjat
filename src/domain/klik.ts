@@ -33,6 +33,8 @@ export interface RecordClickParams {
   ipHash: string;
   uaHash: string;
   referer: string | null;
+  /** Where the click came from: papan | jelajah | pencarian (R22). */
+  asal: string | null;
   isBot: boolean;
   now: Date;
 }
@@ -74,6 +76,7 @@ export async function recordClick(
       ipHash: p.ipHash,
       uaHash: p.uaHash,
       referer: p.referer,
+      asal: p.asal,
       valid,
     });
 

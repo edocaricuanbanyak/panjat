@@ -1,0 +1,1 @@
+ALTER TABLE "klik" ADD COLUMN "asal" text;

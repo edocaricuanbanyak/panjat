@@ -1,6 +1,7 @@
 import { BoardLive } from "@/components/BoardLive";
 import { buttonClasses } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
+import { Nav } from "@/components/Nav";
 import { TiangRail } from "@/components/TiangRail";
 import { db } from "@/db";
 import { getBoard } from "@/domain/board";
@@ -15,6 +16,7 @@ export default async function Home() {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8">
+      <Nav active="papan" />
       <header>
         <div className="flex items-end justify-between gap-4">
           <div>

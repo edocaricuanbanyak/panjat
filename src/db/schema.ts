@@ -139,6 +139,7 @@ export const klik = pgTable("klik", {
   ipHash: text("ip_hash"), // salted, daily-rotated — never raw
   uaHash: text("ua_hash"),
   referer: text("referer"),
+  asal: text("asal"), // origin: papan | jelajah | pencarian (R22)
   valid: boolean("valid").notNull().default(true),
 });
 

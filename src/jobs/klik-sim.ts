@@ -31,6 +31,7 @@ async function click(listingId: string, ip: string, ua: string, now: Date) {
     ipHash: hashWith(ip, salt),
     uaHash: hashWith(ua, salt),
     referer: null,
+    asal: "papan",
     isBot: isBot(ua),
     now,
   });

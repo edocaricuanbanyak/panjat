@@ -17,6 +17,7 @@
     "moderate:run": "tsx src/jobs/moderate.ts",
     "moderasi:sim": "tsx src/jobs/moderasi-sim.ts",
     "notifikasi:sim": "tsx src/jobs/notifikasi-sim.ts",
+    "jelajah:sim": "tsx src/jobs/jelajah-sim.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

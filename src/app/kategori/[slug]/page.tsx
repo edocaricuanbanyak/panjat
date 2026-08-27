@@ -1,0 +1,95 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { eq } from "drizzle-orm";
+import { JelajahCard } from "@/components/JelajahCard";
+import { LogoTile } from "@/components/LogoTile";
+import { Nav } from "@/components/Nav";
+import { db } from "@/db";
+import { kategori } from "@/db/schema";
+import { categoryDirectory, KATEGORI_INTRO, parseSort, SORT_LABELS, type Sort } from "@/domain/jelajah";
+
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const [kat] = await db.select({ nama: kategori.nama }).from(kategori).where(eq(kategori.slug, slug)).limit(1);
+  if (!kat) return { title: "Kategori — Panjat" };
+  return {
+    title: `${kat.nama} — Panjat`,
+    description: KATEGORI_INTRO[slug] ?? `Direktori ${kat.nama} di Panjat.`,
+  };
+}
+
+const SORTS: Sort[] = ["terbaru", "klik", "sorak"];
+
+export default async function KategoriPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ sort?: string }>;
+}) {
+  const [{ slug }, { sort }] = await Promise.all([params, searchParams]);
+  const active = parseSort(sort);
+  const dir = await categoryDirectory(db, slug, active);
+  if (!dir) notFound();
+
+  return (
+    <main className="mx-auto w-full max-w-2xl px-4 py-8">
+      <Nav active="jelajah" />
+      <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+        {dir.kategori.nama}
+      </h1>
+      {dir.kategori.intro && <p className="mt-1 text-sm text-tinta-redup">{dir.kategori.intro}</p>}
+
+      {dir.champion && (
+        <div className="mt-4 flex items-center gap-3 rounded-lg border border-merah/40 bg-merah/5 p-3">
+          <LogoTile nama={dir.champion.nama} />
+          <div className="min-w-0">
+            <p className="font-mono text-xs text-merah">Juara kategori</p>
+            <a
+              href={`/k/${dir.champion.id}?asal=jelajah`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block truncate font-display font-semibold text-tinta hover:text-merah"
+            >
+              {dir.champion.nama}
+            </a>
+          </div>
+          <a href="/" className="ml-auto shrink-0 font-mono text-xs text-tinta-redup hover:text-tinta">
+            di papan →
+          </a>
+        </div>
+      )}
+
+      {/* Explicit, visible ordering — no hidden "smart" sort (R22). */}
+      <div className="mt-6 flex flex-wrap gap-2">
+        {SORTS.map((s) => (
+          <a
+            key={s}
+            href={`/kategori/${slug}?sort=${s}`}
+            className={`inline-flex h-8 items-center rounded-full border px-3 text-xs ${
+              s === active ? "border-tinta bg-tinta text-kertas-1" : "border-garis bg-kertas-1 text-tinta-redup"
+            }`}
+          >
+            {SORT_LABELS[s]}
+          </a>
+        ))}
+      </div>
+
+      {dir.items.length === 0 ? (
+        <p className="mt-6 text-sm text-tinta-redup">Belum ada listing di kategori ini.</p>
+      ) : (
+        <div className="mt-4 flex flex-col gap-2">
+          {dir.items.map((c) => (
+            <JelajahCard key={c.id} card={c} asal="jelajah" />
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}

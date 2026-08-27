@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { listing } from "@/db/schema";
 import { isBot, recordClick, withUtm } from "@/domain/klik";
+import { parseAsal } from "@/domain/jelajah";
 import { clientIp, dailySalt, hashWith } from "@/lib/ip";
 
 export const runtime = "nodejs";
@@ -37,6 +38,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ listing: string
       ipHash: hashWith(clientIp(req.headers), salt),
       uaHash: hashWith(ua, salt),
       referer: req.headers.get("referer"),
+      asal: parseAsal(new URL(req.url).searchParams.get("asal")),
       isBot: isBot(ua),
       now,
     });

@@ -40,12 +40,15 @@ export function ListingCard({
       />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <h3
-            className={`truncate font-display font-semibold text-tinta ${puncak ? "text-xl" : "text-base"}`}
+          <a
+            href={`/k/${entry.id}?asal=papan`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`truncate font-display font-semibold text-tinta hover:text-merah ${puncak ? "text-xl" : "text-base"}`}
             style={{ fontStretch: `${wdth}%` }}
           >
             {entry.nama}
-          </h3>
+          </a>
           {entry.kategoriNama && (
             <span className="hidden sm:inline">
               <CategoryChip label={entry.kategoriNama} />
