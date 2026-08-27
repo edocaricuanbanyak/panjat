@@ -7,7 +7,8 @@
  */
 import { count, desc, eq, gte, sql } from "drizzle-orm";
 import type { Database } from "@/db";
-import { klikHarian, listing, peganganLedger, posisiSnapshot } from "@/db/schema";
+import { klikHarian, listing, peganganLedger } from "@/db/schema";
+import { visitorStats } from "@/lib/presence";
 
 export interface Statistik {
   /** Grip currently holding #1 — the live "price of the summit". */
@@ -24,6 +25,10 @@ export interface Statistik {
   sponsor: number;
   /** Number of times #1 changed hands in the last 7 days. */
   puncakBerganti: number;
+  /** Visitors online right now. */
+  online: number;
+  /** All-time unique visitors (reach). */
+  totalPengunjung: number;
 }
 
 export async function getStatistik(db: Database): Promise<Statistik> {
@@ -73,6 +78,7 @@ export async function getStatistik(db: Database): Promise<Statistik> {
   const klik7hari = Number(klik7.n);
   const totalKlik = Number(klikTotal.n);
   const totalBayar = Number(bayar.n);
+  const visitor = await visitorStats();
 
   return {
     hargaPuncak: Number(puncak?.p ?? 0),
@@ -82,5 +88,7 @@ export async function getStatistik(db: Database): Promise<Statistik> {
     cpc: totalKlik > 0 ? Math.round(totalBayar / totalKlik) : 0,
     sponsor: sponsor.n,
     puncakBerganti: Number(berganti.rows?.[0]?.n ?? 0),
+    online: visitor.online,
+    totalPengunjung: visitor.total,
   };
 }

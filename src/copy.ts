@@ -206,6 +206,10 @@ export const copy = {
     sponsorSub: "sedang tayang di papan",
     puncakBerganti: "Puncak berganti (7 hari)",
     puncakBergantiSub: "makin sering = makin kontestabel",
+    pengunjung: "Total pengunjung",
+    pengunjungSub: "jangkauan sejak awal",
+    online: "Online sekarang",
+    onlineSub: "lagi lihat papan",
   },
 
   arsip: {

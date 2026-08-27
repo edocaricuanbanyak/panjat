@@ -61,6 +61,16 @@ export default async function StatistikPage() {
           value={String(s.puncakBerganti)}
           sub={copy.statistik.puncakBergantiSub}
         />
+        <StatTile
+          label={copy.statistik.pengunjung}
+          value={s.totalPengunjung.toLocaleString("id-ID")}
+          sub={copy.statistik.pengunjungSub}
+        />
+        <StatTile
+          label={copy.statistik.online}
+          value={String(s.online)}
+          sub={copy.statistik.onlineSub}
+        />
       </div>
     </PageShell>
   );
