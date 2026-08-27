@@ -39,13 +39,11 @@ export function JelajahPanel({ items, categories }: { items: Card[]; categories:
 
   return (
     <div>
-      <p className="text-tinta-redup">{copy.jelajah.sub}</p>
-
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder={copy.jelajah.cariPlaceholder}
-        className={`${fieldClasses} mt-4`}
+        className={fieldClasses}
       />
 
       {/* Selectable category chips */}

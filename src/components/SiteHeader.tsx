@@ -1,11 +1,10 @@
 import { copy } from "@/copy";
 import { Logomark } from "./Logomark";
-import { ManjatButton } from "./ManjatModal";
 
 /**
- * Minimal global chrome (editorial IA): wordmark + the one action. Product doors
- * (Sekarang/Hari Ini/Jelajah) live in BoardTabs within the board area, not here —
- * the header stays a single, calm line on every page.
+ * Minimal global chrome: wordmark + top-level menu (Leaderboard, Statistik).
+ * The Manjat action lives in the hero and on every board row (Salip), so the
+ * header stays a calm nav line on every page.
  */
 export function SiteHeader() {
   return (
@@ -18,7 +17,14 @@ export function SiteHeader() {
         <Logomark className="size-5" />
         {copy.merek.nama}
       </a>
-      <ManjatButton size="sm">{copy.nav.manjat}</ManjatButton>
+      <nav className="flex items-center gap-4 font-display text-sm font-semibold">
+        <a href="/" className="text-tinta-redup hover:text-tinta">
+          {copy.nav.leaderboard}
+        </a>
+        <a href="/statistik" className="text-tinta-redup hover:text-tinta">
+          {copy.nav.statistik}
+        </a>
+      </nav>
     </header>
   );
 }

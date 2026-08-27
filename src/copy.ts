@@ -22,6 +22,8 @@ export const copy = {
     hariIni: "Hari Ini",
     jelajah: "Jelajah",
     manjat: "Manjat",
+    leaderboard: "Leaderboard",
+    statistik: "Statistik",
   },
 
   beranda: {
@@ -168,7 +170,6 @@ export const copy = {
   },
 
   jelajah: {
-    sub: "Cari berdasarkan relevansi — bukan siapa yang bayar paling banyak.",
     cariPlaceholder: "cari AI tools, jasa, game…",
     semua: "Semua",
     kosong: "Tidak ada listing yang cocok. Coba kata kunci atau kategori lain.",

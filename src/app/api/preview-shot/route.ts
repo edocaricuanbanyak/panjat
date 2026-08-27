@@ -27,7 +27,7 @@ export async function GET(req: Request) {
   return new Response(new Uint8Array(buf), {
     status: 200,
     headers: {
-      "content-type": "image/jpeg",
+      "content-type": "image/webp",
       // Short-lived: fine to re-capture on a later visit; keeps it out of shared caches.
       "cache-control": "private, max-age=600",
     },

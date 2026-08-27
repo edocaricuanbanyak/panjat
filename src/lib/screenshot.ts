@@ -8,19 +8,17 @@
  * browser installed) returns null so the listing goes live without a screenshot
  * and the UI falls back to og:image → logo. Never blocks payment or publishing.
  *
- * Storage here is local (`public/screenshots`) for dev; production should swap
- * `store()` for object storage + CDN. Output is JPEG (~100–200KB); WebP needs a
- * transcoder (sharp) — a follow-up.
+ * Output is WebP (~80–160KB, transcoded with sharp). Storage is Vercel Blob in
+ * production (BLOB_READ_WRITE_TOKEN) or the local `public/screenshots` dir in dev
+ * — see lib/storage.
  */
 import dns from "node:dns/promises";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { isPrivateIp } from "./ssrf";
+import { storeScreenshot } from "./storage";
 
 const VIEWPORT = { width: 1200, height: 800 };
 const NAV_TIMEOUT_MS = 15_000;
 const SOCIAL = /^(x\.com|twitter\.com|instagram\.com|tiktok\.com|facebook\.com)\//i;
-const STORE_DIR = path.join(process.cwd(), "public", "screenshots");
 
 /** Resolve the host and reject if ANY address is private/link-local/metadata. */
 async function hostIsSafe(hostname: string): Promise<boolean> {
@@ -82,10 +80,15 @@ export async function capture(url: string): Promise<Buffer | null> {
       .catch(() => null);
     if (!resp || !resp.ok()) return null;
 
-    // Let above-the-fold settle, then snap the viewport.
+    // Let above-the-fold settle, then snap the viewport and transcode to WebP.
     await page.waitForTimeout(1200);
-    const buf = await page.screenshot({ type: "jpeg", quality: 72, fullPage: false });
-    return buf;
+    const jpeg = await page.screenshot({ type: "jpeg", quality: 82, fullPage: false });
+    try {
+      const { default: sharp } = await import("sharp");
+      return await sharp(jpeg).webp({ quality: 72 }).toBuffer();
+    } catch {
+      return null; // no transcoder → skip (UI falls back to logo)
+    }
   } catch {
     return null;
   } finally {
@@ -93,15 +96,9 @@ export async function capture(url: string): Promise<Buffer | null> {
   }
 }
 
-/** Capture + persist for a listing. Returns the public URL, or null. */
+/** Capture + persist for a listing (own storage/CDN). Returns the URL, or null. */
 export async function captureAndStore(listingId: string, url: string): Promise<string | null> {
   const buf = await capture(url);
   if (!buf) return null;
-  try {
-    await mkdir(STORE_DIR, { recursive: true });
-    await writeFile(path.join(STORE_DIR, `${listingId}.jpg`), buf);
-    return `/screenshots/${listingId}.jpg`;
-  } catch {
-    return null;
-  }
+  return storeScreenshot(listingId, buf);
 }

@@ -27,11 +27,8 @@ export default async function JelajahPage({
   return (
     <PageShell>
       <BoardTabs active="jelajah" className="mb-5" />
-      <p className="text-tinta-redup">
-        Cari berdasarkan relevansi — bukan siapa yang bayar paling banyak.
-      </p>
 
-      <form action="/jelajah" method="get" className="mt-4 flex gap-2">
+      <form action="/jelajah" method="get" className="flex gap-2">
         <input
           name="q"
           defaultValue={query}
