@@ -9,6 +9,7 @@ import { listing, peganganLedger, posisiSnapshot } from "@/db/schema";
 import { loadRosotConfig } from "./config";
 import { BOARD_LOCK_KEY } from "./constants";
 import { appendLedger } from "./ledger";
+import { detectDrops, type Drop } from "./notifikasi";
 import { computeRanks } from "./ranking";
 import { dailyRateForRank, decayGripOneHour } from "./rosot";
 
@@ -17,6 +18,8 @@ export interface RosotRunResult {
   skipped: boolean;
   listings: number;
   totalDecayed: number;
+  /** Listings that fell out of a threshold this run (R3 detection). */
+  drops: Drop[];
 }
 
 /** Truncate to the top of the hour in UTC — the run's identity and snapshot time. */
@@ -42,7 +45,7 @@ export async function applyHourlyRosot(db: Database, now: Date): Promise<RosotRu
       .where(eq(peganganLedger.ref, ref))
       .limit(1);
     if (already.length > 0) {
-      return { ref, skipped: true, listings: 0, totalDecayed: 0 };
+      return { ref, skipped: true, listings: 0, totalDecayed: 0, drops: [] };
     }
 
     const cfg = await loadRosotConfig(tx);
@@ -98,6 +101,11 @@ export async function applyHourlyRosot(db: Database, now: Date): Promise<RosotRu
       );
     }
 
-    return { ref, skipped: false, listings: rows.length, totalDecayed };
+    // Decay-driven overtakes: who fell out of a threshold this hour (R3).
+    const preMap = new Map(preRanked.map(({ rank, listing: l }) => [l.id, rank]));
+    const postMap = new Map(postRanked.map(({ rank, listing: l }) => [l.id, rank]));
+    const drops = detectDrops(preMap, postMap, cfg.ambang);
+
+    return { ref, skipped: false, listings: rows.length, totalDecayed, drops };
   });
 }

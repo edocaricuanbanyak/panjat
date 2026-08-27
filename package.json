@@ -16,6 +16,7 @@
     "klik:sim": "tsx src/jobs/klik-sim.ts",
     "moderate:run": "tsx src/jobs/moderate.ts",
     "moderasi:sim": "tsx src/jobs/moderasi-sim.ts",
+    "notifikasi:sim": "tsx src/jobs/notifikasi-sim.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

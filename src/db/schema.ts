@@ -71,6 +71,8 @@ export const sponsorKontak = pgTable("sponsor_kontak", {
   email: text("email"),
   wa: text("wa"),
   verifiedAt: timestamp("verified_at", { withTimezone: true }),
+  // Unsubscribe from "kamu disalip" notifications (R3).
+  notifOptOut: boolean("notif_opt_out").notNull().default(false),
   createdAt: createdAt(),
 });
 

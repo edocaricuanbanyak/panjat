@@ -1,15 +1,22 @@
 /** CLI: apply this hour's rosot once. Wire to an hourly scheduler in prod. */
 import { db, pool } from "@/db";
+import { notifyDrops } from "@/domain/notifikasi";
 import { applyHourlyRosot } from "@/domain/rosot-run";
 
 async function main() {
-  const res = await applyHourlyRosot(db, new Date());
+  const now = new Date();
+  const res = await applyHourlyRosot(db, now);
   if (res.skipped) {
     console.log(`rosot: skipped, already ran for ${res.ref}`);
   } else {
     console.log(
       `rosot ${res.ref}: ${res.listings} listing(s), total decayed Rp${res.totalDecayed.toLocaleString("id-ID")}`,
     );
+    // Send "kamu disalip" notifications outside the board transaction (R3).
+    if (res.drops.length > 0) {
+      const n = await notifyDrops(db, res.drops, undefined, now);
+      console.log(`notifikasi disalip: ${n.sent} terkirim, ${n.suppressed} ditahan`);
+    }
   }
   await pool.end();
 }

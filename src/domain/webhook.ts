@@ -11,15 +11,18 @@ import {
   verifySignature,
   type MidtransNotification,
 } from "@/lib/midtrans";
+import { loadRosotConfig } from "./config";
 import { BOARD_LOCK_KEY } from "./constants";
 import { appendLedger, gripFromLedger } from "./ledger";
 import { screenListing } from "./moderasi";
+import { detectDrops, type Drop } from "./notifikasi";
+import { getRanking } from "./ranking";
 
 export type WebhookOutcome =
   | { status: "rejected"; reason: "bad_signature" | "unknown_order" }
   | { status: "ignored"; reason: "replay" | "pending" }
   | { status: "held"; reason: "amount_mismatch" }
-  | { status: "settled" }
+  | { status: "settled"; drops: Drop[] }
   | { status: "failed"; transactionStatus: string };
 
 const FAILURE_STATUSES = new Set(["expire", "cancel", "deny", "failure"]);
@@ -75,6 +78,10 @@ export async function applyNotification(
     const isSuccess = ts === "settlement" || (ts === "capture" && notif.fraud_status === "accept");
 
     if (isSuccess) {
+      // Board ranks before this payment — to detect who gets pushed down (R3).
+      const before = new Map(
+        (await getRanking(tx)).map((r) => [r.listing.id, r.rank]),
+      );
       // Grip enters the ledger; cache is re-derived from the ledger sum.
       await appendLedger(tx, {
         listingId: trx.listingId,
@@ -122,7 +129,10 @@ export async function applyNotification(
           orderId: notif.order_id,
         });
       }
-      return { status: "settled" };
+      // Ranks after the payment + screen; who fell out of a threshold (R3).
+      const cfg = await loadRosotConfig(tx);
+      const after = new Map((await getRanking(tx)).map((r) => [r.listing.id, r.rank]));
+      return { status: "settled", drops: detectDrops(before, after, cfg.ambang) };
     }
 
     if (FAILURE_STATUSES.has(ts)) {

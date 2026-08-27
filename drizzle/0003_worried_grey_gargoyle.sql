@@ -1,0 +1,1 @@
+ALTER TABLE "sponsor_kontak" ADD COLUMN "notif_opt_out" boolean DEFAULT false NOT NULL;
