@@ -3,7 +3,7 @@ import { Tabs } from "./Tabs";
 type Tab = "sekarang" | "hari-ini" | "jelajah";
 
 const ITEMS = [
-  { key: "sekarang", href: "/", label: "Sekarang" },
+  { key: "sekarang", href: "/", label: "Sepanjang Masa" },
   { key: "hari-ini", href: "/hari-ini", label: "Hari Ini" },
   { key: "jelajah", href: "/jelajah", label: "Jelajah" },
 ];
