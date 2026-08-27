@@ -58,13 +58,14 @@ export function BoardLive({
     <div className="flex flex-1 flex-col gap-4">
       {/* Board updates must not be read row-by-row (R20-e). */}
       <div aria-live="off">
-        {/* Summit zone — the top three each get their own rank-tinted card. */}
-        <section className="grid gap-3">
+        {/* Summit zone — the top three each get their own rank-tinted card;
+            auto-rows-fr keeps all three the same height regardless of content. */}
+        <section className="grid auto-rows-fr gap-3">
           {puncak.map((e) => (
             <div
               key={e.id}
               style={{ viewTransitionName: `vt-${e.id}` } as React.CSSProperties}
-              className={`rounded-2xl border shadow-kartu ${
+              className={`h-full rounded-2xl border shadow-kartu ${
                 e.rank === 1 ? "podium-1" : e.rank === 2 ? "podium-2" : "podium-3"
               }`}
             >
