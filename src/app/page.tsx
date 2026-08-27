@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { HeroManjat } from "@/components/HeroManjat";
 import { KakiTiang } from "@/components/KakiTiang";
 import { ListingCard } from "@/components/ListingCard";
+import { JuaraKakiTiang } from "@/components/JuaraKakiTiang";
 import { PageShell } from "@/components/PageShell";
 import { Pagination } from "@/components/Pagination";
 import { PasangGratisModal } from "@/components/PasangGratisModal";
@@ -52,6 +53,7 @@ export default async function Home({
   const pageEntries = entries.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   const voteEntries = entries.map((e) => ({ id: e.id, nama: e.nama }));
+  const juaraGratis = kakiTiang[0]; // top Kaki Tiang by dukungan (wildcard showcase)
 
   return (
     <PageShell
@@ -89,10 +91,14 @@ export default async function Home({
         {entries.length === 0 ? (
           <EmptyState title={copy.beranda.papanKosongJudul} message={copy.beranda.papanKosongPesan} />
         ) : page === 1 ? (
-          <BoardLive
-            initial={{ entries, max }}
-            middle={<VoteFavorit entries={voteEntries} leaderboard={favorit} myChoice={choice} />}
-          />
+          <>
+            <BoardLive
+              initial={{ entries, max }}
+              middle={<VoteFavorit entries={voteEntries} leaderboard={favorit} myChoice={choice} />}
+            />
+            {/* Top free listing rises here as a labelled wildcard — never a paid rank (R16). */}
+            {juaraGratis && juaraGratis.sorak > 0 && <JuaraKakiTiang entry={juaraGratis} />}
+          </>
         ) : (
           <div className="flex flex-col gap-2.5">
             {pageEntries.map((e) => (
