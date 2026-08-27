@@ -96,7 +96,12 @@ export const copy = {
     nominalTanya: "Mau bayar berapa? Posisi dihitung otomatis.",
     nominalNaik: "Makin besar bayarannya, makin tinggi posisimu. Minimal Rp1.000.",
     diPosisi: "Kamu akan di posisi",
-    ketikNominal: "Ketik nominal untuk lihat posisimu.",
+    ketikNominal: "Ketik nominal untuk lihat posisimu di papan.",
+    kamuBadge: "kamu",
+    listingKamu: "Listing kamu",
+    salipTambah: (extra: string, rank: number) => `Tambah ${extra} → salip #${rank}`,
+    jadiPuncak: "🚩 Kamu jadi #1 — puncak!",
+    papanPratinjau: "Posisimu di papan",
     posisiRingkas: (bayar: string, rosot: string, estimasiHari: number | null) =>
       `Bayar ${bayar} · merosot ~${rosot}/hari · ` +
       (estimasiHari === null ? "stabil (kaki tiang)" : `bertahan ~${estimasiHari} hari`),

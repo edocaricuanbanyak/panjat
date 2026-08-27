@@ -60,6 +60,13 @@ export function nominalForTarget(
   return Math.max(minNaik, needed);
 }
 
+export interface QuoteNeighbor {
+  nama: string;
+  pegangan: number;
+  /** Display rank in the projected board (after you slot in). */
+  rank: number;
+}
+
 export interface Quote {
   nominal: number;
   /** Rank this grip would take right now. */
@@ -67,6 +74,14 @@ export interface Quote {
   rosotPerHari: number;
   /** Whole days it would hold that position under self-decay; null if it never decays. */
   estimasiHari: number | null;
+  /** Up to 2 listings directly above you (they keep their rank). */
+  atas: QuoteNeighbor[];
+  /** Up to 2 listings you'd push below you (their new rank). */
+  bawah: QuoteNeighbor[];
+  /** The listing directly above + the extra rupiah to overtake it; null at #1. */
+  salipAtas: { nama: string; rank: number; extra: number } | null;
+  /** Total listings currently on the paid board. */
+  totalPapan: number;
 }
 
 /**
@@ -95,11 +110,34 @@ export async function quote(
   const threshold = Math.max(gripsDesc[rank - 1] ?? 0, manjatCfg.minimumNaik);
   const hari = estimateDaysToThreshold(nominal, rate, threshold);
 
+  // Board window around where you slot in (for the live-board preview). Listings
+  // above keep their rank; the ones you pass drop by one.
+  const nb = (r: number, displayRank: number): QuoteNeighbor | null => {
+    const item = ranking[r - 1];
+    return item
+      ? { nama: item.listing.nama, pegangan: item.listing.peganganCached, rank: displayRank }
+      : null;
+  };
+  const atas = [nb(rank - 2, rank - 2), nb(rank - 1, rank - 1)].filter(
+    (x): x is QuoteNeighbor => x !== null,
+  );
+  const bawah = [nb(rank, rank + 1), nb(rank + 1, rank + 2)].filter(
+    (x): x is QuoteNeighbor => x !== null,
+  );
+  const above = ranking[rank - 2]?.listing;
+  const salipAtas = above
+    ? { nama: above.nama, rank: rank - 1, extra: Math.max(1, above.peganganCached + 1 - nominal) }
+    : null;
+
   return {
     nominal,
     rank,
     rosotPerHari: Math.round(nominal * rate),
     estimasiHari: Number.isFinite(hari) ? hari : null,
+    atas,
+    bawah,
+    salipAtas,
+    totalPapan: ranking.length,
   };
 }
 

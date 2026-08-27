@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import { Dropdown } from "@/components/Dropdown";
 import { Input, textareaClasses } from "@/components/Input";
-import { MiniTiang } from "@/components/MiniTiang";
 import { Steps } from "@/components/Steps";
 import { copy } from "@/copy";
 import type { Quote } from "@/domain/manjat";
@@ -25,8 +24,48 @@ async function postManjat(payload: unknown) {
   return data;
 }
 
-function markerHeight(rank: number): number {
-  return Math.min(0.95, Math.max(0.05, 1 - (rank - 1) / 12));
+/** One board row in the live position preview. */
+function BoardRow({
+  rank,
+  nama,
+  rp,
+  kamu,
+}: {
+  rank: number;
+  nama: string;
+  rp: number;
+  kamu?: boolean;
+}) {
+  return (
+    <div className={`flex items-center gap-3 px-3 py-2 ${kamu ? "bg-merah/8" : ""}`}>
+      <span
+        className={`w-8 shrink-0 font-mono tabular text-sm font-semibold ${
+          kamu ? "text-merah-teks" : "text-tinta-redup"
+        }`}
+      >
+        #{rank}
+      </span>
+      <span className="flex min-w-0 flex-1 items-center gap-1.5">
+        <span
+          className={`truncate ${kamu ? "font-display font-semibold text-tinta" : "text-sm text-tinta"}`}
+        >
+          {nama}
+        </span>
+        {kamu && (
+          <span className="shrink-0 rounded bg-merah px-1.5 py-0.5 text-[10px] font-semibold uppercase leading-none text-kertas-1">
+            {copy.manjat.kamuBadge}
+          </span>
+        )}
+      </span>
+      <span
+        className={`shrink-0 font-mono tabular text-sm ${
+          kamu ? "font-semibold text-tinta" : "text-tinta-redup"
+        }`}
+      >
+        {formatRupiah(rp)}
+      </span>
+    </div>
+  );
 }
 
 export function ManjatWizard({
@@ -281,33 +320,62 @@ export function ManjatWizard({
             <p className="mt-1.5 text-xs text-tinta-redup">{copy.manjat.nominalNaik}</p>
           </div>
 
-          {/* Auto result — the resulting position is the anchor here. */}
-          <div className="flex items-center gap-4 rounded-xl border border-garis bg-kertas-1 p-4">
-            <MiniTiang height={quote ? markerHeight(quote.rank) : 0.05} />
-            <div className="min-w-0 flex-1">
-              {loadingQuote && !quote ? (
-                <p className="text-sm text-tinta-redup">{copy.manjat.menghitung}</p>
-              ) : quote ? (
-                <>
-                  <p className="text-xs uppercase tracking-wide text-tinta-redup">
-                    {copy.manjat.diPosisi}
-                  </p>
-                  <p className="font-mono tabular text-4xl font-bold leading-tight text-tinta">
-                    #{quote.rank}
-                  </p>
-                  <p className="mt-1 font-mono tabular text-xs text-tinta-redup">
-                    {copy.manjat.posisiRingkas(
-                      formatRupiah(quote.nominal),
-                      formatRupiah(quote.rosotPerHari),
-                      quote.estimasiHari,
+          {/* Live board — you slot in among real competitors as you set the amount. */}
+          {quote ? (
+            <div className="flex flex-col gap-3">
+              <div className="divide-y divide-garis/50 overflow-hidden rounded-xl border border-garis bg-kertas-1">
+                <p className="px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide text-tinta-redup">
+                  {copy.manjat.papanPratinjau}
+                </p>
+                {quote.atas.map((n) => (
+                  <BoardRow key={`a${n.rank}`} rank={n.rank} nama={n.nama} rp={n.pegangan} />
+                ))}
+                {/* KAMU — re-keyed on rank so it re-animates when you move. */}
+                <div key={quote.rank} className="manjat-slot">
+                  <BoardRow rank={quote.rank} nama={nama || host} rp={quote.nominal} kamu />
+                </div>
+                {quote.bawah.map((n) => (
+                  <BoardRow key={`b${n.rank}`} rank={n.rank} nama={n.nama} rp={n.pegangan} />
+                ))}
+              </div>
+
+              {quote.salipAtas ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setNominalInput(String(quote.nominal + (quote.salipAtas?.extra ?? 0)))
+                  }
+                  className="flex items-center justify-between gap-2 rounded-xl border border-merah/40 bg-merah/8 px-3 py-2 text-left text-sm text-merah-teks transition ease-panjat hover:bg-merah/12 active:scale-[0.99]"
+                >
+                  <span className="font-medium">
+                    {copy.manjat.salipTambah(
+                      formatRupiah(quote.salipAtas.extra),
+                      quote.salipAtas.rank,
                     )}
-                  </p>
-                </>
+                  </span>
+                  <span className="shrink-0 truncate font-mono text-xs opacity-80">
+                    {quote.salipAtas.nama}
+                  </span>
+                </button>
               ) : (
-                <p className="text-sm text-tinta-redup">{copy.manjat.ketikNominal}</p>
+                <p className="rounded-xl border border-emas/40 bg-emas/10 px-3 py-2 text-sm font-medium text-tinta">
+                  {copy.manjat.jadiPuncak}
+                </p>
               )}
+
+              <p className="text-center font-mono tabular text-xs text-tinta-redup">
+                {copy.manjat.posisiRingkas(
+                  formatRupiah(quote.nominal),
+                  formatRupiah(quote.rosotPerHari),
+                  quote.estimasiHari,
+                )}
+              </p>
             </div>
-          </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-garis bg-kertas-1 px-4 py-6 text-center text-sm text-tinta-redup">
+              {loadingQuote ? copy.manjat.menghitung : copy.manjat.ketikNominal}
+            </div>
+          )}
 
           <div className="flex gap-2">
             <Button variant="secondary" onClick={() => setStep(1)}>

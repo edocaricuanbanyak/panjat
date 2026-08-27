@@ -177,6 +177,15 @@ body {
   animation: dukung-plus 720ms var(--ease-panjat) forwards;
 }
 
+/* Live-board slot-in — the KAMU row settles into place when your rank changes. */
+@keyframes manjat-slot {
+  0% { opacity: 0; transform: translateY(-6px); background-color: color-mix(in srgb, var(--color-merah) 22%, transparent); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.manjat-slot {
+  animation: manjat-slot 260ms var(--ease-panjat);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
