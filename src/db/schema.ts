@@ -289,6 +289,25 @@ export const lencana = pgTable(
   (t) => [unique("lencana_listing_jenis").on(t.listingId, t.jenis)],
 );
 
+// Weekly champions archive — a snapshot the weekly cron writes at each week's
+// close: board #1/#2/#3 (by grip), the week's Terfavorit, and the Kaki Tiang
+// champion (most Sorak). One row per (week, kind). Feeds the archive page, the
+// featured showcase, and the weekly Instagram card.
+export const juaraMingguan = pgTable(
+  "juara_mingguan",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    minggu: date("minggu").notNull(), // WIB week-start (Monday)
+    jenis: text("jenis").notNull(), // papan1 | papan2 | papan3 | terfavorit | kaki_tiang
+    listingId: uuid("listing_id")
+      .notNull()
+      .references(() => listing.id),
+    metrik: bigint("metrik", { mode: "number" }).notNull().default(0), // grip | votes | sorak
+    createdAt: createdAt(),
+  },
+  (t) => [unique("juara_mingguan_minggu_jenis").on(t.minggu, t.jenis)],
+);
+
 // Reports & URL-ownership claims (R8 "tombol lapor", §18.6). Decided by a human.
 export const laporan = pgTable("laporan", {
   id: uuid("id").defaultRandom().primaryKey(),

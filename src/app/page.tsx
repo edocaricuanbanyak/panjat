@@ -19,7 +19,8 @@ import { db } from "@/db";
 import { getBoard } from "@/domain/board";
 import { jelajahAll, listCategories } from "@/domain/jelajah";
 import { getHariIni } from "@/domain/papan-hari-ini";
-import { getJuaraKakiTiangMingguan, getKakiTiang, sorakRemaining } from "@/domain/sorak";
+import { getJuaraKakiTiangArsip } from "@/domain/juara-mingguan";
+import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
 import { recentAktivitas } from "@/lib/aktivitas";
 import { currentAnon } from "@/lib/anon";
 import { favoritBoard, myFavoritToday } from "@/lib/favorit";
@@ -54,7 +55,7 @@ export default async function Home({
     jelajahItems,
   ] = await Promise.all([
     getKakiTiang(db),
-    getJuaraKakiTiangMingguan(db),
+    getJuaraKakiTiangArsip(db),
     sorakRemaining(db, anonId, now),
     listCategories(db),
     visitorStats(),
