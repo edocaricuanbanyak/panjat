@@ -2,9 +2,12 @@ import { BoardLive } from "@/components/BoardLive";
 import { buttonClasses } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
 import { Nav } from "@/components/Nav";
+import { TebakJuara } from "@/components/TebakJuara";
 import { TiangRail } from "@/components/TiangRail";
 import { db } from "@/db";
 import { getBoard } from "@/domain/board";
+import { guessStatus } from "@/domain/tebakan";
+import { currentAnon } from "@/lib/anon";
 import { formatRupiah } from "@/lib/format";
 
 // Reads the DB per request; also keeps it out of the build-time prerender.
@@ -13,6 +16,7 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const { entries, max } = await getBoard(db);
   const totalPegangan = entries.reduce((sum, e) => sum + e.pegangan, 0);
+  const tebak = await guessStatus(db, await currentAnon(), new Date());
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8">
@@ -43,6 +47,8 @@ export default async function Home() {
           Bayar untuk manjat · Tiangnya licin, semua merosot · Manjat lagi kalau mau bertahan
         </p>
       </header>
+
+      {entries.length > 0 && <TebakJuara status={tebak} />}
 
       {entries.length === 0 ? (
         <EmptyState title="Belum ada yang manjat." message="Tiangnya masih kinclong." />

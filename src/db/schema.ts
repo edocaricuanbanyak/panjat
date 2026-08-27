@@ -205,6 +205,16 @@ export const konfigurasi = pgTable("konfigurasi", {
 // --- Anonymous visitor / gamification (R14–R17) ---------------------------
 // Never touches money, paid ranking, or clicks (§7.5.2).
 
+// Archived daily champion — the answer Tebak Juara resolves against (R15).
+// Interim: main-board #1 at reset; switches to Papan Hari Ini's champion when R7 lands.
+export const juaraHarian = pgTable("juara_harian", {
+  tanggal: date("tanggal").primaryKey(),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listing.id),
+  createdAt: createdAt(),
+});
+
 export const pengunjungAnon = pgTable("pengunjung_anon", {
   id: uuid("id").defaultRandom().primaryKey(),
   createdAt: createdAt(),
