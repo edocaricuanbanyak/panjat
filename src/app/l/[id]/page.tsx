@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { buttonClasses } from "@/components/Button";
 import { LencanaRow } from "@/components/LencanaRow";
 import { ManjatButton } from "@/components/ManjatModal";
+import { copy } from "@/copy";
 import { LogoTile } from "@/components/LogoTile";
 import { PageShell } from "@/components/PageShell";
 import { Sparkline } from "@/components/Sparkline";
@@ -83,6 +84,17 @@ export default async function ListingPublikPage({
           Salip di papan
         </ManjatButton>
       </div>
+
+      {/* Site screenshot (R21) — own storage; absent → the logo above stands in. */}
+      {l.screenshotUrl && (
+        <img
+          src={l.screenshotUrl}
+          alt={copy.listing.pratinjauAlt(l.nama)}
+          width={1200}
+          height={800}
+          className="mt-6 w-full rounded-xl border border-garis shadow-kartu"
+        />
+      )}
 
       {l.riwayat.length >= 2 && (
         <section className="mt-6">

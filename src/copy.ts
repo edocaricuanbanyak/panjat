@@ -43,6 +43,10 @@ export const copy = {
     ["3", "Naik — lalu merosot", "Tiangnya licin, semua turun pelan. Manjat lagi kalau mau bertahan."],
   ] as const,
 
+  listing: {
+    pratinjauAlt: (nama: string) => `Pratinjau situs ${nama}`,
+  },
+
   papan: {
     aktivitas: "Aktivitas",
     juaraKakiTiang: "Juara Kaki Tiang · gratis",

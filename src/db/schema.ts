@@ -91,6 +91,9 @@ export const listing = pgTable("listing", {
     .default(0),
   kontakId: uuid("kontak_id").references(() => sponsorKontak.id),
   catatan: text("catatan"), // honest "seed" label etc. (R11)
+  // Site screenshot (R21) — own storage/CDN path; null falls back to og:image/logo.
+  screenshotUrl: text("screenshot_url"),
+  screenshotAt: timestamp("screenshot_at", { withTimezone: true }),
   createdAt: createdAt(),
 });
 

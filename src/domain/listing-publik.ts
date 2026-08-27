@@ -18,6 +18,7 @@ export interface ListingPublik {
   kategoriSlug: string | null;
   pegangan: number;
   rank: number | null;
+  screenshotUrl: string | null;
   badges: string[];
   riwayat: { jam: Date; rank: number }[];
   serupa: { id: string; nama: string; deskripsi: string | null }[];
@@ -32,6 +33,7 @@ export async function getListingPublik(db: Database, id: string): Promise<Listin
       urlNormal: listing.urlNormal,
       status: listing.status,
       pegangan: listing.peganganCached,
+      screenshotUrl: listing.screenshotUrl,
       kategoriId: listing.kategoriId,
       kategoriNama: kategori.nama,
       kategoriSlug: kategori.slug,
@@ -70,6 +72,7 @@ export async function getListingPublik(db: Database, id: string): Promise<Listin
     kategoriSlug: l.kategoriSlug,
     pegangan: l.pegangan,
     rank: momen?.rank ?? null,
+    screenshotUrl: l.screenshotUrl,
     badges: badges.get(id) ?? [],
     riwayat: riwayat.reverse(),
     serupa,
