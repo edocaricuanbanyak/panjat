@@ -218,6 +218,17 @@ export const copy = {
     metaTitle: "Arsip Juara — Panjat",
     metaDesc: "Setiap juara harian, tersimpan permanen.",
     kosong: "Belum ada juara yang diarsipkan.",
+    mingguanJudul: "Juara minggu ini",
+    mingguanPekan: (minggu: string) => `Pekan ${minggu}`,
+    unduhKartu: "Unduh kartu Instagram",
+    harianJudul: "Juara harian",
+    jenis: {
+      papan1: "Juara 1",
+      papan2: "Juara 2",
+      papan3: "Juara 3",
+      terfavorit: "Terfavorit",
+      kaki_tiang: "Juara Kaki Tiang",
+    } as Record<string, string>,
   },
 
   aturan: {
