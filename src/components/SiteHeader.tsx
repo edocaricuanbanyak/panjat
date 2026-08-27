@@ -1,4 +1,5 @@
 import { copy } from "@/copy";
+import { Logomark } from "./Logomark";
 import { ManjatButton } from "./ManjatModal";
 
 /**
@@ -11,9 +12,10 @@ export function SiteHeader() {
     <header className="flex items-center justify-between py-3">
       <a
         href="/"
-        className="font-display text-xl font-bold tracking-tight text-tinta"
+        className="flex items-center gap-1.5 font-display text-xl font-bold tracking-tight text-tinta"
         style={{ fontStretch: "125%" }}
       >
+        <Logomark className="size-5" />
         {copy.merek.nama}
       </a>
       <ManjatButton size="sm">{copy.nav.manjat}</ManjatButton>
