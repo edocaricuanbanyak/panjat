@@ -31,12 +31,36 @@ export default async function StatistikPage() {
       <p className="mt-2 text-tinta-redup">{copy.statistik.sub}</p>
 
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <StatTile label={copy.statistik.online} value={String(s.online)} />
-        <StatTile label={copy.statistik.totalPengunjung} value={s.totalPengunjung.toLocaleString("id-ID")} />
-        <StatTile label={copy.statistik.sponsor} value={String(s.sponsor)} />
-        <StatTile label={copy.statistik.klik} value={s.klikTerkirim.toLocaleString("id-ID")} />
-        <StatTile label={copy.statistik.pegangan} value={formatRupiah(s.totalPegangan)} />
-        <StatTile label={copy.statistik.hari} value={String(s.hariDiarsip)} />
+        <StatTile
+          label={copy.statistik.hargaPuncak}
+          value={formatRupiah(s.hargaPuncak)}
+          sub={copy.statistik.hargaPuncakSub}
+        />
+        <StatTile
+          label={s.hargaMasuk20 > 0 ? copy.statistik.hargaMasuk20 : copy.statistik.hargaMasuk20Terbuka}
+          value={s.hargaMasuk20 > 0 ? formatRupiah(s.hargaMasuk20) : "—"}
+          sub={s.hargaMasuk20 > 0 ? copy.statistik.hargaMasuk20Sub : copy.statistik.hargaMasuk20TerbukaSub}
+        />
+        <StatTile
+          label={copy.statistik.klik7}
+          value={s.klik7hari.toLocaleString("id-ID")}
+          sub={copy.statistik.klik7Sub(s.klikPerHari.toLocaleString("id-ID"))}
+        />
+        <StatTile
+          label={copy.statistik.cpc}
+          value={s.cpc > 0 ? formatRupiah(s.cpc) : "—"}
+          sub={copy.statistik.cpcSub}
+        />
+        <StatTile
+          label={copy.statistik.sponsor}
+          value={String(s.sponsor)}
+          sub={copy.statistik.sponsorSub}
+        />
+        <StatTile
+          label={copy.statistik.puncakBerganti}
+          value={String(s.puncakBerganti)}
+          sub={copy.statistik.puncakBergantiSub}
+        />
       </div>
     </PageShell>
   );

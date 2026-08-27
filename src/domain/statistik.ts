@@ -1,16 +1,29 @@
-/** Public stats (R22 "statistik publik") — honest, first-party counts. */
-import { count, eq, sql } from "drizzle-orm";
+/**
+ * Public stats aimed at a *calon pemanjat* (R22 "statistik publik") — honest,
+ * first-party numbers that answer the questions you weigh before paying: what
+ * does the summit cost, how much traffic gets delivered, how efficient is it,
+ * and how contestable is the board. All deterministic from the ledger/snapshots
+ * (no AI, no estimates on money paths).
+ */
+import { count, desc, eq, gte, sql } from "drizzle-orm";
 import type { Database } from "@/db";
-import { juaraHarian, klikHarian, listing, peganganLedger } from "@/db/schema";
-import { visitorStats } from "@/lib/presence";
+import { klikHarian, listing, peganganLedger, posisiSnapshot } from "@/db/schema";
 
 export interface Statistik {
+  /** Grip currently holding #1 — the live "price of the summit". */
+  hargaPuncak: number;
+  /** Grip at rank 20 — cost to enter the top-20 board; 0 if fewer than 20 tayang. */
+  hargaMasuk20: number;
+  /** Valid clicks delivered in the last 7 days. */
+  klik7hari: number;
+  /** Average clicks/day over that window (rounded). */
+  klikPerHari: number;
+  /** Rupiah paid per valid click, all-time (Σbayar / Σklik). */
+  cpc: number;
+  /** Listings currently tayang. */
   sponsor: number;
-  klikTerkirim: number;
-  totalPegangan: number;
-  hariDiarsip: number;
-  online: number;
-  totalPengunjung: number;
+  /** Number of times #1 changed hands in the last 7 days. */
+  puncakBerganti: number;
 }
 
 export async function getStatistik(db: Database): Promise<Statistik> {
@@ -18,22 +31,56 @@ export async function getStatistik(db: Database): Promise<Statistik> {
     .select({ n: count() })
     .from(listing)
     .where(eq(listing.status, "tayang"));
-  const [klik] = await db
+
+  // Summit price + top-20 entry: read the ranked tayang grips.
+  const [puncak] = await db
+    .select({ p: listing.peganganCached })
+    .from(listing)
+    .where(eq(listing.status, "tayang"))
+    .orderBy(desc(listing.peganganCached))
+    .limit(1);
+  const rank20 = await db
+    .select({ p: listing.peganganCached })
+    .from(listing)
+    .where(eq(listing.status, "tayang"))
+    .orderBy(desc(listing.peganganCached))
+    .offset(19)
+    .limit(1);
+
+  const [klik7] = await db
+    .select({ n: sql<number>`coalesce(sum(${klikHarian.jumlahValid}), 0)::int` })
+    .from(klikHarian)
+    .where(gte(klikHarian.tanggal, sql`current_date - 7`));
+
+  const [klikTotal] = await db
     .select({ n: sql<number>`coalesce(sum(${klikHarian.jumlahValid}), 0)::int` })
     .from(klikHarian);
   const [bayar] = await db
     .select({ n: sql<number>`coalesce(sum(${peganganLedger.nominalSigned}), 0)::bigint` })
     .from(peganganLedger)
     .where(eq(peganganLedger.jenis, "bayar"));
-  const [arsip] = await db.select({ n: count() }).from(juaraHarian);
-  const visitor = await visitorStats();
+
+  // #1 turnover in the last 7 days: count transitions of the rank-1 listing.
+  const berganti = await db.execute<{ n: number }>(sql`
+    with r1 as (
+      select listing_id, lag(listing_id) over (order by jam) as prev
+      from posisi_snapshot
+      where rank = 1 and jam >= now() - interval '7 days'
+    )
+    select count(*)::int as n from r1 where prev is not null and listing_id <> prev
+  `);
+
+  const klik7hari = Number(klik7.n);
+  const totalKlik = Number(klikTotal.n);
+  const totalBayar = Number(bayar.n);
 
   return {
+    hargaPuncak: Number(puncak?.p ?? 0),
+    hargaMasuk20: Number(rank20[0]?.p ?? 0),
+    klik7hari,
+    klikPerHari: Math.round(klik7hari / 7),
+    cpc: totalKlik > 0 ? Math.round(totalBayar / totalKlik) : 0,
     sponsor: sponsor.n,
-    klikTerkirim: Number(klik.n),
-    totalPegangan: Number(bayar.n),
-    hariDiarsip: arsip.n,
-    online: visitor.online,
-    totalPengunjung: visitor.total,
+    puncakBerganti: Number(berganti.rows?.[0]?.n ?? 0),
   };
 }
