@@ -21,6 +21,7 @@ export interface BoardEntry {
   pegangan: number;
   klikHariIni: number;
   rosotPerHari: number;
+  screenshotUrl: string | null;
   badges: string[];
 }
 
@@ -42,6 +43,7 @@ export async function getBoard(db: Database): Promise<Board> {
         deskripsi: listing.deskripsi,
         peganganCached: listing.peganganCached,
         createdAt: listing.createdAt,
+        screenshotUrl: listing.screenshotUrl,
         kategoriNama: kategori.nama,
         klikHariIni: klikHarian.jumlahValid,
       })
@@ -67,6 +69,7 @@ export async function getBoard(db: Database): Promise<Board> {
     pegangan: r.peganganCached,
     klikHariIni: r.klikHariIni ?? 0,
     rosotPerHari: Math.round(r.peganganCached * dailyRateForRank(rank, r.peganganCached, cfg)),
+    screenshotUrl: r.screenshotUrl,
     badges: badges.get(r.id) ?? [],
   }));
 

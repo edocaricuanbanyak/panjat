@@ -63,6 +63,21 @@ export function ListingCard({
         </ManjatButton>
       </div>
 
+      {/* Desktop hover-card: the site screenshot after ~400ms (R21) — never a
+          board-row thumbnail, only this on-hover preview. */}
+      {entry.screenshotUrl && (
+        <div className="pointer-events-none absolute right-2 top-full z-30 mt-1 hidden w-64 overflow-hidden rounded-lg border border-garis bg-kertas-1 opacity-0 shadow-naik transition-opacity delay-0 duration-150 group-hover:opacity-100 group-hover:delay-[400ms] md:block">
+          {/* biome-ignore lint/performance/noImgElement: user-captured screenshot */}
+          <img
+            src={entry.screenshotUrl}
+            alt={copy.listing.pratinjauAlt(entry.nama)}
+            width={1200}
+            height={800}
+            className="w-full"
+          />
+        </div>
+      )}
+
       <div
         className={`shrink-0 text-right font-mono tabular font-semibold ${
           puncak ? "w-10 text-xl sm:w-12 sm:text-2xl" : "w-9 text-base"

@@ -22,6 +22,7 @@ const entry = (over: Partial<BoardEntry> = {}): BoardEntry => ({
   pegangan: 98_808,
   klikHariIni: 412,
   rosotPerHari: 24_702,
+  screenshotUrl: null,
   badges: ["Pernah di Puncak", "Comeback"],
   ...over,
 });
