@@ -20,6 +20,7 @@
     "jelajah:sim": "tsx src/jobs/jelajah-sim.ts",
     "tebak:resolve": "tsx src/jobs/tebak-resolve.ts",
     "tebak:sim": "tsx src/jobs/tebak-sim.ts",
+    "hariini:sim": "tsx src/jobs/hariini-sim.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

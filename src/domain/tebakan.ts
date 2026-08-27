@@ -7,9 +7,10 @@
  * Interim: the champion is the main board's #1; it switches to Papan Hari Ini's
  * champion when R7 lands.
  */
-import { and, desc, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { Database } from "@/db";
 import { juaraHarian, listing, pengunjungAnon, tebakan } from "@/db/schema";
+import { getHariIni, papanHariIniChampion, wibDayWindow } from "./papan-hari-ini";
 import { getRanking } from "./ranking";
 
 // --- Pure time/streak helpers -----------------------------------------------
@@ -89,10 +90,10 @@ export async function recordGuess(
   }
 }
 
-/** Resolve a day's champion (idempotent). Interim: current board #1. */
+/** Resolve a day's champion (idempotent) = Papan Hari Ini #1 for that WIB day. */
 export async function resolveDay(db: Database, tanggal: string): Promise<string | null> {
-  const ranking = await getRanking(db);
-  const championId = ranking[0]?.listing.id;
+  const { start, end } = wibDayWindow(tanggal);
+  const championId = await papanHariIniChampion(db, start, end);
   if (!championId) return null;
   await db
     .insert(juaraHarian)
@@ -138,8 +139,9 @@ export async function guessStatus(
   const tanggal = todayWIB(now);
   const yTanggal = prevDate(tanggal);
 
-  const [ranking, myGuess, streak, yChamp] = await Promise.all([
+  const [ranking, hariIni, myGuess, streak, yChamp] = await Promise.all([
     getRanking(db),
+    getHariIni(db, now),
     anonId
       ? db
           .select({ listingId: tebakan.listingId })
@@ -162,6 +164,11 @@ export async function guessStatus(
     myGuessListingId: myGuess[0]?.listingId ?? null,
     streak,
     yesterdayChampion: yChamp[0] ?? null,
-    candidates: ranking.slice(0, 10).map((r) => ({ id: r.listing.id, nama: r.listing.nama })),
+    // Guess pool = today's contenders (who paid today); fall back to the main
+    // board early in the day before anyone has paid.
+    candidates:
+      hariIni.length > 0
+        ? hariIni.slice(0, 10).map((e) => ({ id: e.id, nama: e.nama }))
+        : ranking.slice(0, 10).map((r) => ({ id: r.listing.id, nama: r.listing.nama })),
   };
 }
