@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { ManjatWizard } from "@/app/manjat/ManjatWizard";
 import { buttonClasses, type ButtonSize, type ButtonVariant } from "./Button";
+import { Modal } from "./Modal";
 
 type Kategori = { slug: string; nama: string };
 
@@ -40,18 +41,6 @@ export function ManjatProvider({
   children: React.ReactNode;
 }) {
   const [state, setState] = useState<Required<OpenOpts> | null>(null);
-  const openModal = state !== null;
-
-  useEffect(() => {
-    if (!openModal) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setState(null);
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [openModal]);
 
   return (
     <Ctx.Provider
@@ -61,25 +50,17 @@ export function ManjatProvider({
       }}
     >
       {children}
-      {state && (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 kaca-overlay sm:items-center"
-          onClick={() => setState(null)}
-        >
-          <div
-            className="w-full max-w-md rounded-xl border border-garis/80 bg-kertas p-5 shadow-naik"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <ManjatWizard
-              initialUrl={state.url}
-              initialKategori={state.kategoriSlug}
-              express={state.express}
-              kategori={kategori}
-              onClose={() => setState(null)}
-            />
-          </div>
-        </div>
-      )}
+      <Modal open={state !== null} onClose={() => setState(null)}>
+        {state && (
+          <ManjatWizard
+            initialUrl={state.url}
+            initialKategori={state.kategoriSlug}
+            express={state.express}
+            kategori={kategori}
+            onClose={() => setState(null)}
+          />
+        )}
+      </Modal>
     </Ctx.Provider>
   );
 }

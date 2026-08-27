@@ -1,3 +1,4 @@
+import { Heart } from "lucide-react";
 import type { KakiTiangEntry } from "@/domain/sorak";
 import { LogoTile } from "./LogoTile";
 
@@ -40,9 +41,9 @@ export function KakiTiang({ entries, remaining }: { entries: KakiTiangEntry[]; r
                 <input type="hidden" name="listingId" value={e.id} />
                 <button
                   disabled={remaining <= 0}
-                  className="h-9 rounded-lg border border-garis bg-kertas-1 px-3 text-sm text-tinta shadow-kartu transition hover:bg-kertas-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah disabled:opacity-50"
+                  className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-garis bg-kertas-1 px-3 text-sm text-tinta shadow-kartu transition hover:bg-kertas-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah disabled:opacity-50"
                 >
-                  Dukung
+                  <Heart className="size-3.5" aria-hidden /> Dukung
                 </button>
               </form>
             </article>

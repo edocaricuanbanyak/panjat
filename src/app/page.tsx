@@ -8,6 +8,7 @@ import { KakiTiang } from "@/components/KakiTiang";
 import { ListingCard } from "@/components/ListingCard";
 import { PageShell } from "@/components/PageShell";
 import { Pagination } from "@/components/Pagination";
+import { PasangGratisModal } from "@/components/PasangGratisModal";
 import { Spotlight } from "@/components/Spotlight";
 import { VoteFavorit } from "@/components/VoteFavorit";
 import { db } from "@/db";
@@ -105,13 +106,10 @@ export default async function Home({
       {/* KAKI TIANG (gratis) */}
       <div className="mt-12">
         <KakiTiang entries={kakiTiang} remaining={sisaSorak} />
-        <p className="mt-3 text-xs text-tinta-redup">
+        <div className="mt-3 text-xs text-tinta-redup">
           Punya produk?{" "}
-          <a href="/pasang-gratis" className="text-merah-teks hover:underline">
-            Pasang gratis di Kaki Tiang
-          </a>
-          .
-        </p>
+          <PasangGratisModal kategori={kats} className="text-merah-teks hover:underline" />.
+        </div>
       </div>
 
       {/* CARA MAIN */}
