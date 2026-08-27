@@ -50,14 +50,14 @@ export function ManjatProvider({
       }}
     >
       {children}
-      <Modal open={state !== null} onClose={() => setState(null)}>
+      <Modal open={state !== null} onClose={() => setState(null)} title="Naik tiang">
         {state && (
           <ManjatWizard
             initialUrl={state.url}
             initialKategori={state.kategoriSlug}
             express={state.express}
             kategori={kategori}
-            onClose={() => setState(null)}
+            inModal
           />
         )}
       </Modal>
@@ -80,8 +80,13 @@ export function ManjatButton({
   children: React.ReactNode;
 }) {
   const { open } = useManjat();
+  // Consistent behaviour: a known URL (Salip a card, hero) jumps straight to the
+  // position+pay step; no URL (new Manjat) starts at step 1 to paste one.
   return (
-    <button onClick={() => open({ url })} className={`${buttonClasses(variant, size)} ${className ?? ""}`}>
+    <button
+      onClick={() => open({ url, express: Boolean(url) })}
+      className={`${buttonClasses(variant, size)} ${className ?? ""}`}
+    >
       {children}
     </button>
   );

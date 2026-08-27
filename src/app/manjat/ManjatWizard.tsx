@@ -1,6 +1,5 @@
 "use client";
 
-import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AmountSelector, type TargetChoice } from "@/components/AmountSelector";
 import { Button } from "@/components/Button";
@@ -35,15 +34,15 @@ export function ManjatWizard({
   kategori,
   initialKategori = "",
   express = false,
-  onClose,
+  inModal = false,
 }: {
   initialUrl: string;
   kategori: Kategori[];
   initialKategori?: string;
   /** Front-page flow: start at position+pay, auto-preview, pay in one step. */
   express?: boolean;
-  /** When set, renders as a modal body (close button instead of a back link). */
-  onClose?: () => void;
+  /** Rendered inside the standard Modal (which owns the title + close). */
+  inModal?: boolean;
 }) {
   const [step, setStep] = useState(express ? 2 : 1);
   const [url, setUrl] = useState(initialUrl);
@@ -135,26 +134,23 @@ export function ManjatWizard({
 
   return (
     <div className="w-full">
-      {onClose ? (
-        <button
-          onClick={onClose}
-          className="inline-flex items-center gap-1 text-sm text-tinta-redup hover:text-tinta"
-        >
-          <X className="size-4" aria-hidden /> Tutup
-        </button>
-      ) : (
-        <a href="/" className="text-sm text-tinta-redup hover:text-tinta">
-          ← Papan
-        </a>
+      {/* On the /manjat page we render our own header; in the modal the shell
+          owns the title + close, so we only show the step indicator. */}
+      {!inModal && (
+        <>
+          <a href="/" className="text-sm text-tinta-redup hover:text-tinta">
+            ← Papan
+          </a>
+          <h1
+            className="mt-2 font-display text-2xl font-bold text-tinta"
+            style={{ fontStretch: "120%" }}
+          >
+            Naik tiang
+          </h1>
+        </>
       )}
-      <h1
-        className="mt-2 font-display text-2xl font-bold text-tinta"
-        style={{ fontStretch: "120%" }}
-      >
-        Naik tiang
-      </h1>
 
-      <div className="mt-4">
+      <div className={inModal ? "" : "mt-4"}>
         <Steps current={step} labels={STEP_LABELS} />
       </div>
 
