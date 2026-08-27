@@ -21,36 +21,31 @@ export function HeroManjat({ kategori }: { kategori: Kategori[] }) {
   }
 
   return (
-    <div className="mt-4 rounded-lg border border-garis bg-kertas-1 p-3">
-      <p className="mb-2 text-sm text-tinta-redup">
-        Naikkan produkmu ke papan — tempel link, pilih kategori, bayar.
-      </p>
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <input
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && go()}
-          placeholder="tempel URL produkmu — mis. nyala.id"
-          className="h-11 flex-1 rounded-md border border-garis bg-kertas-2 px-3 text-base text-tinta focus-visible:outline-2 focus-visible:outline-merah"
-        />
-        <select
-          value={kategoriSlug}
-          onChange={(e) => setKategoriSlug(e.target.value)}
-          className="h-11 rounded-md border border-garis bg-kertas-2 px-3 text-base text-tinta"
-        >
-          <option value="">Kategori</option>
-          {kategori.map((k) => (
-            <option key={k.slug} value={k.slug}>{k.nama}</option>
-          ))}
-        </select>
-        <button
-          onClick={go}
-          disabled={!url.trim()}
-          className="h-11 rounded-md bg-merah px-5 text-sm font-medium text-kertas-1 disabled:opacity-50"
-        >
-          Manjat →
-        </button>
-      </div>
+    <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+      <input
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && go()}
+        placeholder="Tempel URL produkmu — mis. nyala.id"
+        className="h-12 flex-1 rounded-md border border-garis bg-kertas-1 px-4 text-base text-tinta shadow-sm focus-visible:outline-2 focus-visible:outline-merah"
+      />
+      <select
+        value={kategoriSlug}
+        onChange={(e) => setKategoriSlug(e.target.value)}
+        className="h-12 rounded-md border border-garis bg-kertas-1 px-3 text-base text-tinta shadow-sm"
+      >
+        <option value="">Kategori</option>
+        {kategori.map((k) => (
+          <option key={k.slug} value={k.slug}>{k.nama}</option>
+        ))}
+      </select>
+      <button
+        onClick={go}
+        disabled={!url.trim()}
+        className="h-12 rounded-md bg-merah px-6 font-medium text-kertas-1 shadow-sm hover:brightness-95 disabled:opacity-50"
+      >
+        Manjat →
+      </button>
     </div>
   );
 }

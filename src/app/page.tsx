@@ -1,9 +1,10 @@
 import { BoardLive } from "@/components/BoardLive";
+import { CaraMain } from "@/components/CaraMain";
 import { EmptyState } from "@/components/EmptyState";
 import { Footer } from "@/components/Footer";
 import { HeroManjat } from "@/components/HeroManjat";
 import { KakiTiang } from "@/components/KakiTiang";
-import { ManjatButton, ManjatProvider } from "@/components/ManjatModal";
+import { ManjatProvider } from "@/components/ManjatModal";
 import { Nav } from "@/components/Nav";
 import { Spotlight } from "@/components/Spotlight";
 import { TebakJuara } from "@/components/TebakJuara";
@@ -33,60 +34,63 @@ export default async function Home() {
 
   return (
     <ManjatProvider kategori={kats}>
-    <main className="mx-auto w-full max-w-3xl px-4 py-8">
-      <Nav active="papan" />
-      <header>
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <h1
-              className="font-display text-3xl font-bold text-tinta"
-              style={{ fontStretch: "125%" }}
-            >
-              Panjat
-            </h1>
-            <p className="mt-1 text-sm text-tinta-redup">Manjat, atau merosot.</p>
+      <main className="mx-auto w-full max-w-3xl px-4 py-8">
+        <Nav active="papan" />
+
+        {/* HERO — value + the one action, up top */}
+        <section className="py-2">
+          <h1
+            className="font-display text-4xl font-bold text-tinta"
+            style={{ fontStretch: "130%" }}
+          >
+            Panjat
+          </h1>
+          <p className="mt-2 max-w-xl text-tinta-redup">
+            Bayar untuk manjat. Pegangan paling kuat duduk paling atas. Tiangnya licin — yang
+            berhenti manjat, merosot.
+          </p>
+          <HeroManjat kategori={kats} />
+          <div className="mt-3 flex gap-4 font-mono tabular text-xs text-tinta-redup">
+            <span>{entries.length} pemanjat</span>
+            <span>{formatRupiah(totalPegangan)} total pegangan</span>
           </div>
-          <ManjatButton size="md">Manjat</ManjatButton>
-        </div>
+        </section>
 
-        <div className="mt-4 flex gap-4 font-mono tabular text-xs text-tinta-redup">
-          <span>{entries.length} pemanjat</span>
-          <span>{formatRupiah(totalPegangan)} total pegangan</span>
-        </div>
+        <CaraMain />
 
-        {/* Cara main, 10 detik (R20-b) */}
-        <p className="mt-4 rounded-md bg-kertas-2 px-3 py-2 text-xs text-tinta-redup">
-          Bayar untuk manjat · Tiangnya licin, semua merosot · Manjat lagi kalau mau bertahan
+        {/* PAPAN */}
+        <section className="mt-10">
+          <h2 className="mb-3 font-display text-lg font-semibold text-tinta">Papan</h2>
+          {entries.length === 0 ? (
+            <EmptyState title="Belum ada yang manjat." message="Tiangnya masih kinclong." />
+          ) : (
+            <div className="flex gap-4">
+              <TiangRail className="w-3 shrink-0" />
+              <BoardLive initial={{ entries, max }} />
+            </div>
+          )}
+        </section>
+
+        {/* KAKI TIANG (gratis) */}
+        <KakiTiang entries={kakiTiang} remaining={sisaSorak} />
+        <p className="mt-3 text-xs text-tinta-redup">
+          Punya produk?{" "}
+          <a href="/pasang-gratis" className="text-merah hover:underline">
+            Pasang gratis di Kaki Tiang
+          </a>
+          .
         </p>
 
-        <HeroManjat kategori={kats} />
-      </header>
+        {/* SEKUNDER — ritual & sorotan, di bawah */}
+        {entries.length > 0 && (
+          <div className="mt-10">
+            <TebakJuara status={tebak} />
+            <Spotlight items={entries.map((e) => ({ id: e.id, nama: e.nama, pegangan: e.pegangan }))} />
+          </div>
+        )}
 
-      {entries.length > 0 && (
-        <Spotlight items={entries.map((e) => ({ id: e.id, nama: e.nama, pegangan: e.pegangan }))} />
-      )}
-      {entries.length > 0 && <TebakJuara status={tebak} />}
-
-      {entries.length === 0 ? (
-        <EmptyState title="Belum ada yang manjat." message="Tiangnya masih kinclong." />
-      ) : (
-        <div className="mt-6 flex gap-4">
-          <TiangRail className="w-3 shrink-0" />
-          <BoardLive initial={{ entries, max }} />
-        </div>
-      )}
-
-      <KakiTiang entries={kakiTiang} remaining={sisaSorak} />
-      <p className="mt-3 text-xs text-tinta-redup">
-        Punya produk?{" "}
-        <a href="/pasang-gratis" className="text-merah hover:underline">
-          Pasang gratis di Kaki Tiang
-        </a>{" "}
-        atau <a href="/manjat" className="text-merah hover:underline">manjat ke papan berbayar</a>.
-      </p>
-
-      <Footer />
-    </main>
+        <Footer />
+      </main>
     </ManjatProvider>
   );
 }
