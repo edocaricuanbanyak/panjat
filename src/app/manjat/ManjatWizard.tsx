@@ -95,6 +95,20 @@ export function ManjatWizard({
     }
   }
 
+  async function prefillFromUrl() {
+    if (!url.trim()) return;
+    try {
+      const res = await fetch(`/api/preview?url=${encodeURIComponent(url)}`);
+      if (!res.ok) return;
+      const p = await res.json();
+      // Never overwrite what the user already typed.
+      setNama((n) => n || p.nama || "");
+      setDeskripsi((d) => d || p.deskripsi || "");
+    } catch {
+      /* preview is best-effort; the pay flow never waits on it */
+    }
+  }
+
   const canStep1 = url.trim() !== "" && email.trim() !== "";
   const bigAmount = (quote?.nominal ?? 0) > 200_000;
 
@@ -125,8 +139,10 @@ export function ManjatWizard({
           <Input
             label="URL atau @username"
             placeholder="nyala.id"
+            hint="Kami isi nama & deskripsi otomatis dari URL-mu."
             value={url}
             onChange={(e) => setUrl(e.target.value)}
+            onBlur={prefillFromUrl}
           />
           <Input
             label="Nama listing"

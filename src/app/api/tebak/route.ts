@@ -3,11 +3,18 @@ import { cookies } from "next/headers";
 import { db } from "@/db";
 import { GuessError, recordGuess } from "@/domain/tebakan";
 import { ANON_COOKIE, anonCookieOptions, newAnonId, signAnon, verifyAnon } from "@/lib/anon";
+import { clientIp } from "@/lib/ip";
+import { rateLimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
 /** POST /api/tebak (form: listingId) — record today's guess; ensures anon (R14). */
 export async function POST(req: Request) {
+  const rl = await rateLimit(`tebak:${clientIp(req.headers)}`, 20, 60);
+  if (!rl.ok) {
+    return NextResponse.redirect(new URL("/?tebak=gagal", req.url), { status: 303 });
+  }
+
   const form = await req.formData();
   const listingId = String(form.get("listingId") ?? "");
 

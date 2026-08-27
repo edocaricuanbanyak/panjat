@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { createOrTopUp, quote, type Target } from "@/domain/manjat";
+import { clientIp } from "@/lib/ip";
 import { isMock, midtransSnapClient, mockSnapClient } from "@/lib/midtrans";
+import { rateLimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
@@ -35,7 +37,11 @@ export async function POST(req: Request) {
       return NextResponse.json(q);
     }
 
-    // Create/top-up mode.
+    // Create/top-up mode — rate-limit invoice creation per IP (§18.4).
+    const rl = await rateLimit(`manjat:${clientIp(req.headers)}`, 10, 60);
+    if (!rl.ok) {
+      return NextResponse.json({ error: "Terlalu banyak permintaan. Coba lagi sebentar." }, { status: 429 });
+    }
     if (typeof body.email !== "string") {
       return NextResponse.json({ error: "email wajib" }, { status: 400 });
     }

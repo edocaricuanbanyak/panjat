@@ -5,6 +5,7 @@ import { listing } from "@/db/schema";
 import { isBot, recordClick, withUtm } from "@/domain/klik";
 import { parseAsal } from "@/domain/jelajah";
 import { clientIp, dailySalt, hashWith } from "@/lib/ip";
+import { rateLimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
@@ -32,6 +33,9 @@ export async function GET(req: Request, ctx: { params: Promise<{ listing: string
   try {
     const ua = req.headers.get("user-agent") ?? "";
     const now = new Date();
+    // Rate-limit per IP (§18.4); if exceeded, still redirect but don't count.
+    const rl = await rateLimit(`k:${clientIp(req.headers)}`, 60, 60);
+    if (!rl.ok) return NextResponse.redirect(withUtm(l.urlNormal), 302);
     const salt = dailySalt(now);
     await recordClick(db, {
       listingId,
