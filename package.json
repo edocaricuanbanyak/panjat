@@ -13,6 +13,7 @@
     "db:reconcile": "tsx src/jobs/reconcile.ts",
     "rosot:run": "tsx src/jobs/rosot.ts",
     "manjat:sim": "tsx src/jobs/manjat-sim.ts",
+    "klik:sim": "tsx src/jobs/klik-sim.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
