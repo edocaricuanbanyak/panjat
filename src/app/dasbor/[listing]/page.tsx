@@ -4,6 +4,7 @@ import { LencanaRow } from "@/components/LencanaRow";
 import { PageShell } from "@/components/PageShell";
 import { Sparkline } from "@/components/Sparkline";
 import { StatTile } from "@/components/StatTile";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { getDashboard, ownsListing } from "@/domain/dashboard";
 import { formatRupiah, formatWIB } from "@/lib/format";
@@ -44,31 +45,31 @@ export default async function DasborListing({
       )}
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <StatTile label="Pegangan" value={formatRupiah(d.pegangan)} />
-        <StatTile label="Posisi" value={d.rank ? `#${d.rank}` : "—"} />
+        <StatTile label={copy.dasbor.statPegangan} value={formatRupiah(d.pegangan)} />
+        <StatTile label={copy.dasbor.statPosisi} value={d.rank ? `#${d.rank}` : "—"} />
         <StatTile
-          label="Laju rosot"
-          value={d.rosotPerHari ? `${formatRupiah(d.rosotPerHari)}/hari` : "—"}
+          label={copy.dasbor.statRosot}
+          value={d.rosotPerHari ? copy.dasbor.perHari(formatRupiah(d.rosotPerHari)) : "—"}
         />
         <StatTile
-          label="Estimasi bertahan"
-          value={d.estimasiHari === null ? "stabil" : `~${d.estimasiHari} hari`}
+          label={copy.dasbor.statEstimasi}
+          value={d.estimasiHari === null ? copy.dasbor.stabil : copy.dasbor.bertahanHari(d.estimasiHari)}
         />
         <StatTile
-          label="Klik hari ini"
+          label={copy.dasbor.statKlik}
           value={String(d.klikHariIni)}
-          sub={`total ${d.klikTotal}`}
+          sub={copy.dasbor.totalKlik(d.klikTotal)}
         />
         <StatTile
-          label="CPC"
-          value={d.cpc === null ? "—" : `${formatRupiah(d.cpc)}/klik`}
-          sub={d.cpc === null ? "belum ada klik" : "biaya rosot ÷ klik hari ini"}
+          label={copy.dasbor.statCpc}
+          value={d.cpc === null ? "—" : copy.dasbor.perKlik(formatRupiah(d.cpc))}
+          sub={d.cpc === null ? copy.dasbor.cpcBelum : copy.dasbor.cpcSub}
         />
       </div>
 
       <section className="mt-6">
         <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
-          Posisi 7 hari
+          {copy.dasbor.posisi7}
         </h2>
         <div className="rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu">
           <Sparkline ranks={d.seri7hari.map((p) => p.rank)} />
@@ -77,23 +78,23 @@ export default async function DasborListing({
 
       <section className="mt-6 flex flex-wrap gap-2">
         <a href={`/manjat?url=${encodeURIComponent(d.urlNormal)}`} className={buttonClasses("primary", "md")}>
-          Manjat lagi
+          {copy.dasbor.manjatLagi}
         </a>
       </section>
 
       <section className="mt-6">
         <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
-          Deskripsi
+          {copy.dasbor.deskripsi}
         </h2>
         <DescEdit listingId={d.listingId} initial={d.deskripsi ?? ""} />
       </section>
 
       <section className="mt-6">
         <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
-          Riwayat pembayaran
+          {copy.dasbor.riwayat}
         </h2>
         {d.riwayat.length === 0 ? (
-          <p className="text-sm text-tinta-redup">Belum ada pembayaran.</p>
+          <p className="text-sm text-tinta-redup">{copy.dasbor.belumBayar}</p>
         ) : (
           <ul className="flex flex-col gap-1.5">
             {d.riwayat.map((r, i) => (
