@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AmountSelector, type TargetChoice } from "@/components/AmountSelector";
 import { Button } from "@/components/Button";
 import { Dropdown } from "@/components/Dropdown";
 import { Input, textareaClasses } from "@/components/Input";
@@ -55,7 +54,6 @@ export function ManjatWizard({
   const [kategoriSlug, setKategoriSlug] = useState(initialKategori);
   const [deskripsi, setDeskripsi] = useState("");
 
-  const [target, setTarget] = useState<TargetChoice | null>(initialNominal > 0 ? "nominal" : null);
   const [nominalInput, setNominalInput] = useState(initialNominal > 0 ? String(initialNominal) : "");
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loadingQuote, setLoadingQuote] = useState(false);
@@ -65,10 +63,9 @@ export function ManjatWizard({
   const [error, setError] = useState<string | null>(null);
   const [shotFailed, setShotFailed] = useState(false);
 
-  async function refreshQuote(payload: { target?: TargetChoice; nominal?: number }) {
+  async function refreshQuote(payload: { nominal: number }) {
     setError(null);
     setLoadingQuote(true);
-    setQuote(null);
     try {
       setQuote(await postManjat(payload));
     } catch (e) {
@@ -78,14 +75,17 @@ export function ManjatWizard({
     }
   }
 
-  function onSelectTarget(choice: TargetChoice) {
-    setTarget(choice);
-    if (choice === "nominal") {
+  // Open amount → auto-compute the resulting position (debounced as you type).
+  useEffect(() => {
+    const n = Number(nominalInput);
+    if (!n) {
       setQuote(null);
-    } else {
-      void refreshQuote({ target: choice });
+      return;
     }
-  }
+    const t = setTimeout(() => void refreshQuote({ nominal: n }), 400);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nominalInput]);
 
   async function onPay() {
     if (!quote) return;
@@ -126,16 +126,16 @@ export function ManjatWizard({
     }
   }
 
-  // Auto-preview on open when a URL is already provided (Salip / express), and
-  // pre-compute the quote when a Salip amount was passed in.
+  // Auto-preview on open when a URL is already provided (Salip / express). The
+  // Salip amount pre-fills nominalInput, so the debounced effect quotes it.
   useEffect(() => {
     if (initialUrl.trim()) void prefillFromUrl();
-    if (initialNominal > 0) void refreshQuote({ nominal: initialNominal });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Only the URL is required; the rest is auto-filled and editable.
   const canStep1 = url.trim() !== "";
+  const host = url.trim().replace(/^https?:\/\//, "").replace(/\/+$/, "");
   const onPayOrConfirm = () => (bigAmount ? setStep(3) : onPay());
   const bigAmount = (quote?.nominal ?? 0) > 200_000;
 
@@ -229,82 +229,85 @@ export function ManjatWizard({
 
       {step === 2 && (
         <div className="mt-6 flex flex-col gap-4">
-          {express && (
-            <div className="rounded-xl bg-kertas-2 px-3 py-2 text-xs text-tinta-redup">
-              {copy.manjat.manjatPrefix} <span className="text-tinta">{nama || url}</span>
-              {kategoriSlug && ` · ${kategori.find((k) => k.slug === kategoriSlug)?.nama ?? ""}`}
-              {" · "}
-              <button onClick={() => setStep(1)} className="text-merah-teks hover:underline">
-                {copy.manjat.ubahDetail}
-              </button>
-            </div>
+          {/* Compact site confirmation — a small thumbnail instead of a full-width
+              screenshot, so the modal stays short. Doubles as "ganti detail". */}
+          {url.trim() && (
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="flex items-center gap-3 rounded-xl border border-garis bg-kertas-1 p-2 text-left"
+            >
+              {!shotFailed ? (
+                // biome-ignore lint/performance/noImgElement: on-demand capture, not a static asset
+                <img
+                  src={`/api/preview-shot?url=${encodeURIComponent(url)}`}
+                  alt={copy.manjat.pratinjauAlt(nama || url)}
+                  width={1200}
+                  height={800}
+                  onError={() => setShotFailed(true)}
+                  className="h-11 w-16 shrink-0 rounded-lg border border-garis object-cover object-top"
+                />
+              ) : (
+                <div className="flex h-11 w-16 shrink-0 items-center justify-center rounded-lg bg-kertas-2 font-display text-lg font-bold text-tinta-redup">
+                  {(nama || url).slice(0, 1).toUpperCase()}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-tinta">{nama || host}</p>
+                <p className="truncate font-mono text-xs text-tinta-redup">{host}</p>
+              </div>
+              <span className="shrink-0 text-xs text-merah-teks">{copy.manjat.ubahDetail}</span>
+            </button>
           )}
 
-          {/* 1 — choose a target. The pole marker shows where it lands. */}
+          {/* Open amount — you set what to pay; position is computed automatically. */}
           <div>
-            <p className="mb-2 text-sm font-medium text-tinta">{copy.manjat.posisiTanya}</p>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <AmountSelector value={target} onSelect={onSelectTarget} />
-                {target === "nominal" && (
-                  <div className="mt-2">
-                    <Input
-                      label={copy.manjat.nominalLabel}
-                      inputMode="numeric"
-                      placeholder={copy.manjat.nominalPlaceholder}
-                      value={nominalInput ? Number(nominalInput).toLocaleString("id-ID") : ""}
-                      onChange={(e) => setNominalInput(e.target.value.replace(/\D/g, ""))}
-                      onBlur={() => nominalInput && refreshQuote({ nominal: Number(nominalInput) })}
-                    />
-                  </div>
-                )}
-              </div>
-              <MiniTiang height={quote ? markerHeight(quote.rank) : 0.05} />
-            </div>
-          </div>
-
-          {/* 2 — the price is the anchor of this step: big, centered, with the
-              resulting rank + decay as supporting detail. */}
-          <div className="rounded-xl border border-garis bg-kertas-1 p-4 text-center">
-            {loadingQuote ? (
-              <p className="py-2 text-sm text-tinta-redup">{copy.manjat.menghitung}</p>
-            ) : quote ? (
-              <>
-                <p className="text-xs uppercase tracking-wide text-tinta-redup">
-                  {copy.manjat.posisiPrimer}
-                </p>
-                <p className="mt-0.5 font-mono tabular text-3xl font-bold text-tinta">
-                  {formatRupiah(quote.nominal)}
-                </p>
-                <p className="mt-1 font-mono tabular text-xs text-tinta-redup">
-                  {copy.manjat.quoteRingkas(
-                    quote.rank,
-                    formatRupiah(quote.rosotPerHari),
-                    quote.estimasiHari,
-                  )}
-                </p>
-              </>
-            ) : (
-              <p className="py-2 text-sm text-tinta-redup">{copy.manjat.pilihTarget}</p>
-            )}
-          </div>
-
-          {/* On-demand site screenshot (R21) so the sponsor confirms the right URL
-              before paying. Loads async as an image; hidden on failure. */}
-          {url.trim() && !shotFailed && (
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-tinta-redup">{copy.manjat.pratinjauSitus}</span>
-              {/* biome-ignore lint/performance/noImgElement: on-demand capture, not a static asset */}
-              <img
-                src={`/api/preview-shot?url=${encodeURIComponent(url)}`}
-                alt={copy.manjat.pratinjauAlt(nama || url)}
-                width={1200}
-                height={800}
-                onError={() => setShotFailed(true)}
-                className="w-full rounded-xl border border-garis"
+            <label className="mb-1.5 block text-sm font-medium text-tinta">
+              {copy.manjat.nominalTanya}
+            </label>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-xl text-tinta-redup">
+                Rp
+              </span>
+              <input
+                inputMode="numeric"
+                autoFocus
+                placeholder={copy.manjat.nominalPlaceholder}
+                value={nominalInput ? Number(nominalInput).toLocaleString("id-ID") : ""}
+                onChange={(e) => setNominalInput(e.target.value.replace(/\D/g, ""))}
+                className="h-14 w-full rounded-xl border border-garis bg-kertas-1 pl-12 pr-4 font-mono text-2xl font-bold text-tinta shadow-kartu focus-visible:border-merah focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah/25"
               />
             </div>
-          )}
+            <p className="mt-1.5 text-xs text-tinta-redup">{copy.manjat.nominalNaik}</p>
+          </div>
+
+          {/* Auto result — the resulting position is the anchor here. */}
+          <div className="flex items-center gap-4 rounded-xl border border-garis bg-kertas-1 p-4">
+            <MiniTiang height={quote ? markerHeight(quote.rank) : 0.05} />
+            <div className="min-w-0 flex-1">
+              {loadingQuote && !quote ? (
+                <p className="text-sm text-tinta-redup">{copy.manjat.menghitung}</p>
+              ) : quote ? (
+                <>
+                  <p className="text-xs uppercase tracking-wide text-tinta-redup">
+                    {copy.manjat.diPosisi}
+                  </p>
+                  <p className="font-mono tabular text-4xl font-bold leading-tight text-tinta">
+                    #{quote.rank}
+                  </p>
+                  <p className="mt-1 font-mono tabular text-xs text-tinta-redup">
+                    {copy.manjat.posisiRingkas(
+                      formatRupiah(quote.nominal),
+                      formatRupiah(quote.rosotPerHari),
+                      quote.estimasiHari,
+                    )}
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-tinta-redup">{copy.manjat.ketikNominal}</p>
+              )}
+            </div>
+          </div>
 
           <div className="flex gap-2">
             <Button variant="secondary" onClick={() => setStep(1)}>

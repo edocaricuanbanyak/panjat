@@ -93,6 +93,13 @@ export const copy = {
     pratinjauAlt: (nama: string) => `Pratinjau situs ${nama}`,
     nominalLabel: "Nominal (Rp)",
     nominalPlaceholder: "25.000",
+    nominalTanya: "Mau bayar berapa? Posisi dihitung otomatis.",
+    nominalNaik: "Makin besar bayarannya, makin tinggi posisimu. Minimal Rp1.000.",
+    diPosisi: "Kamu akan di posisi",
+    ketikNominal: "Ketik nominal untuk lihat posisimu.",
+    posisiRingkas: (bayar: string, rosot: string, estimasiHari: number | null) =>
+      `Bayar ${bayar} · merosot ~${rosot}/hari · ` +
+      (estimasiHari === null ? "stabil (kaki tiang)" : `bertahan ~${estimasiHari} hari`),
     akanBayar: "Kamu akan bayar",
     bayar: (rp?: string) => (rp ? `Bayar ${rp}` : "Bayar"),
     bayarQris: (rp: string) => `Bayar ${rp} lewat QRIS`,
