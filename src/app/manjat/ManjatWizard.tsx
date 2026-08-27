@@ -22,7 +22,7 @@ async function postManjat(payload: unknown) {
     body: JSON.stringify(payload),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error ?? "Gagal memproses");
+  if (!res.ok) throw new Error(data.error ?? copy.error.gagalProses);
   return data;
 }
 
@@ -71,7 +71,7 @@ export function ManjatWizard({
     try {
       setQuote(await postManjat(payload));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Gagal menghitung");
+      setError(e instanceof Error ? e.message : copy.error.gagalHitung);
     } finally {
       setLoadingQuote(false);
     }
@@ -101,7 +101,7 @@ export function ManjatWizard({
       });
       window.location.href = result.redirectUrl;
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Gagal membuat tagihan");
+      setError(e instanceof Error ? e.message : copy.error.gagalTagihan);
       setSubmitting(false);
     }
   }
@@ -145,13 +145,13 @@ export function ManjatWizard({
       {!inModal && (
         <>
           <a href="/" className="text-sm text-tinta-redup hover:text-tinta">
-            ← Papan
+            {copy.manjat.kembaliPapan}
           </a>
           <h1
             className="mt-2 font-display text-2xl font-bold text-tinta"
             style={{ fontStretch: "120%" }}
           >
-            Naik tiang
+            {copy.manjat.judul}
           </h1>
         </>
       )}
@@ -169,9 +169,9 @@ export function ManjatWizard({
       {step === 1 && (
         <div className="mt-6 flex flex-col gap-4">
           <Input
-            label="URL"
-            placeholder="nyala.id"
-            hint={previewing ? "Mengambil detail…" : "Cukup tempel URL saja — sisanya kami isi otomatis."}
+            label={copy.manjat.urlLabel}
+            placeholder={copy.manjat.urlPlaceholder}
+            hint={previewing ? copy.manjat.urlHintMemuat : copy.manjat.urlHint}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             onBlur={prefillFromUrl}
@@ -179,23 +179,25 @@ export function ManjatWizard({
 
           {/* Auto-filled from the URL — editable, but not required. */}
           <details className="rounded-md border border-garis bg-kertas-1 p-3" open>
-            <summary className="cursor-pointer text-sm text-tinta-redup">Detail (terisi otomatis)</summary>
+            <summary className="cursor-pointer text-sm text-tinta-redup">
+              {copy.manjat.detailRingkas}
+            </summary>
             <div className="mt-3 flex flex-col gap-3">
               <Input
-                label="Judul"
-                placeholder="Nyala Analytics"
+                label={copy.manjat.judulListing}
+                placeholder={copy.manjat.judulPlaceholder}
                 value={nama}
                 onChange={(e) => setNama(e.target.value)}
               />
               <Dropdown
-                label="Kategori"
+                label={copy.manjat.kategori}
                 placeholder="—"
                 value={kategoriSlug}
                 onChange={setKategoriSlug}
                 options={kategori.map((k) => ({ value: k.slug, label: k.nama }))}
               />
               <label className="block">
-                <span className="text-sm text-tinta-redup">Deskripsi (160 kar.)</span>
+                <span className="text-sm text-tinta-redup">{copy.manjat.deskripsi}</span>
                 <textarea
                   value={deskripsi}
                   maxLength={160}
@@ -208,16 +210,16 @@ export function ManjatWizard({
           </details>
 
           <Input
-            label="Email (opsional)"
+            label={copy.manjat.emailOpsional}
             type="email"
-            placeholder="kamu@email.com"
-            hint="Isi kalau mau akses dasbor & notifikasi. Tanpa akun."
+            placeholder={copy.manjat.emailPlaceholder}
+            hint={copy.manjat.emailHint}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
 
           <Button disabled={!canStep1} onClick={() => setStep(2)}>
-            Lanjut
+            {copy.manjat.lanjut}
           </Button>
         </div>
       )}
@@ -226,24 +228,24 @@ export function ManjatWizard({
         <div className="mt-6 flex flex-col gap-4">
           {express && (
             <div className="rounded-md bg-kertas-2 px-3 py-2 text-xs text-tinta-redup">
-              Manjat: <span className="text-tinta">{nama || url}</span>
+              {copy.manjat.manjatPrefix} <span className="text-tinta">{nama || url}</span>
               {kategoriSlug && ` · ${kategori.find((k) => k.slug === kategoriSlug)?.nama ?? ""}`}
               {" · "}
               <button onClick={() => setStep(1)} className="text-merah-teks hover:underline">
-                ubah detail
+                {copy.manjat.ubahDetail}
               </button>
             </div>
           )}
-          <p className="text-sm text-tinta-redup">Mau di posisi berapa? Sistem yang menghitung.</p>
+          <p className="text-sm text-tinta-redup">{copy.manjat.posisiTanya}</p>
           <div className="flex gap-4">
             <div className="flex-1">
               <AmountSelector value={target} onSelect={onSelectTarget} />
               {target === "nominal" && (
                 <div className="mt-2">
                   <Input
-                    label="Nominal (Rp)"
+                    label={copy.manjat.nominalLabel}
                     inputMode="numeric"
-                    placeholder="25.000"
+                    placeholder={copy.manjat.nominalPlaceholder}
                     value={nominalInput ? Number(nominalInput).toLocaleString("id-ID") : ""}
                     onChange={(e) => setNominalInput(e.target.value.replace(/\D/g, ""))}
                     onBlur={() =>
@@ -258,30 +260,31 @@ export function ManjatWizard({
 
           <div className="rounded-md border border-garis bg-kertas-1 p-3">
             {loadingQuote ? (
-              <p className="text-sm text-tinta-redup">Menghitung…</p>
+              <p className="text-sm text-tinta-redup">{copy.manjat.menghitung}</p>
             ) : quote ? (
               <div className="flex flex-col gap-1">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-tinta-redup">Kamu akan bayar</span>
+                  <span className="text-sm text-tinta-redup">{copy.manjat.akanBayar}</span>
                   <span className="font-mono tabular text-lg font-semibold text-tinta">
                     {formatRupiah(quote.nominal)}
                   </span>
                 </div>
                 <p className="font-mono tabular text-xs text-tinta-redup">
-                  Posisi #{quote.rank} · merosot ~{formatRupiah(quote.rosotPerHari)}/hari ·{" "}
-                  {quote.estimasiHari === null
-                    ? "stabil (kaki tiang)"
-                    : `bertahan ~${quote.estimasiHari} hari`}
+                  {copy.manjat.quoteRingkas(
+                    quote.rank,
+                    formatRupiah(quote.rosotPerHari),
+                    quote.estimasiHari,
+                  )}
                 </p>
               </div>
             ) : (
-              <p className="text-sm text-tinta-redup">Pilih target posisi.</p>
+              <p className="text-sm text-tinta-redup">{copy.manjat.pilihTarget}</p>
             )}
           </div>
 
           <div className="flex gap-2">
             <Button variant="secondary" onClick={() => setStep(1)}>
-              {express ? "Detail" : "Kembali"}
+              {express ? copy.manjat.detail : copy.manjat.kembali}
             </Button>
             {express ? (
               <Button
@@ -289,11 +292,13 @@ export function ManjatWizard({
                 disabled={!quote || submitting}
                 onClick={onPayOrConfirm}
               >
-                {submitting ? "Memproses…" : quote ? `Bayar ${formatRupiah(quote.nominal)}` : "Bayar"}
+                {submitting
+                  ? copy.manjat.memproses
+                  : copy.manjat.bayar(quote ? formatRupiah(quote.nominal) : undefined)}
               </Button>
             ) : (
               <Button className="flex-1" disabled={!quote} onClick={() => setStep(3)}>
-                Lanjut
+                {copy.manjat.lanjut}
               </Button>
             )}
           </div>
@@ -304,21 +309,23 @@ export function ManjatWizard({
         <div className="mt-6 flex flex-col gap-4">
           <dl className="rounded-md border border-garis bg-kertas-1 p-4 text-sm">
             <div className="flex justify-between py-1">
-              <dt className="text-tinta-redup">Listing</dt>
+              <dt className="text-tinta-redup">{copy.manjat.ringkasListing}</dt>
               <dd className="text-tinta">{nama || url}</dd>
             </div>
             <div className="flex justify-between py-1">
-              <dt className="text-tinta-redup">Target posisi</dt>
+              <dt className="text-tinta-redup">{copy.manjat.ringkasTarget}</dt>
               <dd className="font-mono tabular text-tinta">#{quote.rank}</dd>
             </div>
             <div className="flex justify-between py-1">
-              <dt className="text-tinta-redup">Estimasi bertahan</dt>
+              <dt className="text-tinta-redup">{copy.manjat.ringkasEstimasi}</dt>
               <dd className="font-mono tabular text-tinta">
-                {quote.estimasiHari === null ? "stabil" : `~${quote.estimasiHari} hari`}
+                {quote.estimasiHari === null
+                  ? copy.manjat.stabil
+                  : copy.manjat.bertahanHari(quote.estimasiHari)}
               </dd>
             </div>
             <div className="mt-1 flex justify-between border-t border-garis pt-2">
-              <dt className="text-tinta">Total</dt>
+              <dt className="text-tinta">{copy.manjat.ringkasTotal}</dt>
               <dd className="font-mono tabular text-lg font-semibold text-tinta">
                 {formatRupiah(quote.nominal)}
               </dd>
@@ -333,20 +340,20 @@ export function ManjatWizard({
                 onChange={(e) => setConfirmBig(e.target.checked)}
                 className="mt-0.5"
               />
-              Saya yakin membayar {formatRupiah(quote.nominal)}.
+              {copy.manjat.yakinBayar(formatRupiah(quote.nominal))}
             </label>
           )}
 
           <div className="flex gap-2">
             <Button variant="secondary" onClick={() => setStep(2)}>
-              Kembali
+              {copy.manjat.kembali}
             </Button>
             <Button
               className="flex-1"
               disabled={submitting || (bigAmount && !confirmBig)}
               onClick={onPay}
             >
-              {submitting ? "Memproses…" : `Bayar ${formatRupiah(quote.nominal)} lewat QRIS`}
+              {submitting ? copy.manjat.memproses : copy.manjat.bayarQris(formatRupiah(quote.nominal))}
             </Button>
           </div>
         </div>

@@ -56,6 +56,7 @@ export const copy = {
 
   manjat: {
     judul: "Naik tiang",
+    kembaliPapan: "← Papan",
     steps: ["Detail", "Posisi", "Bayar"],
     urlLabel: "URL",
     urlPlaceholder: "nyala.id",
@@ -63,12 +64,17 @@ export const copy = {
     urlHintMemuat: "Mengambil detail…",
     detailRingkas: "Detail (terisi otomatis)",
     judulListing: "Judul",
+    judulPlaceholder: "Nyala Analytics",
     kategori: "Kategori",
     deskripsi: "Deskripsi (160 kar.)",
     emailOpsional: "Email (opsional)",
+    emailPlaceholder: "kamu@email.com",
     emailHint: "Isi kalau mau akses dasbor & notifikasi. Tanpa akun.",
     lanjut: "Lanjut",
     kembali: "Kembali",
+    detail: "Detail",
+    ubahDetail: "ubah detail",
+    manjatPrefix: "Manjat:",
     posisiTanya: "Mau di posisi berapa? Sistem yang menghitung.",
     nominalLabel: "Nominal (Rp)",
     nominalPlaceholder: "25.000",
@@ -82,6 +88,16 @@ export const copy = {
     diprosesJudul: "Pembayaran diproses",
     diprosesPesan: "Posisimu akan muncul di papan begitu pembayaran dikonfirmasi.",
     kePapan: "Ke papan",
+    // Quote summary line under the amount selector.
+    quoteRingkas: (rank: number, rosotRp: string, estimasiHari: number | null) =>
+      `Posisi #${rank} · merosot ~${rosotRp}/hari · ` +
+      (estimasiHari === null ? "stabil (kaki tiang)" : `bertahan ~${estimasiHari} hari`),
+    ringkasListing: "Listing",
+    ringkasTarget: "Target posisi",
+    ringkasEstimasi: "Estimasi bertahan",
+    ringkasTotal: "Total",
+    stabil: "stabil",
+    bertahanHari: (n: number) => `~${n} hari`,
   },
 
   favorit: {
@@ -129,6 +145,7 @@ export const copy = {
     bodyTidakValid: "Data yang dikirim tidak terbaca. Coba ulangi dari awal.",
     listingTidakDitemukan: "Listing ini tidak ada atau sudah tidak tayang. Segarkan papan lalu coba lagi.",
     nominalWajib: "Nominal belum diisi. Masukkan jumlah rupiah yang mau kamu bayar.",
+    gagalProses: "Gagal memproses. Coba lagi sebentar lagi.",
     gagalHitung: "Gagal menghitung posisi. Cek koneksi lalu coba lagi.",
     gagalTagihan: "Gagal membuat tagihan. Pembayaran belum berjalan — coba lagi sebentar lagi.",
     tautanKedaluwarsa: "Tautan tidak valid atau sudah kedaluwarsa. Minta tautan baru untuk masuk.",
