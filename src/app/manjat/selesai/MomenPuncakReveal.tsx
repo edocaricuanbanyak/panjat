@@ -2,6 +2,7 @@
 
 import { ShareButton } from "./ShareButton";
 import { buttonClasses } from "@/components/Button";
+import { copy } from "@/copy";
 
 /**
  * Momen Puncak (MI-1) — "ini produk sesungguhnya" (§9.2). A ~1.2s staggered
@@ -26,7 +27,7 @@ export function MomenPuncakReveal({
   return (
     <>
       <p className="reveal font-mono text-xs uppercase tracking-wide text-tinta-redup">
-        Momen Puncak
+        {copy.momen.eyebrow}
       </p>
 
       <div className="relative mt-3">
@@ -52,13 +53,13 @@ export function MomenPuncakReveal({
         {heading}
       </h1>
       <p className="reveal mt-1 text-sm text-tinta-redup" style={{ animationDelay: "0.6s" }}>
-        {nama} · pegangan {pegangan}
-        {overtaken > 0 && <> · menyalip {overtaken} pemanjat</>}
+        {copy.momen.ringkas(nama, pegangan)}
+        {overtaken > 0 && <> · {copy.momen.menyalip(overtaken)}</>}
       </p>
 
       <img
         src={`/api/og/${listingId}?story=1`}
-        alt={`Kartu ${nama}`}
+        alt={copy.momen.kartuAlt(nama)}
         width={270}
         height={480}
         className="reveal mt-6 rounded-lg border border-garis shadow-sm"
@@ -69,9 +70,9 @@ export function MomenPuncakReveal({
         className="reveal mt-6 flex w-full max-w-xs flex-col gap-2"
         style={{ animationDelay: "1.05s" }}
       >
-        <ShareButton url="/" text={`Aku #${rank} di Panjat!`} />
+        <ShareButton url="/" text={copy.momen.share(rank)} />
         <a href="/" className={buttonClasses("secondary", "md")}>
-          Lihat papan
+          {copy.momen.lihatPapan}
         </a>
       </div>
     </>

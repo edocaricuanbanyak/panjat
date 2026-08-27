@@ -123,6 +123,17 @@ export const copy = {
     pasangGratisTaut: "Pasang gratis di Kaki Tiang",
   },
 
+  momen: {
+    eyebrow: "Momen Puncak",
+    dipuncak: "Kamu di puncak!",
+    naik: (rank: number) => `Kamu naik ke #${rank}`,
+    ringkas: (nama: string, pegangan: string) => `${nama} · pegangan ${pegangan}`,
+    menyalip: (n: number) => `menyalip ${n} pemanjat`,
+    share: (rank: number) => `Aku #${rank} di Panjat!`,
+    kartuAlt: (nama: string) => `Kartu ${nama}`,
+    lihatPapan: "Lihat papan",
+  },
+
   jelajah: {
     sub: "Cari berdasarkan relevansi — bukan siapa yang bayar paling banyak.",
     cariPlaceholder: "cari AI tools, jasa, game…",
