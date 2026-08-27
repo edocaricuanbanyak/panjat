@@ -1,14 +1,12 @@
 import { BoardLive } from "@/components/BoardLive";
+import { BoardTabs } from "@/components/BoardTabs";
 import { CaraMain } from "@/components/CaraMain";
 import { EmptyState } from "@/components/EmptyState";
-import { Footer } from "@/components/Footer";
 import { HeroManjat } from "@/components/HeroManjat";
 import { KakiTiang } from "@/components/KakiTiang";
-import { ManjatProvider } from "@/components/ManjatModal";
-import { Nav } from "@/components/Nav";
+import { PageShell } from "@/components/PageShell";
 import { Spotlight } from "@/components/Spotlight";
 import { TebakJuara } from "@/components/TebakJuara";
-import { TiangRail } from "@/components/TiangRail";
 import { db } from "@/db";
 import { getBoard } from "@/domain/board";
 import { listCategories } from "@/domain/jelajah";
@@ -33,45 +31,41 @@ export default async function Home() {
   ]);
 
   return (
-    <ManjatProvider kategori={kats}>
-      <main className="mx-auto w-full max-w-3xl px-4 py-8">
-        <Nav active="papan" />
+    <PageShell manjatKategori={kats}>
+      {/* HERO — value + the one action */}
+      <section className="pt-2 pb-8">
+        <h1
+          className="font-display text-5xl font-bold leading-[0.95] text-tinta sm:text-6xl"
+          style={{ fontStretch: "130%" }}
+        >
+          Bayar untuk manjat.
+        </h1>
+        <p className="mt-4 max-w-xl text-lg text-tinta-redup">
+          Pegangan paling kuat duduk paling atas. Tiangnya licin — yang berhenti manjat, merosot.
+        </p>
+        <HeroManjat kategori={kats} />
+        <div className="mt-4 flex gap-6 font-mono tabular text-xs text-tinta-redup">
+          <span>
+            <b className="text-tinta">{entries.length}</b> pemanjat
+          </span>
+          <span>
+            <b className="text-tinta">{formatRupiah(totalPegangan)}</b> total pegangan
+          </span>
+        </div>
+      </section>
 
-        {/* HERO — value + the one action, up top */}
-        <section className="py-2">
-          <h1
-            className="font-display text-4xl font-bold text-tinta"
-            style={{ fontStretch: "130%" }}
-          >
-            Panjat
-          </h1>
-          <p className="mt-2 max-w-xl text-tinta-redup">
-            Bayar untuk manjat. Pegangan paling kuat duduk paling atas. Tiangnya licin — yang
-            berhenti manjat, merosot.
-          </p>
-          <HeroManjat kategori={kats} />
-          <div className="mt-3 flex gap-4 font-mono tabular text-xs text-tinta-redup">
-            <span>{entries.length} pemanjat</span>
-            <span>{formatRupiah(totalPegangan)} total pegangan</span>
-          </div>
-        </section>
+      {/* PAPAN — the board, under its tab */}
+      <section>
+        <BoardTabs active="sekarang" className="mb-5" />
+        {entries.length === 0 ? (
+          <EmptyState title="Belum ada yang manjat." message="Tiangnya masih kinclong." />
+        ) : (
+          <BoardLive initial={{ entries, max }} />
+        )}
+      </section>
 
-        <CaraMain />
-
-        {/* PAPAN */}
-        <section className="mt-10">
-          <h2 className="mb-3 font-display text-lg font-semibold text-tinta">Papan</h2>
-          {entries.length === 0 ? (
-            <EmptyState title="Belum ada yang manjat." message="Tiangnya masih kinclong." />
-          ) : (
-            <div className="flex gap-4">
-              <TiangRail className="w-3 shrink-0" />
-              <BoardLive initial={{ entries, max }} />
-            </div>
-          )}
-        </section>
-
-        {/* KAKI TIANG (gratis) */}
+      {/* KAKI TIANG (gratis) */}
+      <div className="mt-12">
         <KakiTiang entries={kakiTiang} remaining={sisaSorak} />
         <p className="mt-3 text-xs text-tinta-redup">
           Punya produk?{" "}
@@ -80,17 +74,23 @@ export default async function Home() {
           </a>
           .
         </p>
+      </div>
 
-        {/* SEKUNDER — ritual & sorotan, di bawah */}
-        {entries.length > 0 && (
-          <div className="mt-10">
-            <TebakJuara status={tebak} />
-            <Spotlight items={entries.map((e) => ({ id: e.id, nama: e.nama, pegangan: e.pegangan }))} />
-          </div>
-        )}
+      {/* CARA MAIN */}
+      <section className="mt-14">
+        <h2 className="mb-6 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+          Cara main
+        </h2>
+        <CaraMain />
+      </section>
 
-        <Footer />
-      </main>
-    </ManjatProvider>
+      {/* SEKUNDER — ritual & sorotan */}
+      {entries.length > 0 && (
+        <div className="mt-14 flex flex-col gap-8">
+          <TebakJuara status={tebak} />
+          <Spotlight items={entries.map((e) => ({ id: e.id, nama: e.nama, pegangan: e.pegangan }))} />
+        </div>
+      )}
+    </PageShell>
   );
 }

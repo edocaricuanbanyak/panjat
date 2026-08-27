@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { asc } from "drizzle-orm";
-import { Nav } from "@/components/Nav";
+import { PageShell } from "@/components/PageShell";
 import { db } from "@/db";
 import { kategori } from "@/db/schema";
 import { PasangGratisForm } from "./PasangGratisForm";
@@ -19,17 +19,21 @@ export default async function PasangGratisPage() {
     .orderBy(asc(kategori.nama));
 
   return (
-    <main className="mx-auto w-full max-w-md px-4 py-8">
-      <Nav active="papan" />
-      <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+    <PageShell>
+      <h1
+        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
+        style={{ fontStretch: "125%" }}
+      >
         Pasang gratis
       </h1>
-      <p className="mt-1 mb-4 text-sm text-tinta-redup">
+      <p className="mt-2 mb-6 max-w-xl text-tinta-redup">
         Listing gratis masuk Kaki Tiang di bawah listing berbayar, diurut Sorak pengunjung. Kapan
         pun bisa manjat ke papan berbayar.
       </p>
-      <PasangGratisForm kategori={kats} />
+      <div className="max-w-md">
+        <PasangGratisForm kategori={kats} />
+      </div>
       <a href="/" className="mt-6 inline-block text-sm text-tinta-redup hover:text-tinta">← Papan</a>
-    </main>
+    </PageShell>
   );
 }

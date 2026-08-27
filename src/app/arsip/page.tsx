@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { desc, eq } from "drizzle-orm";
-import { Footer } from "@/components/Footer";
 import { LogoTile } from "@/components/LogoTile";
-import { Nav } from "@/components/Nav";
+import { PageShell } from "@/components/PageShell";
 import { db } from "@/db";
 import { juaraHarian, listing } from "@/db/schema";
 
@@ -22,24 +21,26 @@ export default async function ArsipPage() {
     .limit(90);
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-8">
-      <Nav active="hari-ini" />
-      <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+    <PageShell>
+      <h1
+        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
+        style={{ fontStretch: "125%" }}
+      >
         Arsip Juara
       </h1>
-      <p className="mt-1 text-sm text-tinta-redup">
+      <p className="mt-2 max-w-xl text-tinta-redup">
         Posisi disewa, tapi sejarah permanen. Setiap juara harian tersimpan selamanya.
       </p>
 
       {rows.length === 0 ? (
         <p className="mt-6 text-sm text-tinta-redup">Belum ada juara yang diarsipkan.</p>
       ) : (
-        <ul className="mt-6 flex flex-col gap-2">
+        <ul className="mt-6 divide-y divide-garis">
           {rows.map((r) => (
             <li key={r.tanggal}>
               <a
                 href={`/hari-ini/${r.tanggal}`}
-                className="flex items-center gap-3 rounded-lg border border-garis bg-kertas-1 p-3 hover:bg-kertas-2"
+                className="flex items-center gap-3 py-3 hover:text-merah"
               >
                 <LogoTile nama={r.nama} />
                 <div className="min-w-0">
@@ -51,8 +52,6 @@ export default async function ArsipPage() {
           ))}
         </ul>
       )}
-
-      <Footer />
-    </main>
+    </PageShell>
   );
 }

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
+import { BoardTabs } from "@/components/BoardTabs";
 import { JelajahCard } from "@/components/JelajahCard";
 import { LogoTile } from "@/components/LogoTile";
-import { Nav } from "@/components/Nav";
+import { PageShell } from "@/components/PageShell";
 import { db } from "@/db";
 import { kategori } from "@/db/schema";
 import { categoryDirectory, KATEGORI_INTRO, parseSort, SORT_LABELS, type Sort } from "@/domain/jelajah";
@@ -39,12 +40,15 @@ export default async function KategoriPage({
   if (!dir) notFound();
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-8">
-      <Nav active="jelajah" />
-      <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+    <PageShell>
+      <BoardTabs active="jelajah" className="mb-5" />
+      <h1
+        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
+        style={{ fontStretch: "125%" }}
+      >
         {dir.kategori.nama}
       </h1>
-      {dir.kategori.intro && <p className="mt-1 text-sm text-tinta-redup">{dir.kategori.intro}</p>}
+      {dir.kategori.intro && <p className="mt-2 max-w-xl text-tinta-redup">{dir.kategori.intro}</p>}
 
       {dir.champion && (
         <div className="mt-4 flex items-center gap-3 rounded-lg border border-merah/40 bg-merah/5 p-3">
@@ -90,6 +94,6 @@ export default async function KategoriPage({
           ))}
         </div>
       )}
-    </main>
+    </PageShell>
   );
 }

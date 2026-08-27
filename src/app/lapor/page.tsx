@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
-import { Nav } from "@/components/Nav";
+import { PageShell } from "@/components/PageShell";
 import { db } from "@/db";
 import { listing } from "@/db/schema";
 
@@ -17,16 +17,18 @@ export default async function LaporPage({ searchParams }: { searchParams: Promis
   if (!l) notFound();
 
   return (
-    <main className="mx-auto w-full max-w-md px-4 py-8">
-      <Nav active="papan" />
-      <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+    <PageShell>
+      <h1
+        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
+        style={{ fontStretch: "125%" }}
+      >
         Laporkan / klaim
       </h1>
-      <p className="mt-1 mb-4 text-sm text-tinta-redup">
+      <p className="mt-2 mb-4 max-w-md text-tinta-redup">
         Listing: <span className="text-tinta">{l.nama}</span>. Laporan diputus manusia. Pemilik sah URL
         berhak meminta penurunan listing atas URL-nya.
       </p>
-      <form action="/api/lapor" method="post" className="flex flex-col gap-3">
+      <form action="/api/lapor" method="post" className="flex max-w-md flex-col gap-3">
         <input type="hidden" name="listingId" value={id} />
         <label className="block">
           <span className="text-sm text-tinta-redup">Jenis</span>
@@ -46,6 +48,6 @@ export default async function LaporPage({ searchParams }: { searchParams: Promis
         <button className="h-11 rounded-md bg-merah px-4 text-sm font-medium text-kertas-1">Kirim</button>
       </form>
       <a href={`/l/${id}`} className="mt-6 inline-block text-sm text-tinta-redup hover:text-tinta">← Kembali</a>
-    </main>
+    </PageShell>
   );
 }

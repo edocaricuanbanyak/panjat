@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { buttonClasses } from "@/components/Button";
-import { Footer } from "@/components/Footer";
 import { LencanaRow } from "@/components/LencanaRow";
 import { LogoTile } from "@/components/LogoTile";
-import { Nav } from "@/components/Nav";
+import { PageShell } from "@/components/PageShell";
 import { Sparkline } from "@/components/Sparkline";
 import { db } from "@/db";
 import { getListingPublik } from "@/domain/listing-publik";
@@ -44,13 +43,11 @@ export default async function ListingPublikPage({
   if (!l) notFound();
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-8">
-      <Nav active="papan" />
-
+    <PageShell>
       <div className="flex items-start gap-4">
         <LogoTile nama={l.nama} className="size-16 rounded-md text-3xl" />
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+          <h1 className="font-display text-3xl font-bold text-tinta" style={{ fontStretch: "125%" }}>
             {l.nama}
           </h1>
           <p className="font-mono text-xs text-tinta-redup">
@@ -119,8 +116,6 @@ export default async function ListingPublikPage({
           Laporkan / klaim listing ini
         </a>
       </p>
-
-      <Footer />
-    </main>
+    </PageShell>
   );
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Footer } from "@/components/Footer";
-import { Nav } from "@/components/Nav";
+import { PageShell } from "@/components/PageShell";
 import { db } from "@/db";
 import { loadRosotConfig } from "@/domain/config";
 import { formatRupiah } from "@/lib/format";
@@ -24,12 +23,14 @@ export default async function AturanPage() {
   ];
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-8">
-      <Nav active="papan" />
-      <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+    <PageShell>
+      <h1
+        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
+        style={{ fontStretch: "125%" }}
+      >
         Aturan
       </h1>
-      <p className="mt-2 text-sm text-tinta-redup">
+      <p className="mt-2 max-w-xl text-tinta-redup">
         Kamu bayar untuk manjat. Pegangan paling kuat duduk paling atas. Tiangnya licin — semua
         merosot pelan-pelan. Manjat lagi kalau mau bertahan.
       </p>
@@ -76,8 +77,6 @@ export default async function AturanPage() {
           (Kaki Tiang) dan listing tidak pernah dihapus karena merosot.
         </p>
       </section>
-
-      <Footer />
-    </main>
+    </PageShell>
   );
 }

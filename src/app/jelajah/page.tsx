@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import { BoardTabs } from "@/components/BoardTabs";
 import { JelajahCard } from "@/components/JelajahCard";
-import { Nav } from "@/components/Nav";
+import { PageShell } from "@/components/PageShell";
 import { db } from "@/db";
 import { listCategories, searchListings } from "@/domain/jelajah";
 
@@ -24,12 +25,9 @@ export default async function JelajahPage({
   ]);
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-8">
-      <Nav active="jelajah" />
-      <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
-        Jelajah
-      </h1>
-      <p className="mt-1 text-sm text-tinta-redup">
+    <PageShell>
+      <BoardTabs active="jelajah" className="mb-5" />
+      <p className="text-tinta-redup">
         Cari berdasarkan relevansi — bukan siapa yang bayar paling banyak.
       </p>
 
@@ -56,8 +54,10 @@ export default async function JelajahPage({
           </div>
         )
       ) : (
-        <div className="mt-6">
-          <h2 className="mb-2 text-sm font-semibold text-tinta">Jelajahi per kategori</h2>
+        <div className="mt-8">
+          <h2 className="mb-3 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+            Jelajahi per kategori
+          </h2>
           <div className="flex flex-wrap gap-2">
             {cats.map((k) => (
               <a
@@ -71,6 +71,6 @@ export default async function JelajahPage({
           </div>
         </div>
       )}
-    </main>
+    </PageShell>
   );
 }

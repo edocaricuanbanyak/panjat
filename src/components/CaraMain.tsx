@@ -1,4 +1,4 @@
-/** Clear 3-step explanation (R20-b). The mechanic in ten seconds. */
+/** The mechanic in ten seconds (R20-b) — editorial, three quiet steps. */
 export function CaraMain() {
   const steps: [string, string, string][] = [
     ["1", "Tempel link produkmu", "Judul, deskripsi, dan kategori terisi otomatis."],
@@ -6,14 +6,17 @@ export function CaraMain() {
     ["3", "Naik — lalu merosot", "Tiangnya licin, semua turun pelan. Manjat lagi kalau mau bertahan."],
   ];
   return (
-    <ol className="mt-6 grid gap-3 sm:grid-cols-3">
+    <ol className="grid gap-6 sm:grid-cols-3">
       {steps.map(([n, judul, ket]) => (
-        <li key={n} className="rounded-lg border border-garis bg-kertas-1 p-3">
-          <span className="grid size-6 place-items-center rounded-full bg-merah font-mono text-xs text-kertas-1">
+        <li key={n}>
+          <span
+            className="font-display text-3xl font-bold text-tinta-redup/50"
+            style={{ fontStretch: "125%" }}
+          >
             {n}
           </span>
-          <p className="mt-2 font-display font-semibold text-tinta">{judul}</p>
-          <p className="mt-0.5 text-xs text-tinta-redup">{ket}</p>
+          <p className="mt-1 font-display font-semibold text-tinta">{judul}</p>
+          <p className="mt-1 text-sm text-tinta-redup">{ket}</p>
         </li>
       ))}
     </ol>

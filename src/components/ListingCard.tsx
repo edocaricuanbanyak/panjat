@@ -3,12 +3,12 @@ import { formatRupiah } from "@/lib/format";
 import { LencanaRow } from "./LencanaRow";
 import { LogoTile } from "./LogoTile";
 import { ManjatButton } from "./ManjatModal";
-import { RankBadge } from "./RankBadge";
 
 /**
- * One climber on the pole — a clean row: rank · logo · name · pegangan · Salip.
- * Summit (top 3) is larger and shows the description; secondary detail (clicks,
- * decay estimate) lives on the dashboard, not the board.
+ * One climber, as an editorial row: big rank numeral · logo · name · grip · Salip.
+ * Summit (top 3) is larger, shows the description, and carries the flag-red rank
+ * (§9.6.2 — merah only in the summit zone). Rows are hairline-divided by the
+ * containing list, not individually boxed.
  */
 export function ListingCard({
   entry,
@@ -19,18 +19,20 @@ export function ListingCard({
   density?: "puncak" | "row";
 }) {
   const puncak = density === "puncak";
-  const wdth = puncak ? Math.max(100, 130 - (entry.rank - 1) * 12) : 100;
+  const wdth = puncak ? Math.max(105, 130 - (entry.rank - 1) * 10) : 100;
 
   return (
-    <article
-      className={`flex items-center gap-3 rounded-lg border border-garis bg-kertas-1 ${puncak ? "p-4" : "p-3"}`}
-    >
-      <div className="w-7 shrink-0 text-right">
-        <RankBadge rank={entry.rank} />
+    <article className={`flex items-center gap-4 ${puncak ? "py-3.5" : "py-3"}`}>
+      <div
+        className={`shrink-0 text-right font-mono tabular font-semibold ${
+          puncak ? "w-10 text-2xl" : "w-8 text-base"
+        } ${entry.rank <= 3 ? "text-merah" : "text-tinta-redup"}`}
+      >
+        {entry.rank}
       </div>
       <LogoTile
         nama={entry.nama}
-        className={puncak ? "size-12 rounded-md text-xl" : "size-9 rounded-md text-base"}
+        className={puncak ? "size-11 rounded-md text-lg" : "size-9 rounded-md text-sm"}
       />
       <div className="min-w-0 flex-1">
         <a
@@ -43,7 +45,7 @@ export function ListingCard({
           {entry.nama}
         </a>
         {puncak && entry.deskripsi ? (
-          <p className="truncate text-xs text-tinta-redup">{entry.deskripsi}</p>
+          <p className="truncate text-sm text-tinta-redup">{entry.deskripsi}</p>
         ) : (
           entry.kategoriNama && <p className="text-xs text-tinta-redup">{entry.kategoriNama}</p>
         )}
@@ -53,14 +55,16 @@ export function ListingCard({
           </div>
         )}
       </div>
-      <span
-        className={`shrink-0 font-mono tabular font-semibold text-tinta ${puncak ? "text-lg" : "text-sm"}`}
-      >
-        {formatRupiah(entry.pegangan)}
-      </span>
-      <ManjatButton url={entry.urlNormal} size="sm">
-        Salip
-      </ManjatButton>
+      <div className="flex shrink-0 items-center gap-3">
+        <span
+          className={`font-mono tabular font-semibold text-tinta ${puncak ? "text-xl" : "text-base"}`}
+        >
+          {formatRupiah(entry.pegangan)}
+        </span>
+        <ManjatButton url={entry.urlNormal} size="sm" variant="secondary">
+          Salip
+        </ManjatButton>
+      </div>
     </article>
   );
 }

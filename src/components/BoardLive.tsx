@@ -60,7 +60,8 @@ export function BoardLive({ initial }: { initial: Board }) {
 
       {/* Board updates must not be read row-by-row (R20-e). */}
       <div aria-live="off">
-        <section className="flex flex-col gap-3">
+        {/* Summit zone — the top three sit on paper, hairline-divided. */}
+        <section className="divide-y divide-garis rounded-lg border border-garis bg-kertas-1 px-4">
           {puncak.map((e) => (
             <div key={e.id} style={{ viewTransitionName: `vt-${e.id}` } as React.CSSProperties}>
               <ListingCard entry={e} max={board.max} density="puncak" />
@@ -68,7 +69,7 @@ export function BoardLive({ initial }: { initial: Board }) {
           ))}
         </section>
         {sisa.length > 0 && (
-          <section className="mt-4 flex flex-col gap-2">
+          <section className="mt-4 divide-y divide-garis px-4">
             {sisa.map((e) => (
               <div key={e.id} style={{ viewTransitionName: `vt-${e.id}` } as React.CSSProperties}>
                 <ListingCard entry={e} max={board.max} />

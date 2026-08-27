@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { BoardTabs } from "@/components/BoardTabs";
 import { HariIniBoard } from "@/components/HariIniBoard";
-import { Nav } from "@/components/Nav";
+import { PageShell } from "@/components/PageShell";
 import { db } from "@/db";
 import { getPapanHariIni, wibDayWindow } from "@/domain/papan-hari-ini";
 
@@ -31,19 +32,22 @@ export default async function ArsipHariIni({
   const entries = await getPapanHariIni(db, start, end);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8">
-      <Nav active="hari-ini" />
+    <PageShell>
+      <BoardTabs active="hari-ini" className="mb-5" />
       <p className="font-mono text-xs text-tinta-redup">Arsip</p>
-      <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+      <h1
+        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
+        style={{ fontStretch: "125%" }}
+      >
         Papan Hari Ini · {tanggal}
       </h1>
-      <p className="mt-1 text-sm text-tinta-redup">
+      <p className="mt-2 text-tinta-redup">
         Standings final hari itu, dihitung ulang dari ledger permanen.
       </p>
       <HariIniBoard entries={entries} />
       <a href="/hari-ini" className="mt-6 inline-block text-sm text-tinta-redup hover:text-tinta">
         ← Hari ini
       </a>
-    </main>
+    </PageShell>
   );
 }
