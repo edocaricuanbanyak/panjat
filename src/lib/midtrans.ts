@@ -4,6 +4,7 @@
  * manjat flow can be exercised offline with a fake.
  */
 import { createHash, timingSafeEqual } from "node:crypto";
+import { BASE_URL } from "./site";
 
 /** Fields of a Midtrans HTTP notification we rely on. */
 export interface MidtransNotification {
@@ -120,6 +121,8 @@ export const midtransSnapClient: SnapClient = {
         ...(email ? { customer_details: { email } } : {}),
         expiry: { unit: "minutes", duration: expiryMinutes },
         ...(enabled ? { enabled_payments: enabled } : {}),
+        // Browser returns here after payment; grip still activates only via webhook.
+        callbacks: { finish: `${BASE_URL}/manjat/selesai?order=${orderId}` },
       }),
     });
     if (!res.ok) {
