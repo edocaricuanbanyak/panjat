@@ -69,12 +69,12 @@ export default async function Home({
       {/* HERO — value + the one action */}
       <section className="pt-2 pb-8">
         <h1
-          className="font-display text-5xl font-bold leading-[0.95] text-tinta sm:text-6xl"
+          className="font-display text-4xl font-bold leading-[0.95] text-tinta sm:text-5xl md:text-6xl"
           style={{ fontStretch: "130%" }}
         >
           {copy.beranda.heroJudul}
         </h1>
-        <p className="mt-4 max-w-xl text-lg text-tinta-redup">{copy.beranda.heroSub}</p>
+        <p className="mt-4 max-w-xl text-base text-tinta-redup sm:text-lg">{copy.beranda.heroSub}</p>
         <HeroManjat kategori={kats} />
         <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 font-mono tabular text-xs text-tinta-redup">
           <span className="inline-flex items-center gap-1.5">
