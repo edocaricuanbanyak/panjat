@@ -1,6 +1,6 @@
+import { BoardLive } from "@/components/BoardLive";
 import { buttonClasses } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
-import { ListingCard } from "@/components/ListingCard";
 import { TiangRail } from "@/components/TiangRail";
 import { db } from "@/db";
 import { getBoard } from "@/domain/board";
@@ -11,8 +11,6 @@ export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const { entries, max } = await getBoard(db);
-  const puncak = entries.slice(0, 3);
-  const sisa = entries.slice(3);
   const totalPegangan = entries.reduce((sum, e) => sum + e.pegangan, 0);
 
   return (
@@ -49,20 +47,7 @@ export default async function Home() {
       ) : (
         <div className="mt-6 flex gap-4">
           <TiangRail className="w-3 shrink-0" />
-          <div className="flex flex-1 flex-col gap-4">
-            <section className="flex flex-col gap-3">
-              {puncak.map((e) => (
-                <ListingCard key={e.id} entry={e} max={max} density="puncak" />
-              ))}
-            </section>
-            {sisa.length > 0 && (
-              <section className="flex flex-col gap-2">
-                {sisa.map((e) => (
-                  <ListingCard key={e.id} entry={e} max={max} />
-                ))}
-              </section>
-            )}
-          </div>
+          <BoardLive initial={{ entries, max }} />
         </div>
       )}
     </main>

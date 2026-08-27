@@ -21,6 +21,7 @@ export function MockPay({ orderId, nominal }: { orderId: string; nominal: number
       if (!res.ok) throw new Error(data.error ?? "gagal");
       if (data.status !== "settled") throw new Error(`status: ${data.status}`);
       setStatus("done");
+      window.location.href = `/manjat/selesai?order=${encodeURIComponent(orderId)}`;
     } catch (e) {
       setStatus("error");
       setMsg(e instanceof Error ? e.message : "gagal");
