@@ -5,11 +5,12 @@ import { useState } from "react";
 import type { FavoritEntry } from "@/lib/favorit";
 import { Button } from "./Button";
 import { Dropdown } from "./Dropdown";
+import { LogoTile } from "./LogoTile";
 
 /**
- * "Board terfavorit" — a free spectator vote that runs alongside the paid board
- * (never money/ranking). Pick a favourite; a separate leaderboard ranks listings
- * by votes. One active vote per visitor, changeable.
+ * "Pemanjat terfavorit" — a free spectator vote alongside the paid board (never
+ * money/ranking). One vote per WIB day, accumulated weekly. Before voting: a
+ * picker. After voting: the week's top-5, laid out horizontally.
  */
 export function VoteFavorit({
   entries,
@@ -21,8 +22,9 @@ export function VoteFavorit({
   myChoice: string | null;
 }) {
   const router = useRouter();
-  const [pick, setPick] = useState(myChoice ?? "");
+  const [pick, setPick] = useState("");
   const [saving, setSaving] = useState(false);
+  const voted = myChoice !== null;
 
   async function vote() {
     if (!pick || saving) return;
@@ -39,46 +41,64 @@ export function VoteFavorit({
     }
   }
 
+  const top5 = leaderboard.slice(0, 5);
+
   return (
     <section className="rounded-2xl border border-garis bg-kertas-1 p-4 shadow-kartu">
       <div className="flex items-center justify-between">
         <h3 className="font-display font-semibold text-tinta">Pemanjat terfavorit</h3>
-        <span className="font-mono text-xs text-tinta-redup">vote gratis</span>
-      </div>
-      <p className="mt-1 text-sm text-tinta-redup">
-        Pilih favoritmu — bukan soal uang, soal selera.
-      </p>
-
-      <div className="mt-3 flex items-end gap-2">
-        <Dropdown
-          className="flex-1"
-          placeholder="Pilih listing…"
-          value={pick}
-          onChange={setPick}
-          options={entries.map((e) => ({ value: e.id, label: e.nama }))}
-        />
-        <Button onClick={vote} disabled={!pick || saving}>
-          {saving ? "…" : myChoice ? "Ganti" : "Vote"}
-        </Button>
+        <span className="font-mono text-xs text-tinta-redup">
+          {voted ? "minggu ini" : "vote gratis · 1×/hari"}
+        </span>
       </div>
 
-      {leaderboard.length > 0 && (
-        <ol className="mt-4 flex flex-col divide-y divide-garis/60">
-          {leaderboard.map((e, i) => (
-            <li key={e.id} className="flex items-center gap-3 py-1.5 text-sm">
-              <span className="w-6 shrink-0 text-right font-mono tabular text-tinta-redup">
-                #{i + 1}
-              </span>
-              <span className="min-w-0 flex-1 truncate font-display font-semibold text-tinta">
-                {e.nama}
-                {e.id === myChoice && <span className="ml-1.5 text-xs text-tinta-redup">♥ pilihanmu</span>}
-              </span>
-              <span className="shrink-0 font-mono tabular text-xs text-tinta-redup">
-                {e.votes.toLocaleString("id-ID")} vote
-              </span>
-            </li>
-          ))}
-        </ol>
+      {voted ? (
+        <>
+          <p className="mt-1 text-sm text-tinta-redup">
+            Kamu sudah vote hari ini. Suara diakumulasi mingguan.
+          </p>
+          {top5.length > 0 ? (
+            <ol className="mt-3 flex gap-2 overflow-x-auto pb-1">
+              {top5.map((e, i) => (
+                <li
+                  key={e.id}
+                  className={`flex w-28 shrink-0 flex-col items-center gap-1.5 rounded-xl border p-3 text-center ${
+                    e.id === myChoice ? "border-tinta bg-kertas-2" : "border-garis"
+                  }`}
+                >
+                  <span className="font-mono text-xs text-tinta-redup">#{i + 1}</span>
+                  <LogoTile nama={e.nama} className="size-9 rounded-md text-sm" />
+                  <span className="w-full truncate font-display text-sm font-semibold text-tinta">
+                    {e.nama}
+                  </span>
+                  <span className="font-mono tabular text-xs text-tinta-redup">
+                    {e.votes.toLocaleString("id-ID")} vote
+                  </span>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="mt-3 text-sm text-tinta-redup">Jadilah yang pertama menerima suara.</p>
+          )}
+        </>
+      ) : (
+        <>
+          <p className="mt-1 text-sm text-tinta-redup">
+            Pilih favoritmu — bukan soal uang, soal selera. Sekali sehari.
+          </p>
+          <div className="mt-3 flex items-end gap-2">
+            <Dropdown
+              className="flex-1"
+              placeholder="Pilih listing…"
+              value={pick}
+              onChange={setPick}
+              options={entries.map((e) => ({ value: e.id, label: e.nama }))}
+            />
+            <Button onClick={vote} disabled={!pick || saving}>
+              {saving ? "…" : "Vote"}
+            </Button>
+          </div>
+        </>
       )}
     </section>
   );

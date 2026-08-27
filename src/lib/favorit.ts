@@ -1,42 +1,56 @@
 /**
- * "Board terfavorit" — a free, spectator vote that runs ALONGSIDE the paid board
- * and never touches money/ranking (§ anonymous gamification contract). One active
- * vote per visitor (changeable); tallies live in Redis, names resolved from
- * Postgres. Fail-open: a down Redis just yields an empty favourite board.
+ * "Pemanjat terfavorit" — a free spectator vote alongside the paid board (never
+ * money/ranking). One vote per visitor per WIB day (not changeable); votes
+ * accumulate into a weekly leaderboard. Tallies live in Redis, names resolved
+ * from Postgres. Fail-open: a down Redis just yields an empty favourite board.
  */
 import { inArray } from "drizzle-orm";
 import type { Database } from "@/db";
 import { listing } from "@/db/schema";
 import { redis } from "./redis";
 
-const TALLY = "favorit:tally"; // ZSET member=listingId score=votes
-const choiceKey = (vid: string) => `favorit:choice:${vid}`;
+/** YYYY-MM-DD in WIB — the daily vote bucket. */
+function wibDate(now: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(now);
+}
 
-/** Cast/'move' this visitor's single favourite vote. Best-effort. */
-export async function voteFavorit(vid: string, listingId: string): Promise<boolean> {
+/** Stable weekly bucket id (7-day WIB windows) for accumulation. */
+function weekBucket(now: Date): number {
+  const days = Math.floor(Date.parse(`${wibDate(now)}T00:00:00Z`) / 86_400_000);
+  return Math.floor(days / 7);
+}
+
+const tallyKey = (now: Date) => `favorit:tally:w${weekBucket(now)}`;
+const votedKey = (day: string, vid: string) => `favorit:voted:${day}:${vid}`;
+const VOTED_TTL_S = 60 * 60 * 30; // ~30h, covers the WIB day
+const TALLY_TTL_S = 60 * 60 * 24 * 21; // keep a few weeks
+
+export type VoteResult = { ok: true } | { ok: false; reason: "sudah" | "gagal" };
+
+/** Cast today's single vote. Idempotent-locked per day; never changeable. */
+export async function voteFavorit(vid: string, listingId: string, now = new Date()): Promise<VoteResult> {
   const r = redis();
-  if (!r) return false;
+  if (!r) return { ok: false, reason: "gagal" };
   try {
-    const prev = await r.get(choiceKey(vid));
-    if (prev === listingId) return true; // already voted for this one
-    const tx = r.multi();
-    if (prev) tx.zincrby(TALLY, -1, prev);
-    tx.zincrby(TALLY, 1, listingId);
-    tx.set(choiceKey(vid), listingId);
-    await tx.exec();
-    return true;
+    // Atomic day-lock: SET NX succeeds only on the first vote of the day.
+    const locked = await r.set(votedKey(wibDate(now), vid), listingId, "EX", VOTED_TTL_S, "NX");
+    if (locked === null) return { ok: false, reason: "sudah" };
+    const key = tallyKey(now);
+    await r.zincrby(key, 1, listingId);
+    await r.expire(key, TALLY_TTL_S);
+    return { ok: true };
   } catch {
-    return false;
+    return { ok: false, reason: "gagal" };
   }
 }
 
-/** The listing this visitor currently favours, if any. */
-export async function myFavorit(vid: string | undefined): Promise<string | null> {
+/** The listing this visitor voted for today, if any (locks the UI). */
+export async function myFavoritToday(vid: string | undefined, now = new Date()): Promise<string | null> {
   if (!vid) return null;
   const r = redis();
   if (!r) return null;
   try {
-    return (await r.get(choiceKey(vid))) ?? null;
+    return (await r.get(votedKey(wibDate(now), vid))) ?? null;
   } catch {
     return null;
   }
@@ -48,12 +62,12 @@ export interface FavoritEntry {
   votes: number;
 }
 
-/** Listings ranked by favourite votes (its own little leaderboard). */
-export async function favoritBoard(db: Database, limit = 10): Promise<FavoritEntry[]> {
+/** This week's accumulated favourites, ranked. */
+export async function favoritBoard(db: Database, now = new Date(), limit = 10): Promise<FavoritEntry[]> {
   const r = redis();
   if (!r) return [];
   try {
-    const raw = await r.zrevrange(TALLY, 0, limit - 1, "WITHSCORES");
+    const raw = await r.zrevrange(tallyKey(now), 0, limit - 1, "WITHSCORES");
     if (raw.length === 0) return [];
     const ids: string[] = [];
     const votes = new Map<string, number>();

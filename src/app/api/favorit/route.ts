@@ -32,6 +32,10 @@ export async function POST(req: Request) {
     .limit(1);
   if (!l) return NextResponse.json({ error: "Listing tidak ditemukan" }, { status: 404 });
 
-  const ok = await voteFavorit(vid, listingId);
-  return NextResponse.json({ ok });
+  const result = await voteFavorit(vid, listingId);
+  if (!result.ok) {
+    // Already voted today → 409; anything else is a soft failure.
+    return NextResponse.json(result, { status: result.reason === "sudah" ? 409 : 200 });
+  }
+  return NextResponse.json(result);
 }

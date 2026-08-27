@@ -15,7 +15,7 @@ import { getBoard } from "@/domain/board";
 import { listCategories } from "@/domain/jelajah";
 import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
 import { currentAnon } from "@/lib/anon";
-import { favoritBoard, myFavorit } from "@/lib/favorit";
+import { favoritBoard, myFavoritToday } from "@/lib/favorit";
 import { pingVisitor, VID_COOKIE, visitorStats } from "@/lib/presence";
 
 // Reads the DB per request; also keeps it out of the build-time prerender.
@@ -39,8 +39,8 @@ export default async function Home({
     sorakRemaining(db, anonId, now),
     listCategories(db),
     visitorStats(),
-    favoritBoard(db),
-    myFavorit(vid),
+    favoritBoard(db, now, 5),
+    myFavoritToday(vid, now),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(entries.length / PER_PAGE));
