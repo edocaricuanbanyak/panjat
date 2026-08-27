@@ -103,8 +103,10 @@ export function ListingCard({
         >
           {entry.nama}
         </a>
-        {puncak && entry.deskripsi && (
-          <p className="truncate text-sm text-tinta-redup">{entry.deskripsi}</p>
+        {entry.deskripsi && (
+          <p className={`truncate text-tinta-redup ${puncak ? "text-sm" : "text-xs sm:text-sm"}`}>
+            {entry.deskripsi}
+          </p>
         )}
         <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
           <span className="truncate font-mono text-tinta-redup">{host}</span>
@@ -123,21 +125,14 @@ export function ListingCard({
               <LencanaRow badges={entry.badges.slice(0, 2)} />
             </div>
           )}
-          {/* Mobile: pegangan (left) + Salip (right) on one tidy line under the
-              name — replaces the cramped right-justified cluster. */}
-          <div className="mt-2 flex items-center justify-between gap-2 sm:hidden">
+          {/* Mobile: pegangan, then a full-width red Salip CTA right below it. */}
+          <div className="mt-2 flex flex-col gap-1.5 sm:hidden">
             <span className="font-mono tabular text-base font-semibold text-tinta">
               {formatRupiah(entry.pegangan)}
             </span>
-            <span className="relative z-10 shrink-0">
-              <ManjatButton
-                url={entry.urlNormal}
-                nominal={salipCost}
-                size="sm"
-                variant="secondary"
-                className="h-7 px-3 text-xs"
-              >
-                {copy.papan.salipSingkat}
+            <span className="relative z-10">
+              <ManjatButton url={entry.urlNormal} nominal={salipCost} size="sm" className="h-9 w-full">
+                {copy.papan.salip(formatRupiah(salipCost))}
               </ManjatButton>
             </span>
           </div>
