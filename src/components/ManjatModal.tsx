@@ -12,6 +12,8 @@ interface OpenOpts {
   kategoriSlug?: string;
   /** Jump straight to the position+pay step (front-page express flow). */
   express?: boolean;
+  /** Salip: pre-fill the nominal target with the cost to overtake. */
+  nominal?: number;
 }
 interface ManjatCtx {
   open: (opts?: OpenOpts) => void;
@@ -46,7 +48,12 @@ export function ManjatProvider({
     <Ctx.Provider
       value={{
         open: (o) =>
-          setState({ url: o?.url ?? "", kategoriSlug: o?.kategoriSlug ?? "", express: o?.express ?? false }),
+          setState({
+            url: o?.url ?? "",
+            kategoriSlug: o?.kategoriSlug ?? "",
+            express: o?.express ?? false,
+            nominal: o?.nominal ?? 0,
+          }),
       }}
     >
       {children}
@@ -55,6 +62,7 @@ export function ManjatProvider({
           <ManjatWizard
             initialUrl={state.url}
             initialKategori={state.kategoriSlug}
+            initialNominal={state.nominal}
             express={state.express}
             kategori={kategori}
             inModal
@@ -68,12 +76,15 @@ export function ManjatProvider({
 /** Trigger that opens the manjat modal (optionally prefilled with a URL). */
 export function ManjatButton({
   url,
+  nominal,
   variant = "primary",
   size = "md",
   className,
   children,
 }: {
   url?: string;
+  /** Salip: pre-fill the position step with this nominal (cost to overtake). */
+  nominal?: number;
   variant?: ButtonVariant;
   size?: ButtonSize;
   className?: string;
@@ -84,7 +95,7 @@ export function ManjatButton({
   // position+pay step; no URL (new Manjat) starts at step 1 to paste one.
   return (
     <button
-      onClick={() => open({ url, express: Boolean(url) })}
+      onClick={() => open({ url, nominal, express: Boolean(url) })}
       className={`${buttonClasses(variant, size)} ${className ?? ""}`}
     >
       {children}

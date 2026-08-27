@@ -33,12 +33,15 @@ export function ManjatWizard({
   initialUrl,
   kategori,
   initialKategori = "",
+  initialNominal = 0,
   express = false,
   inModal = false,
 }: {
   initialUrl: string;
   kategori: Kategori[];
   initialKategori?: string;
+  /** Salip flow: pre-select the "nominal" target at this amount (cost to overtake). */
+  initialNominal?: number;
   /** Front-page flow: start at position+pay, auto-preview, pay in one step. */
   express?: boolean;
   /** Rendered inside the standard Modal (which owns the title + close). */
@@ -51,8 +54,8 @@ export function ManjatWizard({
   const [kategoriSlug, setKategoriSlug] = useState(initialKategori);
   const [deskripsi, setDeskripsi] = useState("");
 
-  const [target, setTarget] = useState<TargetChoice | null>(null);
-  const [nominalInput, setNominalInput] = useState("");
+  const [target, setTarget] = useState<TargetChoice | null>(initialNominal > 0 ? "nominal" : null);
+  const [nominalInput, setNominalInput] = useState(initialNominal > 0 ? String(initialNominal) : "");
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loadingQuote, setLoadingQuote] = useState(false);
 
@@ -121,9 +124,11 @@ export function ManjatWizard({
     }
   }
 
-  // Auto-preview on open when a URL is already provided (Salip / express).
+  // Auto-preview on open when a URL is already provided (Salip / express), and
+  // pre-compute the quote when a Salip amount was passed in.
   useEffect(() => {
     if (initialUrl.trim()) void prefillFromUrl();
+    if (initialNominal > 0) void refreshQuote({ nominal: initialNominal });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

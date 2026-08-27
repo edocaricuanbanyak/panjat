@@ -79,7 +79,7 @@ export default async function ListingPublikPage({
         <a href={`/k/${l.id}?asal=jelajah`} target="_blank" rel="noopener noreferrer" className={buttonClasses("primary", "sm")}>
           Kunjungi situs
         </a>
-        <ManjatButton url={l.urlNormal} variant="secondary" size="sm">
+        <ManjatButton url={l.urlNormal} nominal={l.pegangan + 1000} variant="secondary" size="sm">
           Salip di papan
         </ManjatButton>
       </div>

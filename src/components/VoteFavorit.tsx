@@ -45,9 +45,9 @@ export function VoteFavorit({
   const top5 = leaderboard.slice(0, 5);
 
   return (
-    <section className="rounded-2xl border border-garis bg-kertas-1 p-4 shadow-kartu">
+    <section className="rounded-xl border border-garis/70 bg-kertas px-3.5 py-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-display font-semibold text-tinta">Pemanjat terfavorit</h3>
+        <h3 className="text-sm font-semibold text-tinta">Pemanjat terfavorit</h3>
         {voted ? (
           <span className="inline-flex items-center gap-1 font-mono text-xs text-hidup">
             <Check className="size-3.5" aria-hidden /> sudah vote
@@ -57,14 +57,11 @@ export function VoteFavorit({
         )}
       </div>
 
-      {/* Weekly prize — motivates the vote. */}
-      <div className="mt-2 flex items-start gap-2 rounded-lg bg-kertas-2 px-3 py-2 text-xs text-tinta-redup">
-        <Trophy className="mt-0.5 size-4 shrink-0 text-merah-teks" aria-hidden />
-        <span>
-          Juara <b className="text-tinta">minggu ini</b> diposting di{" "}
-          <b className="text-tinta">Instagram</b> + <b className="text-tinta">gratis iklan 1 hari</b>.
-        </span>
-      </div>
+      {/* Weekly prize — motivates the vote, kept as a quiet line. */}
+      <p className="mt-1 flex items-center gap-1.5 text-xs text-tinta-redup">
+        <Trophy className="size-3.5 shrink-0 text-merah-teks" aria-hidden />
+        Juara minggu ini diposting di Instagram + gratis iklan 1 hari.
+      </p>
 
       {voted ? (
         <>

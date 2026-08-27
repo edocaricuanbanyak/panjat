@@ -57,7 +57,7 @@ export function ListingCard({
 
       {/* Above-center floating action, revealed on hover (pointer devices). */}
       <div className="pointer-events-none absolute -top-3 left-1/2 z-20 hidden -translate-x-1/2 opacity-0 transition-all ease-panjat group-hover:pointer-events-auto group-hover:-top-3.5 group-hover:opacity-100 md:block">
-        <ManjatButton url={entry.urlNormal} size="sm" className="h-7 px-2.5 text-xs">
+        <ManjatButton url={entry.urlNormal} nominal={salipCost} size="sm" className="h-7 px-2.5 text-xs">
           Salip {formatRupiah(salipCost)}
         </ManjatButton>
       </div>
@@ -114,7 +114,7 @@ export function ListingCard({
         </span>
         {/* Inline action for touch/small screens; z-10 keeps it above the stretched link. */}
         <span className="relative z-10 md:hidden">
-          <ManjatButton url={entry.urlNormal} size="sm" variant="secondary" className="h-7 px-2.5 text-xs">
+          <ManjatButton url={entry.urlNormal} nominal={salipCost} size="sm" variant="secondary" className="h-7 px-2.5 text-xs">
             Salip {formatRupiah(salipCost)}
           </ManjatButton>
         </span>
