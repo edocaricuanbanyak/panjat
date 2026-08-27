@@ -40,7 +40,7 @@ export function ListingCard({
 
   return (
     <article
-      className={`group relative flex items-center gap-4 rounded-xl px-4 transition-all ease-panjat hover:z-10 ${puncak ? "py-3.5" : "py-3"}`}
+      className={`group relative flex items-center gap-3 rounded-xl px-3 transition-all ease-panjat hover:z-10 sm:gap-4 sm:px-4 ${puncak ? "py-3.5" : "py-3"}`}
     >
       {/* Podium ribbon — a little pennant hanging over the top-left (top-3 only). */}
       {medali && (
@@ -65,7 +65,7 @@ export function ListingCard({
 
       <div
         className={`shrink-0 text-right font-mono tabular font-semibold ${
-          puncak ? "w-12 text-2xl" : "w-9 text-base"
+          puncak ? "w-10 text-xl sm:w-12 sm:text-2xl" : "w-9 text-base"
         } ${entry.rank <= 3 ? "text-merah-teks" : "text-tinta-redup"}`}
       >
         #{entry.rank}
@@ -90,11 +90,12 @@ export function ListingCard({
         )}
         <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
           <span className="truncate font-mono text-tinta-redup">{host}</span>
+          {/* Category is secondary — hide it below sm so the name/host keep room. */}
           {entry.kategoriNama && (
-            <>
+            <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
               <span aria-hidden>·</span>
-              <span className="shrink-0">{entry.kategoriNama}</span>
-            </>
+              {entry.kategoriNama}
+            </span>
           )}
           <span aria-hidden>·</span>
           <span className="shrink-0 font-mono tabular">{copy.papan.klik(entry.klikHariIni)}</span>
@@ -105,16 +106,17 @@ export function ListingCard({
           </div>
         )}
       </div>
-      <div className="flex shrink-0 items-center gap-3">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <span
-          className={`font-mono tabular font-semibold text-tinta ${puncak ? "text-xl" : "text-base"}`}
+          className={`font-mono tabular font-semibold text-tinta ${puncak ? "text-lg sm:text-xl" : "text-base"}`}
         >
           {formatRupiah(entry.pegangan)}
         </span>
-        {/* Inline action for touch/small screens; z-10 keeps it above the stretched link. */}
+        {/* Inline action for touch/small screens; short label so it never crushes
+            the name. z-10 keeps it above the stretched link. */}
         <span className="relative z-10 md:hidden">
           <ManjatButton url={entry.urlNormal} nominal={salipCost} size="sm" variant="secondary" className="h-7 px-2.5 text-xs">
-            {copy.papan.salip(formatRupiah(salipCost))}
+            {copy.papan.salipSingkat}
           </ManjatButton>
         </span>
       </div>
