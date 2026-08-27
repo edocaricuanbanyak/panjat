@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/PageShell";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { loadRosotConfig } from "@/domain/config";
 import { formatRupiah } from "@/lib/format";
@@ -7,19 +8,19 @@ import { formatRupiah } from "@/lib/format";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Aturan — Panjat",
-  description: "Bagaimana tiang licin bekerja: laju rosot per posisi, contoh angka, dan kebijakan.",
+  title: copy.aturan.metaTitle,
+  description: copy.aturan.metaDesc,
 };
 
 export default async function AturanPage() {
   const cfg = await loadRosotConfig(db);
   const tiers: [string, number][] = [
-    ["#1 (puncak)", cfg.lajuRosot.r1],
-    ["#2–3", cfg.lajuRosot.r2_3],
-    ["#4–10", cfg.lajuRosot.r4_10],
-    ["#11–30", cfg.lajuRosot.r11_30],
-    ["#31 ke bawah", cfg.lajuRosot.r31plus],
-    [`Pegangan ≤ ${formatRupiah(cfg.kakiTiang)} (Kaki Tiang)`, 0],
+    [copy.aturan.tierR1, cfg.lajuRosot.r1],
+    [copy.aturan.tierR2_3, cfg.lajuRosot.r2_3],
+    [copy.aturan.tierR4_10, cfg.lajuRosot.r4_10],
+    [copy.aturan.tierR11_30, cfg.lajuRosot.r11_30],
+    [copy.aturan.tierR31, cfg.lajuRosot.r31plus],
+    [copy.aturan.tierKaki(formatRupiah(cfg.kakiTiang)), 0],
   ];
 
   return (
@@ -28,21 +29,18 @@ export default async function AturanPage() {
         className="font-display text-3xl font-bold text-tinta sm:text-4xl"
         style={{ fontStretch: "125%" }}
       >
-        Aturan
+        {copy.aturan.judul}
       </h1>
-      <p className="mt-2 max-w-xl text-tinta-redup">
-        Kamu bayar untuk manjat. Pegangan paling kuat duduk paling atas. Tiangnya licin — semua
-        merosot pelan-pelan. Manjat lagi kalau mau bertahan.
-      </p>
+      <p className="mt-2 max-w-xl text-tinta-redup">{copy.aturan.intro}</p>
 
       <section className="mt-6">
-        <h2 className="mb-2 text-sm font-semibold text-tinta">Seberapa licin? (laju rosot per hari)</h2>
+        <h2 className="mb-2 text-sm font-semibold text-tinta">{copy.aturan.tabelJudul}</h2>
         <div className="overflow-hidden rounded-lg border border-garis">
           <table className="w-full text-sm">
             <thead className="bg-kertas-2 text-tinta-redup">
               <tr>
-                <th className="px-3 py-2 text-left font-medium">Posisi</th>
-                <th className="px-3 py-2 text-right font-medium">Rosot / hari</th>
+                <th className="px-3 py-2 text-left font-medium">{copy.aturan.kolomPosisi}</th>
+                <th className="px-3 py-2 text-right font-medium">{copy.aturan.kolomRosot}</th>
               </tr>
             </thead>
             <tbody>
@@ -58,24 +56,20 @@ export default async function AturanPage() {
           </table>
         </div>
         <p className="mt-2 font-mono text-xs text-tinta-redup">
-          Contoh: pegangan {formatRupiah(100_000)} di #1 → merosot {formatRupiah(25_000)}/hari. Berhenti
-          manjat, dalam ~5 hari tinggal ~{formatRupiah(24_000)}. Papan pulih sendiri.
+          {copy.aturan.contoh(formatRupiah(100_000), formatRupiah(25_000), formatRupiah(24_000))}
         </p>
       </section>
 
       <section className="mt-6 flex flex-col gap-2 text-sm text-tinta-redup">
         <p>
-          <span className="text-tinta">Peringkat murni ditentukan pegangan.</span> Tidak ada algoritma
-          tersembunyi, dan tidak ada posisi yang dijual di luar sistem.
+          <span className="text-tinta">{copy.aturan.peringkatTebal}</span>
+          {copy.aturan.peringkatSisa}
         </p>
         <p>
-          <span className="text-tinta">Tidak ada refund</span> untuk pegangan yang sudah dibayar, kecuali
-          listing ditolak moderasi (dana kembali penuh).
+          <span className="text-tinta">{copy.aturan.refundTebal}</span>
+          {copy.aturan.refundSisa}
         </p>
-        <p>
-          Rosot dihitung server-side tiap jam. Pegangan berhenti merosot di {formatRupiah(cfg.kakiTiang)}{" "}
-          (Kaki Tiang) dan listing tidak pernah dihapus karena merosot.
-        </p>
+        <p>{copy.aturan.rosotServer(formatRupiah(cfg.kakiTiang))}</p>
       </section>
     </PageShell>
   );

@@ -135,6 +135,32 @@ export const copy = {
     lihatPapan: "Lihat papan",
   },
 
+  privasi: {
+    metaTitle: "Kebijakan Privasi — Panjat",
+    judul: "Kebijakan Privasi",
+    butir: [
+      ["Data yang kami simpan.", " Kontak sponsor (email/WA) untuk dasbor & notifikasi; hash IP klik bersalt (bukan IP mentah); cookie anonim tanpa data pribadi untuk fitur penonton."],
+      ["Berapa lama.", " Klik mentah 13 bulan lalu dihapus (agregat harian permanen). Log notifikasi 6 bulan. Data transaksi mengikuti kewajiban pajak/audit."],
+      ["Hakmu.", " Kamu bisa berhenti berlangganan notifikasi kapan saja, dan meminta penghapusan data kontak."],
+    ] as const,
+    draf: "Draf — menunggu tinjauan hukum sebelum peluncuran publik.",
+  },
+
+  ketentuan: {
+    metaTitle: "Syarat & Ketentuan — Panjat",
+    judul: "Syarat & Ketentuan",
+    peganganTebal: "Pegangan & refund.",
+    peganganSisa:
+      " Peringkat ditentukan pegangan; tidak ada refund untuk pegangan berjalan, kecuali listing ditolak moderasi (dana kembali penuh). Lihat ",
+    peganganLink: "Aturan",
+    butir: [
+      ["Moderasi & konten.", " Konten judi/slot, dewasa, pinjol ilegal, dan penipuan ditolak. Kami dapat menahan atau menurunkan listing yang melanggar."],
+      ["Kepemilikan URL.", " Pemilik sah sebuah URL berhak mengklaim atau meminta penurunan listing atas URL-nya (verifikasi diperlukan)."],
+      ["Tanggung jawab.", " Panjat tidak bertanggung jawab atas konten atau produk pihak sponsor."],
+    ] as const,
+    draf: "Draf — menunggu tinjauan hukum sebelum peluncuran publik.",
+  },
+
   jelajah: {
     sub: "Cari berdasarkan relevansi — bukan siapa yang bayar paling banyak.",
     cariPlaceholder: "cari AI tools, jasa, game…",
@@ -168,6 +194,31 @@ export const copy = {
     metaTitle: "Arsip Juara — Panjat",
     metaDesc: "Setiap juara harian, tersimpan permanen.",
     kosong: "Belum ada juara yang diarsipkan.",
+  },
+
+  aturan: {
+    metaTitle: "Aturan — Panjat",
+    metaDesc: "Bagaimana tiang licin bekerja: laju rosot per posisi, contoh angka, dan kebijakan.",
+    judul: "Aturan",
+    intro:
+      "Kamu bayar untuk manjat. Pegangan paling kuat duduk paling atas. Tiangnya licin — semua merosot pelan-pelan. Manjat lagi kalau mau bertahan.",
+    tabelJudul: "Seberapa licin? (laju rosot per hari)",
+    kolomPosisi: "Posisi",
+    kolomRosot: "Rosot / hari",
+    tierR1: "#1 (puncak)",
+    tierR2_3: "#2–3",
+    tierR4_10: "#4–10",
+    tierR11_30: "#11–30",
+    tierR31: "#31 ke bawah",
+    tierKaki: (rp: string) => `Pegangan ≤ ${rp} (Kaki Tiang)`,
+    contoh: (grip: string, rosot: string, sisa: string) =>
+      `Contoh: pegangan ${grip} di #1 → merosot ${rosot}/hari. Berhenti manjat, dalam ~5 hari tinggal ~${sisa}. Papan pulih sendiri.`,
+    peringkatTebal: "Peringkat murni ditentukan pegangan.",
+    peringkatSisa: " Tidak ada algoritma tersembunyi, dan tidak ada posisi yang dijual di luar sistem.",
+    refundTebal: "Tidak ada refund",
+    refundSisa: " untuk pegangan yang sudah dibayar, kecuali listing ditolak moderasi (dana kembali penuh).",
+    rosotServer: (rp: string) =>
+      `Rosot dihitung server-side tiap jam. Pegangan berhenti merosot di ${rp} (Kaki Tiang) dan listing tidak pernah dihapus karena merosot.`,
   },
 
   pasangGratis: {
