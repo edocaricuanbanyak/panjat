@@ -3,13 +3,44 @@
  * below all paid listings. No payment, no ledger row (grip stays 0). Still
  * moderated: layer-1 screening runs on creation, same as a paid settlement.
  */
-import { eq } from "drizzle-orm";
-import type { Database } from "@/db";
+import { and, count, eq, gte, inArray } from "drizzle-orm";
+import type { Database, DbOrTx } from "@/db";
 import { listing, sponsorKontak } from "@/db/schema";
 import { screenListing } from "./moderasi";
 import { normalizeUrl } from "./url";
 
 export class GratisError extends Error {}
+
+// Kaki Tiang is first-come-first-served: at most 10 free slots open per WIB week.
+export const GRATIS_PER_MINGGU = 10;
+
+/** Start of the current WIB week (Monday 00:00 WIB) as a UTC instant. */
+function mingguStart(now: Date): Date {
+  const wib = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(now);
+  const d = new Date(`${wib}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); // back to Monday
+  return new Date(`${d.toISOString().slice(0, 10)}T00:00:00+07:00`);
+}
+
+/** Free slots taken this week — accepted (tayang/ditahan) grip-0 listings. */
+async function gratisTerpakai(db: DbOrTx, now: Date): Promise<number> {
+  const [row] = await db
+    .select({ n: count() })
+    .from(listing)
+    .where(
+      and(
+        eq(listing.peganganCached, 0),
+        inArray(listing.status, ["tayang", "ditahan"]),
+        gte(listing.createdAt, mingguStart(now)),
+      ),
+    );
+  return Number(row.n);
+}
+
+/** Remaining Kaki Tiang slots for this week (for the UI). */
+export async function sisaGratisMingguIni(db: Database, now = new Date()): Promise<number> {
+  return Math.max(0, GRATIS_PER_MINGGU - (await gratisTerpakai(db, now)));
+}
 
 export interface GratisInput {
   url: string;
@@ -23,6 +54,13 @@ export async function createGratis(db: Database, input: GratisInput): Promise<{ 
   const urlNormal = normalizeUrl(input.url);
 
   return db.transaction(async (tx) => {
+    // First-come-first-served weekly cap (siapa cepat) — 10 free slots per week.
+    if ((await gratisTerpakai(tx, new Date())) >= GRATIS_PER_MINGGU) {
+      throw new GratisError(
+        "Kuota Kaki Tiang minggu ini sudah penuh (10 per minggu). Coba lagi minggu depan — atau naik tiang berbayar.",
+      );
+    }
+
     const [existing] = await tx
       .select({ id: listing.id })
       .from(listing)
