@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Anybody, Instrument_Sans, Martian_Mono } from "next/font/google";
+import { PostHogProvider } from "@/components/PostHogProvider";
 import { copy } from "@/copy";
 import "./globals.css";
 
@@ -44,7 +45,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="id"
       className={`${anybody.variable} ${instrumentSans.variable} ${martianMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-kertas text-tinta">{children}</body>
+      <body className="min-h-full flex flex-col bg-kertas text-tinta">
+        <PostHogProvider>{children}</PostHogProvider>
+      </body>
     </html>
   );
 }
