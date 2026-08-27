@@ -1,20 +1,16 @@
 "use client";
 
-import { BarChart3, Crown, ScrollText, TrendingUp, Trophy } from "lucide-react";
+import { BarChart3, TrendingUp, Trophy } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { copy } from "@/copy";
 import { useManjat } from "./ManjatModal";
 
 type Tab = { href: string; label: string; icon: typeof Trophy };
 
-const LEFT: Tab[] = [
-  { href: "/", label: copy.nav.papanRingkas, icon: Trophy },
-  { href: "/statistik", label: copy.nav.statistik, icon: BarChart3 },
-];
-const RIGHT: Tab[] = [
-  { href: "/arsip", label: copy.nav.arsip, icon: Crown },
-  { href: "/aturan", label: copy.nav.aturan, icon: ScrollText },
-];
+// Kept deliberately simple: home, the Manjat action, and stats. Arsip/Aturan
+// live in the footer and top nav.
+const LEFT: Tab[] = [{ href: "/", label: copy.nav.papanRingkas, icon: Trophy }];
+const RIGHT: Tab[] = [{ href: "/statistik", label: copy.nav.statistik, icon: BarChart3 }];
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
