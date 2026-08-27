@@ -29,7 +29,7 @@ export function HeroManjat({ kategori }: { kategori: Kategori[] }) {
         onChange={(e) => setUrl(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && go()}
         placeholder="Tempel URL produkmu — mis. nyala.id"
-        className={`${fieldClasses} flex-1`}
+        className={`${fieldClasses} sm:flex-1`}
       />
       <Dropdown
         className="sm:w-44"
