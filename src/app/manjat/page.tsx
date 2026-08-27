@@ -14,5 +14,9 @@ export default async function ManjatPage({
     searchParams,
     db.select({ slug: kategori.slug, nama: kategori.nama }).from(kategori).orderBy(asc(kategori.nama)),
   ]);
-  return <ManjatWizard initialUrl={url ?? ""} kategori={kats} />;
+  return (
+    <main className="mx-auto w-full max-w-md px-4 py-8">
+      <ManjatWizard initialUrl={url ?? ""} kategori={kats} />
+    </main>
+  );
 }

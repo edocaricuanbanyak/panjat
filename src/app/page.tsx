@@ -1,14 +1,15 @@
 import { BoardLive } from "@/components/BoardLive";
-import { buttonClasses } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
 import { Footer } from "@/components/Footer";
 import { KakiTiang } from "@/components/KakiTiang";
+import { ManjatButton, ManjatProvider } from "@/components/ManjatModal";
 import { Nav } from "@/components/Nav";
 import { Spotlight } from "@/components/Spotlight";
 import { TebakJuara } from "@/components/TebakJuara";
 import { TiangRail } from "@/components/TiangRail";
 import { db } from "@/db";
 import { getBoard } from "@/domain/board";
+import { listCategories } from "@/domain/jelajah";
 import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
 import { guessStatus } from "@/domain/tebakan";
 import { currentAnon } from "@/lib/anon";
@@ -22,13 +23,15 @@ export default async function Home() {
   const anonId = await currentAnon();
   const { entries, max } = await getBoard(db);
   const totalPegangan = entries.reduce((sum, e) => sum + e.pegangan, 0);
-  const [tebak, kakiTiang, sisaSorak] = await Promise.all([
+  const [tebak, kakiTiang, sisaSorak, kats] = await Promise.all([
     guessStatus(db, anonId, now),
     getKakiTiang(db),
     sorakRemaining(db, anonId, now),
+    listCategories(db),
   ]);
 
   return (
+    <ManjatProvider kategori={kats}>
     <main className="mx-auto w-full max-w-3xl px-4 py-8">
       <Nav active="papan" />
       <header>
@@ -42,9 +45,7 @@ export default async function Home() {
             </h1>
             <p className="mt-1 text-sm text-tinta-redup">Manjat, atau merosot.</p>
           </div>
-          <a href="/manjat" className={buttonClasses("primary", "md")}>
-            Manjat
-          </a>
+          <ManjatButton size="md">Manjat</ManjatButton>
         </div>
 
         <div className="mt-4 flex gap-4 font-mono tabular text-xs text-tinta-redup">
@@ -83,5 +84,6 @@ export default async function Home() {
 
       <Footer />
     </main>
+    </ManjatProvider>
   );
 }

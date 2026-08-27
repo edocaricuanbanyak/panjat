@@ -1,7 +1,7 @@
 import type { BoardEntry } from "@/domain/board";
 import { formatRupiah } from "@/lib/format";
-import { buttonClasses } from "./Button";
 import { CategoryChip } from "./CategoryChip";
+import { ManjatButton } from "./ManjatModal";
 import { EstimateLabel } from "./EstimateLabel";
 import { LencanaRow } from "./LencanaRow";
 import { LogoTile } from "./LogoTile";
@@ -80,9 +80,9 @@ export function ListingCard({
         >
           {formatRupiah(entry.pegangan)}
         </span>
-        <a href={`/manjat?url=${encodeURIComponent(entry.urlNormal)}`} className={buttonClasses("primary", "sm")}>
+        <ManjatButton url={entry.urlNormal} size="sm">
           Salip
-        </a>
+        </ManjatButton>
       </div>
     </article>
   );

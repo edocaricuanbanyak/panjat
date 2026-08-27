@@ -31,9 +31,12 @@ function markerHeight(rank: number): number {
 export function ManjatWizard({
   initialUrl,
   kategori,
+  onClose,
 }: {
   initialUrl: string;
   kategori: Kategori[];
+  /** When set, renders as a modal body (close button instead of a back link). */
+  onClose?: () => void;
 }) {
   const [step, setStep] = useState(1);
   const [url, setUrl] = useState(initialUrl);
@@ -132,10 +135,16 @@ export function ManjatWizard({
   const bigAmount = (quote?.nominal ?? 0) > 200_000;
 
   return (
-    <main className="mx-auto w-full max-w-md px-4 py-8">
-      <a href="/" className="text-sm text-tinta-redup hover:text-tinta">
-        ← Papan
-      </a>
+    <div className="w-full">
+      {onClose ? (
+        <button onClick={onClose} className="text-sm text-tinta-redup hover:text-tinta">
+          ✕ Tutup
+        </button>
+      ) : (
+        <a href="/" className="text-sm text-tinta-redup hover:text-tinta">
+          ← Papan
+        </a>
+      )}
       <h1
         className="mt-2 font-display text-2xl font-bold text-tinta"
         style={{ fontStretch: "120%" }}
@@ -333,6 +342,6 @@ export function ManjatWizard({
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }
