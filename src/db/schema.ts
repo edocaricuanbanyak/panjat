@@ -260,22 +260,20 @@ export const tebakan = pgTable(
   (t) => [unique("tebakan_anon_tanggal").on(t.anonId, t.tanggal)],
 );
 
-export const sorak = pgTable(
-  "sorak",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    anonId: uuid("anon_id")
-      .notNull()
-      .references(() => pengunjungAnon.id),
-    listingId: uuid("listing_id")
-      .notNull()
-      .references(() => listing.id),
-    tanggal: date("tanggal").notNull(),
-    createdAt: createdAt(),
-  },
-  // At most one Sorak per (visitor, listing, day) (R16).
-  (t) => [unique("sorak_anon_listing_tanggal").on(t.anonId, t.listingId, t.tanggal)],
-);
+// A visitor gets 5 Sorak/day (SORAK_PER_DAY) and may stack them all on a single
+// listing — so there is deliberately no (visitor, listing, day) uniqueness; the
+// daily cap is enforced in recordSorak (R16).
+export const sorak = pgTable("sorak", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  anonId: uuid("anon_id")
+    .notNull()
+    .references(() => pengunjungAnon.id),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listing.id),
+  tanggal: date("tanggal").notNull(),
+  createdAt: createdAt(),
+});
 
 export const lencana = pgTable(
   "lencana",

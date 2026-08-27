@@ -24,14 +24,16 @@ export function KakiTiang({
   const [counts, setCounts] = useState<Record<string, number>>(() =>
     Object.fromEntries(entries.map((e) => [e.id, e.sorak])),
   );
-  const [done, setDone] = useState<Set<string>>(new Set());
+  // How many of my 5 I've poured into each listing (for styling + revert).
+  const [mine, setMine] = useState<Record<string, number>>({});
 
   async function dukung(id: string) {
-    if (remaining <= 0 || done.has(id)) return;
-    // Optimistic: bump this listing + spend one from the daily allowance.
+    if (remaining <= 0) return;
+    // Optimistic: bump this listing + spend one from the daily allowance. You may
+    // stack all 5 on a single listing.
     setCounts((c) => ({ ...c, [id]: (c[id] ?? 0) + 1 }));
     setRemaining((r) => r - 1);
-    setDone((d) => new Set(d).add(id));
+    setMine((m) => ({ ...m, [id]: (m[id] ?? 0) + 1 }));
     try {
       const body = new FormData();
       body.set("listingId", id);
@@ -42,14 +44,10 @@ export function KakiTiang({
       });
       if (!res.ok) throw new Error("gagal");
     } catch {
-      // Revert on failure (already supported today, rate-limited, offline…).
+      // Revert on failure (daily cap hit, rate-limited, offline…).
       setCounts((c) => ({ ...c, [id]: Math.max(0, (c[id] ?? 1) - 1) }));
       setRemaining((r) => r + 1);
-      setDone((d) => {
-        const n = new Set(d);
-        n.delete(id);
-        return n;
-      });
+      setMine((m) => ({ ...m, [id]: Math.max(0, (m[id] ?? 1) - 1) }));
     }
   }
 
@@ -89,8 +87,9 @@ export function KakiTiang({
               </span>
               <DukungButton
                 onDukung={() => dukung(e.id)}
-                disabled={remaining <= 0 || done.has(e.id)}
-                supported={done.has(e.id)}
+                disabled={remaining <= 0}
+                supported={(mine[e.id] ?? 0) > 0}
+                mineCount={mine[e.id] ?? 0}
               />
             </article>
           ))}
@@ -114,10 +113,13 @@ function DukungButton({
   onDukung,
   disabled,
   supported,
+  mineCount,
 }: {
   onDukung: () => void;
   disabled: boolean;
   supported: boolean;
+  /** How many of my daily Sorak I've stacked here (0 = none yet). */
+  mineCount: number;
 }) {
   const [burst, setBurst] = useState(0);
 
@@ -140,8 +142,8 @@ function DukungButton({
         className={`inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-sm shadow-kartu transition ease-panjat focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah disabled:opacity-50 ${
           supported
             ? "border-merah bg-merah text-kertas-1"
-            : "border-garis bg-kertas-1 text-tinta hover:bg-kertas-2 active:scale-95"
-        }`}
+            : "border-garis bg-kertas-1 text-tinta hover:bg-kertas-2"
+        } ${disabled ? "" : "active:scale-95"}`}
       >
         <Heart
           className={`size-3.5 transition-transform ${supported ? "fill-kertas-1" : ""} ${
@@ -150,6 +152,7 @@ function DukungButton({
           aria-hidden
         />
         {copy.kakiTiang.dukung}
+        {mineCount > 0 && <span className="font-mono tabular text-xs">×{mineCount}</span>}
       </button>
 
       {burst > 0 && (

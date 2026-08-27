@@ -1,0 +1,1 @@
+ALTER TABLE "sorak" DROP CONSTRAINT "sorak_anon_listing_tanggal";

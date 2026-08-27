@@ -9,7 +9,7 @@ import type { Database } from "@/db";
 import { listing, pengunjungAnon, sorak } from "@/db/schema";
 import { wibDate } from "./papan-hari-ini";
 
-export const SORAK_PER_DAY = 3;
+export const SORAK_PER_DAY = 5;
 
 export class SorakError extends Error {}
 
@@ -22,7 +22,7 @@ export async function sorakRemaining(db: Database, anonId: string | null, now: D
   return Math.max(0, SORAK_PER_DAY - row.n);
 }
 
-/** Give one Sorak. Kaki Tiang only, ≤3/day, once per listing/day. */
+/** Give one Sorak. Kaki Tiang only, ≤5/day; may stack all 5 on one listing. */
 export async function recordSorak(
   db: Database,
   anonId: string,
@@ -46,11 +46,7 @@ export async function recordSorak(
   if (used.n >= SORAK_PER_DAY) throw new SorakError("Sorak hari ini sudah habis.");
 
   await db.insert(pengunjungAnon).values({ id: anonId }).onConflictDoNothing();
-  try {
-    await db.insert(sorak).values({ anonId, listingId, tanggal });
-  } catch {
-    throw new SorakError("Kamu sudah menyorak listing ini hari ini.");
-  }
+  await db.insert(sorak).values({ anonId, listingId, tanggal });
 }
 
 export interface KakiTiangEntry {
