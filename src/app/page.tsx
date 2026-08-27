@@ -1,6 +1,7 @@
 import { BoardLive } from "@/components/BoardLive";
 import { buttonClasses } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
+import { Footer } from "@/components/Footer";
 import { Nav } from "@/components/Nav";
 import { TebakJuara } from "@/components/TebakJuara";
 import { TiangRail } from "@/components/TiangRail";
@@ -58,6 +59,7 @@ export default async function Home() {
           <BoardLive initial={{ entries, max }} />
         </div>
       )}
+      <Footer />
     </main>
   );
 }
