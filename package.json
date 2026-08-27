@@ -12,6 +12,7 @@
     "db:seed": "tsx src/db/seed.ts",
     "db:reconcile": "tsx src/jobs/reconcile.ts",
     "rosot:run": "tsx src/jobs/rosot.ts",
+    "manjat:sim": "tsx src/jobs/manjat-sim.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

@@ -3,12 +3,36 @@
  * These parameters are expected to change in the first month, so they live in
  * the DB, not in code.
  */
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import type { DbOrTx } from "@/db";
 import { konfigurasi } from "@/db/schema";
 import type { RosotConfig } from "./rosot";
 
 const KEYS = ["laju_rosot", "ambang_tier", "kaki_tiang"] as const;
+
+async function readConfig(db: DbOrTx, key: string): Promise<unknown> {
+  const [row] = await db
+    .select({ value: konfigurasi.value })
+    .from(konfigurasi)
+    .where(eq(konfigurasi.key, key))
+    .limit(1);
+  if (!row) throw new Error(`Missing konfigurasi key: ${key} (run pnpm db:seed)`);
+  return row.value;
+}
+
+export interface ManjatConfig {
+  /** Minimum rupiah to first climb the pole (§5). */
+  minimumNaik: number;
+  /** Minimum rupiah for a top-up (§5). */
+  minimumManjatLagi: number;
+}
+
+export async function loadManjatConfig(db: DbOrTx): Promise<ManjatConfig> {
+  return {
+    minimumNaik: (await readConfig(db, "minimum_naik")) as number,
+    minimumManjatLagi: (await readConfig(db, "minimum_manjat_lagi")) as number,
+  };
+}
 
 export async function loadRosotConfig(db: DbOrTx): Promise<RosotConfig> {
   const rows = await db
