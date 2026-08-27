@@ -97,6 +97,17 @@ body {
 .reveal-pop { opacity: 0; animation: puncak-pop 0.6s var(--ease-panjat) forwards; }
 .reveal-wave { animation: puncak-wave 0.8s var(--ease-panjat) 1s; }
 
+/* Podium ribbons — subtle metallic sheen (top-light gradient of each medal). */
+.pita-emas {
+  background: linear-gradient(155deg, color-mix(in srgb, var(--color-emas) 78%, white), var(--color-emas) 62%, color-mix(in srgb, var(--color-emas) 80%, black));
+}
+.pita-perak {
+  background: linear-gradient(155deg, color-mix(in srgb, var(--color-perak) 78%, white), var(--color-perak) 62%, color-mix(in srgb, var(--color-perak) 82%, black));
+}
+.pita-perunggu {
+  background: linear-gradient(155deg, color-mix(in srgb, var(--color-perunggu) 78%, white), var(--color-perunggu) 62%, color-mix(in srgb, var(--color-perunggu) 82%, black));
+}
+
 /* Live "online" pulse. */
 @keyframes blink {
   0%, 100% { opacity: 1; }

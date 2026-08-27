@@ -6,9 +6,9 @@ import { ManjatButton } from "./ManjatModal";
 
 // Top-3 podium medals: gold crown, silver, bronze (ribbon-style corner badge).
 const MEDALI: Record<1 | 2 | 3, { bg: string; icon: string; label: string }> = {
-  1: { bg: "bg-emas", icon: "👑", label: "Juara 1" },
-  2: { bg: "bg-perak", icon: "2", label: "Juara 2" },
-  3: { bg: "bg-perunggu", icon: "3", label: "Juara 3" },
+  1: { bg: "pita-emas", icon: "👑", label: "Juara 1 (emas)" },
+  2: { bg: "pita-perak", icon: "", label: "Juara 2 (perak)" },
+  3: { bg: "pita-perunggu", icon: "", label: "Juara 3 (perunggu)" },
 };
 
 /**
@@ -42,8 +42,8 @@ export function ListingCard({
         <span
           aria-label={medali.label}
           title={medali.label}
-          style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%)" }}
-          className={`absolute left-3 -top-1.5 z-20 flex h-9 w-6 items-start justify-center pt-1 text-xs font-bold leading-none text-kertas-1 drop-shadow ${medali.bg}`}
+          style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 68%, 0 100%)" }}
+          className={`absolute left-4 -top-2 z-20 flex h-10 w-6 items-start justify-center pt-1.5 text-sm leading-none drop-shadow-md ${medali.bg}`}
         >
           {medali.icon}
         </span>

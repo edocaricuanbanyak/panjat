@@ -42,7 +42,7 @@ export function VoteFavorit({
   return (
     <section className="rounded-2xl border border-garis bg-kertas-1 p-4 shadow-kartu">
       <div className="flex items-center justify-between">
-        <h3 className="font-display font-semibold text-tinta">Board terfavorit</h3>
+        <h3 className="font-display font-semibold text-tinta">Pemanjat terfavorit</h3>
         <span className="font-mono text-xs text-tinta-redup">vote gratis</span>
       </div>
       <p className="mt-1 text-sm text-tinta-redup">
