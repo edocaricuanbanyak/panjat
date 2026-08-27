@@ -269,14 +269,29 @@ export function ManjatWizard({
 
       {step === 2 && (
         <div className="mt-6 flex flex-col gap-4">
-          {/* Compact site confirmation — a small thumbnail instead of a full-width
-              screenshot, so the modal stays short. Doubles as "ganti detail". */}
+          {/* Site confirmation as a mini browser window — a real (recognisable)
+              page preview, kept compact. Whole card doubles as "ganti detail". */}
           {url.trim() && (
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="flex items-center gap-3 rounded-xl border border-garis bg-kertas-1 p-2 text-left"
+              className="block w-full overflow-hidden rounded-xl border border-garis bg-kertas-1 text-left"
             >
+              {/* browser chrome: traffic lights + address + edit */}
+              <div className="flex items-center gap-2 border-b border-garis bg-kertas-2 px-3 py-2">
+                <span className="flex shrink-0 gap-1" aria-hidden>
+                  <span className="size-2 rounded-full bg-garis" />
+                  <span className="size-2 rounded-full bg-garis" />
+                  <span className="size-2 rounded-full bg-garis" />
+                </span>
+                <span className="min-w-0 flex-1 truncate rounded-md bg-kertas-1 px-2 py-0.5 font-mono text-xs text-tinta-redup">
+                  {host}
+                </span>
+                <span className="shrink-0 text-xs font-medium text-merah-teks">
+                  {copy.manjat.ubahDetail}
+                </span>
+              </div>
+              {/* the page itself */}
               {!shotFailed ? (
                 // biome-ignore lint/performance/noImgElement: on-demand capture, not a static asset
                 <img
@@ -285,18 +300,16 @@ export function ManjatWizard({
                   width={1200}
                   height={800}
                   onError={() => setShotFailed(true)}
-                  className="h-11 w-16 shrink-0 rounded-lg border border-garis object-cover object-top"
+                  className="h-28 w-full bg-kertas-1 object-cover object-top"
                 />
               ) : (
-                <div className="flex h-11 w-16 shrink-0 items-center justify-center rounded-lg bg-kertas-2 font-display text-lg font-bold text-tinta-redup">
-                  {(nama || url).slice(0, 1).toUpperCase()}
+                <div className="flex h-20 w-full items-center gap-3 px-4">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-kertas-2 font-display text-lg font-bold text-tinta-redup">
+                    {(nama || url).slice(0, 1).toUpperCase()}
+                  </div>
+                  <p className="truncate text-sm font-medium text-tinta">{nama || host}</p>
                 </div>
               )}
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-tinta">{nama || host}</p>
-                <p className="truncate font-mono text-xs text-tinta-redup">{host}</p>
-              </div>
-              <span className="shrink-0 text-xs text-merah-teks">{copy.manjat.ubahDetail}</span>
             </button>
           )}
 
