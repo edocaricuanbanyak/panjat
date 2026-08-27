@@ -5,17 +5,31 @@
  */
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import { verifyTotp } from "./totp";
 
 export const ADMIN_COOKIE = "panjat_admin";
 const MAX_AGE_S = 60 * 60 * 12; // 12 hours
 
 const secret = () => process.env.ADMIN_SECRET ?? "dev-admin-secret";
 const password = () => process.env.ADMIN_PASSWORD ?? "admin";
+const totpSecret = () => process.env.ADMIN_TOTP_SECRET ?? "";
+
+/** 2FA is enforced when ADMIN_TOTP_SECRET is set. Required before public launch. */
+export function totpEnabled(): boolean {
+  return totpSecret().length > 0;
+}
 
 export function checkPassword(input: string): boolean {
   const a = Buffer.from(input);
   const b = Buffer.from(password());
   return a.length === b.length && timingSafeEqual(a, b);
+}
+
+/** Full admin login check: password + (TOTP code if 2FA enabled). */
+export function checkAdminLogin(inputPassword: string, code: string): boolean {
+  if (!checkPassword(inputPassword)) return false;
+  if (!totpEnabled()) return true;
+  return verifyTotp(totpSecret(), code);
 }
 
 export function signAdmin(now = Date.now()): string {

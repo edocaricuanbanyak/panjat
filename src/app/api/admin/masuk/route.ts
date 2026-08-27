@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ADMIN_COOKIE, adminCookieOptions, checkPassword, signAdmin } from "@/lib/admin";
+import { ADMIN_COOKIE, adminCookieOptions, checkAdminLogin, signAdmin } from "@/lib/admin";
 import { clientIp } from "@/lib/ip";
 import { rateLimit } from "@/lib/ratelimit";
 
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   if (!rl.ok) return NextResponse.redirect(new URL("/admin/masuk?e=limit", req.url), { status: 303 });
 
   const form = await req.formData();
-  if (!checkPassword(String(form.get("password") ?? ""))) {
+  if (!checkAdminLogin(String(form.get("password") ?? ""), String(form.get("code") ?? ""))) {
     return NextResponse.redirect(new URL("/admin/masuk?e=salah", req.url), { status: 303 });
   }
   const res = NextResponse.redirect(new URL("/admin", req.url), { status: 303 });
