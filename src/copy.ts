@@ -123,6 +123,17 @@ export const copy = {
     pasangGratisTaut: "Pasang gratis di Kaki Tiang",
   },
 
+  jelajah: {
+    sub: "Cari berdasarkan relevansi — bukan siapa yang bayar paling banyak.",
+    cariPlaceholder: "cari AI tools, jasa, game…",
+    semua: "Semua",
+    kosong: "Tidak ada listing yang cocok. Coba kata kunci atau kategori lain.",
+  },
+
+  hariIni: {
+    sub: "Hanya pegangan yang dibayar sejak tengah malam. Uang kemarin tidak berlaku — siapa pun dengan Rp20.000 punya peluang jadi juara. Reset 00:00 WIB.",
+  },
+
   pasangGratis: {
     judul: "Pasang gratis",
     subJudul: "Listing gratis di Kaki Tiang, diurut dukungan pengunjung.",

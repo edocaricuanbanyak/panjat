@@ -54,6 +54,25 @@ export interface JelajahCard {
 const klikTotalExpr = sql<number>`(select coalesce(sum(jumlah_valid), 0)::int from klik_harian where klik_harian.listing_id = ${listing.id})`;
 
 /** Full-text search over name + description + category, ranked by text relevance. */
+/** All live listings as directory cards — for the client Jelajah tab to filter. */
+export async function jelajahAll(db: Database): Promise<JelajahCard[]> {
+  return db
+    .select({
+      id: listing.id,
+      nama: listing.nama,
+      urlNormal: listing.urlNormal,
+      deskripsi: listing.deskripsi,
+      kategoriNama: kategori.nama,
+      kategoriSlug: kategori.slug,
+      klikTotal: klikTotalExpr,
+    })
+    .from(listing)
+    .leftJoin(kategori, eq(kategori.id, listing.kategoriId))
+    .where(eq(listing.status, "tayang"))
+    .orderBy(desc(listing.createdAt))
+    .limit(200);
+}
+
 export async function searchListings(db: Database, q: string): Promise<JelajahCard[]> {
   const query = q.trim();
   if (!query) return [];

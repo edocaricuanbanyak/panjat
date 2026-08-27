@@ -1,12 +1,14 @@
 import { cookies } from "next/headers";
 import { BoardLive } from "@/components/BoardLive";
-import { BoardTabs } from "@/components/BoardTabs";
 import { CaraMain } from "@/components/CaraMain";
 import { EmptyState } from "@/components/EmptyState";
+import { HariIniBoard } from "@/components/HariIniBoard";
 import { HeroManjat } from "@/components/HeroManjat";
+import { HomeTabs } from "@/components/HomeTabs";
+import { JelajahPanel } from "@/components/JelajahPanel";
+import { JuaraKakiTiang } from "@/components/JuaraKakiTiang";
 import { KakiTiang } from "@/components/KakiTiang";
 import { ListingCard } from "@/components/ListingCard";
-import { JuaraKakiTiang } from "@/components/JuaraKakiTiang";
 import { PageShell } from "@/components/PageShell";
 import { Pagination } from "@/components/Pagination";
 import { PasangGratisModal } from "@/components/PasangGratisModal";
@@ -15,7 +17,8 @@ import { VoteFavorit } from "@/components/VoteFavorit";
 import { copy } from "@/copy";
 import { db } from "@/db";
 import { getBoard } from "@/domain/board";
-import { listCategories } from "@/domain/jelajah";
+import { jelajahAll, listCategories } from "@/domain/jelajah";
+import { getHariIni } from "@/domain/papan-hari-ini";
 import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
 import { recentAktivitas } from "@/lib/aktivitas";
 import { currentAnon } from "@/lib/anon";
@@ -38,15 +41,18 @@ export default async function Home({
   if (vid) await pingVisitor(vid);
 
   const { entries, max } = await getBoard(db);
-  const [kakiTiang, sisaSorak, kats, visitor, favorit, choice, aktivitas] = await Promise.all([
-    getKakiTiang(db),
-    sorakRemaining(db, anonId, now),
-    listCategories(db),
-    visitorStats(),
-    favoritBoard(db, now, 5),
-    myFavoritToday(vid, now),
-    recentAktivitas(20),
-  ]);
+  const [kakiTiang, sisaSorak, kats, visitor, favorit, choice, aktivitas, hariIni, jelajahItems] =
+    await Promise.all([
+      getKakiTiang(db),
+      sorakRemaining(db, anonId, now),
+      listCategories(db),
+      visitorStats(),
+      favoritBoard(db, now, 5),
+      myFavoritToday(vid, now),
+      recentAktivitas(20),
+      getHariIni(db, now),
+      jelajahAll(db),
+    ]);
 
   const totalPages = Math.max(1, Math.ceil(entries.length / PER_PAGE));
   const page = Math.min(Math.max(1, Number((await searchParams).hal) || 1), totalPages);
@@ -85,29 +91,44 @@ export default async function Home({
         </div>
       </section>
 
-      {/* PAPAN — the board, under its tab */}
-      <section>
-        <BoardTabs active="sekarang" className="mb-5" />
-        {entries.length === 0 ? (
-          <EmptyState title={copy.beranda.papanKosongJudul} message={copy.beranda.papanKosongPesan} />
-        ) : page === 1 ? (
+      {/* PAPAN — three in-place tabs (no page navigation) */}
+      <HomeTabs
+        sekarang={
           <>
-            <BoardLive
-              initial={{ entries, max }}
-              middle={<VoteFavorit entries={voteEntries} leaderboard={favorit} myChoice={choice} />}
-            />
-            {/* Top free listing rises here as a labelled wildcard — never a paid rank (R16). */}
-            {juaraGratis && juaraGratis.sorak > 0 && <JuaraKakiTiang entry={juaraGratis} />}
+            {entries.length === 0 ? (
+              <EmptyState
+                title={copy.beranda.papanKosongJudul}
+                message={copy.beranda.papanKosongPesan}
+              />
+            ) : page === 1 ? (
+              <>
+                <BoardLive
+                  initial={{ entries, max }}
+                  middle={
+                    <VoteFavorit entries={voteEntries} leaderboard={favorit} myChoice={choice} />
+                  }
+                />
+                {/* Top free listing rises here as a labelled wildcard — never a paid rank (R16). */}
+                {juaraGratis && juaraGratis.sorak > 0 && <JuaraKakiTiang entry={juaraGratis} />}
+              </>
+            ) : (
+              <div className="flex flex-col gap-2.5">
+                {pageEntries.map((e) => (
+                  <ListingCard key={e.id} entry={e} />
+                ))}
+              </div>
+            )}
+            <Pagination page={page} totalPages={totalPages} />
           </>
-        ) : (
-          <div className="flex flex-col gap-2.5">
-            {pageEntries.map((e) => (
-              <ListingCard key={e.id} entry={e} />
-            ))}
-          </div>
-        )}
-        <Pagination page={page} totalPages={totalPages} />
-      </section>
+        }
+        hariIni={
+          <>
+            <p className="mb-4 max-w-xl text-tinta-redup">{copy.hariIni.sub}</p>
+            <HariIniBoard entries={hariIni} />
+          </>
+        }
+        jelajah={<JelajahPanel items={jelajahItems} categories={kats} />}
+      />
 
       {/* KAKI TIANG (gratis) */}
       <div className="mt-12">
