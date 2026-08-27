@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Dropdown } from "./Dropdown";
+import { fieldClasses } from "./Input";
 import { useManjat } from "./ManjatModal";
 
 type Kategori = { slug: string; nama: string };
@@ -28,7 +29,7 @@ export function HeroManjat({ kategori }: { kategori: Kategori[] }) {
         onChange={(e) => setUrl(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && go()}
         placeholder="Tempel URL produkmu — mis. nyala.id"
-        className="h-12 flex-1 rounded-lg border border-garis bg-kertas-1 px-4 text-base text-tinta shadow-kartu transition-shadow focus-visible:border-merah focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah/25"
+        className={`${fieldClasses} flex-1`}
       />
       <Dropdown
         className="sm:w-44"
@@ -40,7 +41,7 @@ export function HeroManjat({ kategori }: { kategori: Kategori[] }) {
       <button
         onClick={go}
         disabled={!url.trim()}
-        className="h-12 shrink-0 rounded-lg bg-merah px-6 font-medium text-kertas-1 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah active:translate-y-0 disabled:opacity-50"
+        className="h-11 shrink-0 rounded-lg bg-merah px-5 font-medium text-kertas-1 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah active:translate-y-0 disabled:opacity-50"
       >
         Manjat →
       </button>
