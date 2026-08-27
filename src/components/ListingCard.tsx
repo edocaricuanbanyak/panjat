@@ -20,6 +20,8 @@ export function ListingCard({
 }) {
   const puncak = density === "puncak";
   const wdth = puncak ? Math.max(105, 130 - (entry.rank - 1) * 10) : 100;
+  // Title is owner-editable; show the real URL host so the board stays honest.
+  const host = entry.urlNormal.replace(/^https?:\/\//, "").replace(/\/+$/, "");
 
   return (
     <article
@@ -53,11 +55,22 @@ export function ListingCard({
         >
           {entry.nama}
         </a>
-        {puncak && entry.deskripsi ? (
+        {puncak && entry.deskripsi && (
           <p className="truncate text-sm text-tinta-redup">{entry.deskripsi}</p>
-        ) : (
-          entry.kategoriNama && <p className="text-xs text-tinta-redup">{entry.kategoriNama}</p>
         )}
+        <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
+          <span className="truncate font-mono text-tinta-redup/80">{host}</span>
+          {entry.kategoriNama && (
+            <>
+              <span aria-hidden>·</span>
+              <span className="shrink-0">{entry.kategoriNama}</span>
+            </>
+          )}
+          <span aria-hidden>·</span>
+          <span className="shrink-0 font-mono tabular">
+            {entry.klikHariIni.toLocaleString("id-ID")} klik
+          </span>
+        </p>
         {entry.badges.length > 0 && (
           <div className="mt-1">
             <LencanaRow badges={entry.badges.slice(0, 2)} />

@@ -28,6 +28,19 @@ export function middleware(req: NextRequest) {
   reqHeaders.set("content-security-policy", csp);
 
   const res = NextResponse.next({ request: { headers: reqHeaders } });
+
+  // Provision a visitor id for public presence counting (online + total). Not
+  // security-sensitive and never touches money/ranking — just a stable counter id.
+  if (!req.cookies.get("panjat_vid")) {
+    res.cookies.set("panjat_vid", crypto.randomUUID(), {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: !dev,
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+  }
+
   res.headers.set("content-security-policy", csp);
   res.headers.set("x-content-type-options", "nosniff");
   res.headers.set("x-frame-options", "DENY");

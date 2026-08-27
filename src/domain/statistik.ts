@@ -2,12 +2,15 @@
 import { count, eq, sql } from "drizzle-orm";
 import type { Database } from "@/db";
 import { juaraHarian, klikHarian, listing, peganganLedger } from "@/db/schema";
+import { visitorStats } from "@/lib/presence";
 
 export interface Statistik {
   sponsor: number;
   klikTerkirim: number;
   totalPegangan: number;
   hariDiarsip: number;
+  online: number;
+  totalPengunjung: number;
 }
 
 export async function getStatistik(db: Database): Promise<Statistik> {
@@ -23,11 +26,14 @@ export async function getStatistik(db: Database): Promise<Statistik> {
     .from(peganganLedger)
     .where(eq(peganganLedger.jenis, "bayar"));
   const [arsip] = await db.select({ n: count() }).from(juaraHarian);
+  const visitor = await visitorStats();
 
   return {
     sponsor: sponsor.n,
     klikTerkirim: Number(klik.n),
     totalPegangan: Number(bayar.n),
     hariDiarsip: arsip.n,
+    online: visitor.online,
+    totalPengunjung: visitor.total,
   };
 }

@@ -14,6 +14,8 @@ import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
 import { guessStatus } from "@/domain/tebakan";
 import { currentAnon } from "@/lib/anon";
 import { formatRupiah } from "@/lib/format";
+import { pingVisitor, VID_COOKIE, visitorStats } from "@/lib/presence";
+import { cookies } from "next/headers";
 
 // Reads the DB per request; also keeps it out of the build-time prerender.
 export const dynamic = "force-dynamic";
@@ -21,13 +23,17 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const now = new Date();
   const anonId = await currentAnon();
+  const vid = (await cookies()).get(VID_COOKIE)?.value;
+  if (vid) await pingVisitor(vid);
+
   const { entries, max } = await getBoard(db);
   const totalPegangan = entries.reduce((sum, e) => sum + e.pegangan, 0);
-  const [tebak, kakiTiang, sisaSorak, kats] = await Promise.all([
+  const [tebak, kakiTiang, sisaSorak, kats, visitor] = await Promise.all([
     guessStatus(db, anonId, now),
     getKakiTiang(db),
     sorakRemaining(db, anonId, now),
     listCategories(db),
+    visitorStats(),
   ]);
 
   const spotlightItems = entries.map((e) => ({ id: e.id, nama: e.nama, pegangan: e.pegangan }));
@@ -43,13 +49,17 @@ export default async function Home() {
           className="font-display text-5xl font-bold leading-[0.95] text-tinta sm:text-6xl"
           style={{ fontStretch: "130%" }}
         >
-          Panjat tenar? Di sini aja.
+          Panjat terusss.
         </h1>
         <p className="mt-4 max-w-xl text-lg text-tinta-redup">
           Pegangan paling kuat duduk paling atas. Tiangnya licin — yang berhenti manjat, merosot.
         </p>
         <HeroManjat kategori={kats} />
-        <div className="mt-4 flex gap-6 font-mono tabular text-xs text-tinta-redup">
+        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 font-mono tabular text-xs text-tinta-redup">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-block size-1.5 rounded-full bg-merah" aria-hidden />
+            <b className="text-tinta">{visitor.online}</b> online
+          </span>
           <span>
             <b className="text-tinta">{entries.length}</b> pemanjat
           </span>
