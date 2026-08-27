@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { buttonClasses } from "@/components/Button";
 import { LencanaRow } from "@/components/LencanaRow";
+import { PageShell } from "@/components/PageShell";
 import { Sparkline } from "@/components/Sparkline";
 import { StatTile } from "@/components/StatTile";
 import { db } from "@/db";
@@ -26,14 +27,14 @@ export default async function DasborListing({
   if (!d) notFound();
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-8">
+    <PageShell>
       <a href="/dasbor" className="text-sm text-tinta-redup hover:text-tinta">
         ← Dasbor
       </a>
-      <h1 className="mt-2 font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+      <h1 className="mt-2 font-display text-3xl font-bold text-tinta sm:text-4xl" style={{ fontStretch: "125%" }}>
         {d.nama}
       </h1>
-      <p className="font-mono text-xs text-tinta-redup">
+      <p className="mt-1 font-mono text-xs text-tinta-redup">
         {d.urlNormal} · {d.status}
       </p>
       {d.badges.length > 0 && (
@@ -66,8 +67,10 @@ export default async function DasborListing({
       </div>
 
       <section className="mt-6">
-        <h2 className="mb-2 text-sm font-semibold text-tinta">Posisi 7 hari</h2>
-        <div className="rounded-lg border border-garis bg-kertas-1 p-3">
+        <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+          Posisi 7 hari
+        </h2>
+        <div className="rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu">
           <Sparkline ranks={d.seri7hari.map((p) => p.rank)} />
         </div>
       </section>
@@ -79,20 +82,24 @@ export default async function DasborListing({
       </section>
 
       <section className="mt-6">
-        <h2 className="mb-2 text-sm font-semibold text-tinta">Deskripsi</h2>
+        <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+          Deskripsi
+        </h2>
         <DescEdit listingId={d.listingId} initial={d.deskripsi ?? ""} />
       </section>
 
       <section className="mt-6">
-        <h2 className="mb-2 text-sm font-semibold text-tinta">Riwayat pembayaran</h2>
+        <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+          Riwayat pembayaran
+        </h2>
         {d.riwayat.length === 0 ? (
           <p className="text-sm text-tinta-redup">Belum ada pembayaran.</p>
         ) : (
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col gap-1.5">
             {d.riwayat.map((r, i) => (
               <li
                 key={i}
-                className="flex items-center justify-between rounded-md border border-garis bg-kertas-1 px-3 py-2 text-sm"
+                className="flex items-center justify-between rounded-lg border border-garis bg-kertas-1 px-3.5 py-2.5 text-sm shadow-kartu"
               >
                 <span className="text-tinta-redup">
                   {formatWIB(r.waktu)} · {r.metode ?? "—"}
@@ -105,6 +112,6 @@ export default async function DasborListing({
           </ul>
         )}
       </section>
-    </main>
+    </PageShell>
   );
 }

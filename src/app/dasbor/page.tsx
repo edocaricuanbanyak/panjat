@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { PageShell } from "@/components/PageShell";
 import { db } from "@/db";
 import { listMyListings } from "@/domain/dashboard";
 import { formatRupiah } from "@/lib/format";
@@ -13,9 +14,12 @@ export default async function DasborIndex() {
   const listings = await listMyListings(db, kontakId);
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-8">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+    <PageShell>
+      <div className="flex items-end justify-between">
+        <h1
+          className="font-display text-3xl font-bold text-tinta sm:text-4xl"
+          style={{ fontStretch: "125%" }}
+        >
           Dasbor
         </h1>
         <form action="/api/dasbor/keluar" method="post">
@@ -24,7 +28,7 @@ export default async function DasborIndex() {
       </div>
 
       {listings.length === 0 ? (
-        <p className="mt-6 text-sm text-tinta-redup">
+        <p className="mt-6 text-tinta-redup">
           Belum ada listing atas akun ini.{" "}
           <a href="/manjat" className="text-merah hover:underline">
             Manjat sekarang
@@ -32,12 +36,12 @@ export default async function DasborIndex() {
           .
         </p>
       ) : (
-        <ul className="mt-6 flex flex-col gap-2">
+        <ul className="mt-6 flex flex-col gap-2.5">
           {listings.map((l) => (
             <li key={l.id}>
               <a
                 href={`/dasbor/${l.id}`}
-                className="flex items-center justify-between rounded-lg border border-garis bg-kertas-1 p-3 hover:bg-kertas-2"
+                className="flex items-center justify-between rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:border-tinta/20"
               >
                 <span className="min-w-0">
                   <span className="block truncate font-display font-semibold text-tinta">
@@ -45,7 +49,7 @@ export default async function DasborIndex() {
                   </span>
                   <span className="font-mono text-xs text-tinta-redup">{l.status}</span>
                 </span>
-                <span className="font-mono tabular text-sm font-semibold text-tinta">
+                <span className="font-mono tabular text-base font-semibold text-tinta">
                   {formatRupiah(l.pegangan)}
                 </span>
               </a>
@@ -53,6 +57,6 @@ export default async function DasborIndex() {
           ))}
         </ul>
       )}
-    </main>
+    </PageShell>
   );
 }

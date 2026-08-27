@@ -9,9 +9,9 @@ export function StatTile({
   sub?: string;
 }) {
   return (
-    <div className="rounded-lg border border-garis bg-kertas-1 p-3">
+    <div className="rounded-xl border border-garis bg-kertas-1 p-3.5 shadow-kartu">
       <div className="text-xs text-tinta-redup">{label}</div>
-      <div className="mt-1 font-mono tabular text-lg font-semibold text-tinta">{value}</div>
+      <div className="mt-1 font-mono tabular text-xl font-semibold text-tinta">{value}</div>
       {sub && <div className="mt-0.5 text-xs text-tinta-redup">{sub}</div>}
     </div>
   );
