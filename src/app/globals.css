@@ -47,6 +47,24 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Momen Puncak entrance (MI-1, §9.6.4) — transform/opacity only. */
+@keyframes puncak-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes puncak-pop {
+  from { opacity: 0; transform: scale(0.55); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes puncak-wave {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(-12deg); }
+  60% { transform: rotate(8deg); }
+}
+.reveal { opacity: 0; animation: puncak-rise 0.5s var(--ease-panjat) forwards; }
+.reveal-pop { opacity: 0; animation: puncak-pop 0.6s var(--ease-panjat) forwards; }
+.reveal-wave { animation: puncak-wave 0.8s var(--ease-panjat) 1s; }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
