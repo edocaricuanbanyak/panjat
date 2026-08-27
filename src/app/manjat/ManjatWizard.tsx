@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import { Dropdown } from "@/components/Dropdown";
@@ -378,7 +379,8 @@ export function ManjatWizard({
           )}
 
           <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => setStep(1)}>
+            <Button variant="secondary" onClick={() => setStep(1)} className="gap-1.5">
+              <ArrowLeft className="size-4" aria-hidden />
               {express ? copy.manjat.detail : copy.manjat.kembali}
             </Button>
             {express ? (
