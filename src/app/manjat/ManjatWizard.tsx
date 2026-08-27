@@ -241,8 +241,8 @@ export function ManjatWizard({
                   <Input
                     label="Nominal (Rp)"
                     inputMode="numeric"
-                    placeholder="25000"
-                    value={nominalInput}
+                    placeholder="25.000"
+                    value={nominalInput ? Number(nominalInput).toLocaleString("id-ID") : ""}
                     onChange={(e) => setNominalInput(e.target.value.replace(/\D/g, ""))}
                     onBlur={() =>
                       nominalInput && refreshQuote({ nominal: Number(nominalInput) })

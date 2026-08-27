@@ -1,15 +1,16 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { fieldClasses } from "./Input";
 
 export type DropdownOption = { value: string; label: string };
 
 /**
- * Custom dropdown (not a native <select>): a field-styled trigger + a glass
- * popover listbox. Closes on outside-click/Escape; basic arrow-key navigation.
- * Matches TextField chrome so all form controls read as one system.
+ * Custom dropdown (not a native <select>): a field-styled trigger + a popover
+ * listbox that matches the TextField chrome. Full keyboard support
+ * (Up/Down/Home/End/Enter/Esc) with aria-activedescendant; opens on the current
+ * selection; closes on outside-click/Escape/Tab and returns focus to the trigger.
  */
 export function Dropdown({
   label,
@@ -31,9 +32,24 @@ export function Dropdown({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
-  const listId = useId();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const baseId = useId();
+  const listId = `${baseId}-list`;
+  const optId = (i: number) => `${baseId}-opt-${i}`;
   const selected = options.find((o) => o.value === value);
 
+  function openMenu() {
+    const i = options.findIndex((o) => o.value === value);
+    setActive(i >= 0 ? i : 0);
+    setOpen(true);
+  }
+  function close(returnFocus = false) {
+    setOpen(false);
+    if (returnFocus) triggerRef.current?.focus();
+  }
+
+  // Outside-click closes.
   useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => {
@@ -43,22 +59,41 @@ export function Dropdown({
     return () => document.removeEventListener("mousedown", onDoc);
   }, [open]);
 
+  // Keep the active option scrolled into view.
+  useEffect(() => {
+    if (!open) return;
+    listRef.current?.querySelector<HTMLElement>(`#${CSS.escape(optId(active))}`)?.scrollIntoView({
+      block: "nearest",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, active]);
+
   function choose(v: string) {
     onChange(v);
-    setOpen(false);
+    close(true);
   }
 
   function onKey(e: React.KeyboardEvent) {
-    if (e.key === "Escape") return setOpen(false);
-    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    if (e.key === "Tab") return setOpen(false);
+    if (e.key === "Escape") return close(true);
+    if (!open && (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
-      if (!open) return setOpen(true);
-      setActive((a) => {
-        const next = e.key === "ArrowDown" ? a + 1 : a - 1;
-        return (next + options.length) % options.length;
-      });
+      return openMenu();
     }
-    if ((e.key === "Enter" || e.key === " ") && open) {
+    if (!open) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActive((a) => (a + 1) % options.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive((a) => (a - 1 + options.length) % options.length);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      setActive(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      setActive(options.length - 1);
+    } else if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       const opt = options[active];
       if (opt) choose(opt.value);
@@ -70,15 +105,18 @@ export function Dropdown({
       {label && <span className="mb-1 block text-sm font-medium text-tinta-redup">{label}</span>}
       <div className="relative">
         <button
+          ref={triggerRef}
           type="button"
+          role="combobox"
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-controls={listId}
-          onClick={() => setOpen((o) => !o)}
+          aria-activedescendant={open ? optId(active) : undefined}
+          onClick={() => (open ? setOpen(false) : openMenu())}
           onKeyDown={onKey}
-          className={`${fieldClasses} flex cursor-pointer items-center justify-between text-left`}
+          className={`${fieldClasses} flex cursor-pointer items-center justify-between gap-2 text-left`}
         >
-          <span className={selected ? "text-tinta" : "text-tinta-redup"}>
+          <span className={`truncate ${selected ? "text-tinta" : "text-tinta-redup"}`}>
             {selected ? selected.label : placeholder}
           </span>
           <ChevronDown
@@ -89,6 +127,7 @@ export function Dropdown({
 
         {open && (
           <ul
+            ref={listRef}
             id={listId}
             role="listbox"
             className="absolute z-40 mt-1.5 max-h-64 w-full overflow-auto rounded-xl border border-garis bg-kertas-1 p-1 shadow-naik"
@@ -96,18 +135,19 @@ export function Dropdown({
             {options.map((o, i) => {
               const on = o.value === value;
               return (
-                <li key={o.value} role="option" aria-selected={on}>
-                  <button
-                    type="button"
-                    onClick={() => choose(o.value)}
-                    onMouseEnter={() => setActive(i)}
-                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition ${
-                      i === active ? "bg-kertas-2" : ""
-                    } ${on ? "font-medium text-merah-teks" : "text-tinta"}`}
-                  >
-                    {o.label}
-                    {on && <span aria-hidden>✓</span>}
-                  </button>
+                <li
+                  key={o.value}
+                  id={optId(i)}
+                  role="option"
+                  aria-selected={on}
+                  onClick={() => choose(o.value)}
+                  onMouseEnter={() => setActive(i)}
+                  className={`flex cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition ${
+                    i === active ? "bg-kertas-2" : ""
+                  } ${on ? "font-medium text-merah-teks" : "text-tinta"}`}
+                >
+                  <span className="truncate">{o.label}</span>
+                  {on && <Check className="size-4 shrink-0" aria-hidden />}
                 </li>
               );
             })}
