@@ -40,7 +40,7 @@ export function ListingCard({
 
   return (
     <article
-      className={`group relative flex items-center gap-3 rounded-xl px-3 transition-all ease-panjat hover:z-10 sm:gap-4 sm:px-4 ${puncak ? "py-3.5" : "py-3"}`}
+      className={`group relative flex flex-col gap-1.5 rounded-xl px-3 transition-all ease-panjat hover:z-10 sm:flex-row sm:items-center sm:gap-4 sm:px-4 ${puncak ? "py-3.5" : "py-3"}`}
     >
       {/* Podium ribbon — a little pennant hanging over the top-left (top-3 only). */}
       {medali && (
@@ -78,18 +78,21 @@ export function ListingCard({
         </div>
       )}
 
-      <div
-        className={`shrink-0 text-right font-mono tabular font-semibold ${
-          puncak ? "w-10 text-xl sm:w-12 sm:text-2xl" : "w-9 text-base"
-        } ${entry.rank <= 3 ? "text-merah-teks" : "text-tinta-redup"}`}
-      >
-        #{entry.rank}
-      </div>
-      <LogoTile
-        nama={entry.nama}
-        className={puncak ? "size-11 rounded-md text-lg" : "size-9 rounded-md text-sm"}
-      />
-      <div className="min-w-0 flex-1">
+      {/* Mobile: rank + logo + name share the top line (name gets full width);
+          on sm+ this wrapper dissolves (contents) into the original editorial row. */}
+      <div className="flex min-w-0 items-center gap-3 sm:contents">
+        <div
+          className={`shrink-0 text-right font-mono tabular font-semibold ${
+            puncak ? "w-10 text-xl sm:w-12 sm:text-2xl" : "w-9 text-base"
+          } ${entry.rank <= 3 ? "text-merah-teks" : "text-tinta-redup"}`}
+        >
+          #{entry.rank}
+        </div>
+        <LogoTile
+          nama={entry.nama}
+          className={puncak ? "size-11 rounded-md text-lg" : "size-9 rounded-md text-sm"}
+        />
+        <div className="min-w-0 flex-1">
         {/* Stretched link: the whole card navigates to the tracked redirect. */}
         <a
           href={`/k/${entry.id}?asal=papan`}
@@ -115,13 +118,14 @@ export function ListingCard({
           <span aria-hidden>·</span>
           <span className="shrink-0 font-mono tabular">{copy.papan.klik(entry.klikHariIni)}</span>
         </p>
-        {entry.badges.length > 0 && (
-          <div className="mt-1">
-            <LencanaRow badges={entry.badges.slice(0, 2)} />
-          </div>
-        )}
+          {entry.badges.length > 0 && (
+            <div className="mt-1">
+              <LencanaRow badges={entry.badges.slice(0, 2)} />
+            </div>
+          )}
+        </div>
       </div>
-      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+      <div className="flex shrink-0 items-center justify-end gap-3 sm:gap-3">
         <span
           className={`font-mono tabular font-semibold text-tinta ${puncak ? "text-lg sm:text-xl" : "text-base"}`}
         >

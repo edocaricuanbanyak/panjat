@@ -26,7 +26,7 @@ export function Spotlight({ items }: { items: Aktivitas[] }) {
       <span className="shrink-0 font-mono text-[11px] font-semibold uppercase tracking-wide text-merah-teks">
         {copy.papan.aktivitas}
       </span>
-      <div className="overflow-hidden">
+      <div className="min-w-0 flex-1 overflow-hidden">
         <div className="ticker-track flex w-max gap-8 whitespace-nowrap">
           {loop.map((a, i) => (
             <a

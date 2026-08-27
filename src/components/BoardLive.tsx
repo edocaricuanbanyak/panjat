@@ -60,7 +60,7 @@ export function BoardLive({
       <div aria-live="off">
         {/* Summit zone — the top three each get their own rank-tinted card;
             auto-rows-fr keeps all three the same height regardless of content. */}
-        <section className="grid auto-rows-fr gap-3">
+        <section className="grid grid-cols-1 auto-rows-fr gap-3">
           {puncak.map((e) => (
             <div
               key={e.id}
