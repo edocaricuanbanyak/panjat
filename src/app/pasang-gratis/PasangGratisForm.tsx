@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/Button";
+import { Dropdown } from "@/components/Dropdown";
 import { Input } from "@/components/Input";
 
 type Kategori = { slug: string; nama: string };
@@ -73,31 +74,27 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
         onBlur={prefill}
       />
 
-      <details className="rounded-md border border-garis bg-kertas-1 p-3" open>
-        <summary className="cursor-pointer text-sm text-tinta-redup">Detail (terisi otomatis)</summary>
+      <details className="rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu" open>
+        <summary className="cursor-pointer text-sm font-medium text-tinta-redup">
+          Detail (terisi otomatis)
+        </summary>
         <div className="mt-3 flex flex-col gap-3">
           <Input label="Judul" placeholder="Produkku" value={nama} onChange={(e) => setNama(e.target.value)} />
+          <Dropdown
+            label="Kategori"
+            placeholder="—"
+            value={kategoriSlug}
+            onChange={setKategoriSlug}
+            options={kategori.map((k) => ({ value: k.slug, label: k.nama }))}
+          />
           <label className="block">
-            <span className="text-sm text-tinta-redup">Kategori</span>
-            <select
-              className="mt-1 h-11 w-full rounded-md border border-garis bg-kertas-1 px-3 text-base text-tinta"
-              value={kategoriSlug}
-              onChange={(e) => setKategoriSlug(e.target.value)}
-            >
-              <option value="">—</option>
-              {kategori.map((k) => (
-                <option key={k.slug} value={k.slug}>{k.nama}</option>
-              ))}
-            </select>
-          </label>
-          <label className="block">
-            <span className="text-sm text-tinta-redup">Deskripsi (160 kar.)</span>
+            <span className="mb-1 block text-sm font-medium text-tinta-redup">Deskripsi (160 kar.)</span>
             <textarea
               value={deskripsi}
               maxLength={160}
               rows={2}
               onChange={(e) => setDeskripsi(e.target.value)}
-              className="mt-1 w-full rounded-md border border-garis bg-kertas-1 p-2 text-base text-tinta"
+              className="w-full rounded-lg border border-garis bg-kertas-1 p-2.5 text-base text-tinta shadow-kartu focus-visible:border-merah focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah/25"
             />
           </label>
         </div>
