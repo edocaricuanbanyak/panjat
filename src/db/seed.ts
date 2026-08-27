@@ -131,9 +131,31 @@ async function main() {
         ref: "seed",
       });
     }
+
+    // Kaki Tiang: free Rp0 listings (R16). No ledger row — grip is 0.
+    const gratis: { nama: string; urlNormal: string; deskripsi: string; kategori: string }[] = [
+      { nama: "Catatan Kaki", urlNormal: "catatankaki.id", deskripsi: "Aplikasi catatan minimalis buatan indie.", kategori: "produktivitas" },
+      { nama: "Petani Pintar", urlNormal: "petanipintar.id", deskripsi: "Komunitas petani berbagi tips dan harga.", kategori: "komunitas" },
+    ];
+    for (const g of gratis) {
+      const [k] = await tx
+        .insert(sponsorKontak)
+        .values({ email: `${g.urlNormal.replace(/[^a-z0-9]/gi, "")}@example.id` })
+        .returning({ id: sponsorKontak.id });
+      await tx.insert(listing).values({
+        urlNormal: g.urlNormal,
+        nama: g.nama,
+        deskripsi: g.deskripsi,
+        kategoriId: katBySlug.get(g.kategori),
+        status: "tayang",
+        peganganCached: 0,
+        kontakId: k.id,
+        catatan: "seed-gratis",
+      });
+    }
   });
 
-  console.log(`seeded ${KATEGORI.length} kategori, ${KONFIGURASI.length} konfigurasi, ${LISTINGS.length} listing`);
+  console.log(`seeded ${KATEGORI.length} kategori, ${KONFIGURASI.length} konfigurasi, ${LISTINGS.length} listing + 2 Kaki Tiang`);
   await pool.end();
 }
 

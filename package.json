@@ -23,6 +23,7 @@
     "hariini:sim": "tsx src/jobs/hariini-sim.ts",
     "lencana:run": "tsx src/jobs/lencana.ts",
     "lencana:sim": "tsx src/jobs/lencana-sim.ts",
+    "sorak:sim": "tsx src/jobs/sorak-sim.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

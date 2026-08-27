@@ -2,11 +2,13 @@ import { BoardLive } from "@/components/BoardLive";
 import { buttonClasses } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
 import { Footer } from "@/components/Footer";
+import { KakiTiang } from "@/components/KakiTiang";
 import { Nav } from "@/components/Nav";
 import { TebakJuara } from "@/components/TebakJuara";
 import { TiangRail } from "@/components/TiangRail";
 import { db } from "@/db";
 import { getBoard } from "@/domain/board";
+import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
 import { guessStatus } from "@/domain/tebakan";
 import { currentAnon } from "@/lib/anon";
 import { formatRupiah } from "@/lib/format";
@@ -15,9 +17,15 @@ import { formatRupiah } from "@/lib/format";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  const now = new Date();
+  const anonId = await currentAnon();
   const { entries, max } = await getBoard(db);
   const totalPegangan = entries.reduce((sum, e) => sum + e.pegangan, 0);
-  const tebak = await guessStatus(db, await currentAnon(), new Date());
+  const [tebak, kakiTiang, sisaSorak] = await Promise.all([
+    guessStatus(db, anonId, now),
+    getKakiTiang(db),
+    sorakRemaining(db, anonId, now),
+  ]);
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8">
@@ -59,6 +67,16 @@ export default async function Home() {
           <BoardLive initial={{ entries, max }} />
         </div>
       )}
+
+      <KakiTiang entries={kakiTiang} remaining={sisaSorak} />
+      <p className="mt-3 text-xs text-tinta-redup">
+        Punya produk?{" "}
+        <a href="/pasang-gratis" className="text-merah hover:underline">
+          Pasang gratis di Kaki Tiang
+        </a>{" "}
+        atau <a href="/manjat" className="text-merah hover:underline">manjat ke papan berbayar</a>.
+      </p>
+
       <Footer />
     </main>
   );
