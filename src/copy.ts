@@ -56,6 +56,7 @@ export const copy = {
     aktivitas: "Aktivitas",
     juaraKakiTiang: "Juara Kaki Tiang · gratis",
     salip: (rp: string) => `Salip ${rp}`,
+    salipRank: (rank: number, rp: string) => `Salip #${rank} dengan ${rp}`,
     salipSingkat: "Salip",
     klik: (n: number) => `${n.toLocaleString("id-ID")} klik`,
     kunjungiSitus: "Kunjungi situs",
