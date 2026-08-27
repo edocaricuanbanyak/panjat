@@ -54,7 +54,7 @@ export const copy = {
 
   papan: {
     aktivitas: "Aktivitas",
-    juaraKakiTiang: "Juara Kaki Tiang · gratis",
+    juaraKakiTiang: "Juara Kaki Tiang minggu ini · gratis",
     salip: (rp: string) => `Salip ${rp}`,
     salipRank: (rank: number, rp: string) => `Salip #${rank} dengan ${rp}`,
     salipSingkat: "Salip",

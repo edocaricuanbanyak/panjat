@@ -19,7 +19,7 @@ import { db } from "@/db";
 import { getBoard } from "@/domain/board";
 import { jelajahAll, listCategories } from "@/domain/jelajah";
 import { getHariIni } from "@/domain/papan-hari-ini";
-import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
+import { getJuaraKakiTiangMingguan, getKakiTiang, sorakRemaining } from "@/domain/sorak";
 import { recentAktivitas } from "@/lib/aktivitas";
 import { currentAnon } from "@/lib/anon";
 import { favoritBoard, myFavoritToday } from "@/lib/favorit";
@@ -41,25 +41,35 @@ export default async function Home({
   if (vid) await pingVisitor(vid);
 
   const { entries, max } = await getBoard(db);
-  const [kakiTiang, sisaSorak, kats, visitor, favorit, choice, aktivitas, hariIni, jelajahItems] =
-    await Promise.all([
-      getKakiTiang(db),
-      sorakRemaining(db, anonId, now),
-      listCategories(db),
-      visitorStats(),
-      favoritBoard(db, now, 5),
-      myFavoritToday(vid, now),
-      recentAktivitas(20),
-      getHariIni(db, now),
-      jelajahAll(db),
-    ]);
+  const [
+    kakiTiang,
+    juaraKakiTiang,
+    sisaSorak,
+    kats,
+    visitor,
+    favorit,
+    choice,
+    aktivitas,
+    hariIni,
+    jelajahItems,
+  ] = await Promise.all([
+    getKakiTiang(db),
+    getJuaraKakiTiangMingguan(db),
+    sorakRemaining(db, anonId, now),
+    listCategories(db),
+    visitorStats(),
+    favoritBoard(db, now, 5),
+    myFavoritToday(vid, now),
+    recentAktivitas(20),
+    getHariIni(db, now),
+    jelajahAll(db),
+  ]);
 
   const totalPages = Math.max(1, Math.ceil(entries.length / PER_PAGE));
   const page = Math.min(Math.max(1, Number((await searchParams).hal) || 1), totalPages);
   const pageEntries = entries.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   const voteEntries = entries.map((e) => ({ id: e.id, nama: e.nama }));
-  const juaraGratis = kakiTiang[0]; // top Kaki Tiang by dukungan (wildcard showcase)
 
   return (
     <PageShell
@@ -102,14 +112,15 @@ export default async function Home({
               />
             ) : page === 1 ? (
               <>
+                {/* Weekly free-tier champion rises to the top as a labelled
+                    showcase — never a paid rank (R16). */}
+                {juaraKakiTiang && <JuaraKakiTiang entry={juaraKakiTiang} />}
                 <BoardLive
                   initial={{ entries, max }}
                   middle={
                     <VoteFavorit entries={voteEntries} leaderboard={favorit} myChoice={choice} />
                   }
                 />
-                {/* Top free listing rises here as a labelled wildcard — never a paid rank (R16). */}
-                {juaraGratis && juaraGratis.sorak > 0 && <JuaraKakiTiang entry={juaraGratis} />}
               </>
             ) : (
               <div className="flex flex-col gap-2.5">

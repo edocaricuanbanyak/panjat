@@ -61,6 +61,44 @@ export interface KakiTiangEntry {
   sorak: number;
 }
 
+export interface JuaraKakiTiang {
+  id: string;
+  nama: string;
+  urlNormal: string;
+  deskripsi: string | null;
+  /** Sorak earned in the last 7 days (the weekly contest). */
+  sorak: number;
+  /** Valid clicks delivered in the last 7 days. */
+  klik: number;
+}
+
+/**
+ * Weekly Kaki Tiang champion: the free listing with the most Sorak over the last
+ * 7 days. Shown as a labelled showcase (never a paid rank — R16). Carries its
+ * pitch + weekly clicks so the board can feature it at the top. Null if nobody
+ * was cheered this week.
+ */
+export async function getJuaraKakiTiangMingguan(db: Database): Promise<JuaraKakiTiang | null> {
+  const sorak7 = sql<number>`(select count(*)::int from "sorak"
+    where "sorak"."listing_id" = "listing"."id" and "sorak"."tanggal" >= current_date - 7)`;
+  const klik7 = sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian"
+    where "klik_harian"."listing_id" = "listing"."id" and "klik_harian"."tanggal" >= current_date - 7)`;
+  const [row] = await db
+    .select({
+      id: listing.id,
+      nama: listing.nama,
+      urlNormal: listing.urlNormal,
+      deskripsi: listing.deskripsi,
+      sorak: sorak7,
+      klik: klik7,
+    })
+    .from(listing)
+    .where(and(eq(listing.status, "tayang"), eq(listing.peganganCached, 0)))
+    .orderBy(desc(sorak7), desc(listing.createdAt))
+    .limit(1);
+  return row && row.sorak > 0 ? row : null;
+}
+
 /** Free listings, ordered by Sorak (never above paid — a separate tier). */
 export async function getKakiTiang(db: Database): Promise<KakiTiangEntry[]> {
   // Fully-qualified columns: in a SELECT-list sql fragment drizzle strips table
