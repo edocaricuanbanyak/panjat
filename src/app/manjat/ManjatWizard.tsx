@@ -95,6 +95,25 @@ export function ManjatWizard({
     }
   }
 
+  const [suggesting, setSuggesting] = useState(false);
+  async function suggestDesc() {
+    if (!url.trim()) return;
+    setSuggesting(true);
+    try {
+      const res = await fetch("/api/saran", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url, nama }),
+      });
+      const data = await res.json();
+      if (data.deskripsi) setDeskripsi(data.deskripsi);
+    } catch {
+      /* best-effort */
+    } finally {
+      setSuggesting(false);
+    }
+  }
+
   async function prefillFromUrl() {
     if (!url.trim()) return;
     try {
@@ -178,6 +197,26 @@ export function ManjatWizard({
                 </option>
               ))}
             </select>
+          </label>
+          <label className="block">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-tinta-redup">Deskripsi (160 kar.)</span>
+              <button
+                type="button"
+                onClick={suggestDesc}
+                disabled={suggesting || !url.trim()}
+                className="font-mono text-xs text-merah hover:underline disabled:opacity-50"
+              >
+                {suggesting ? "…" : "Saran AI"}
+              </button>
+            </div>
+            <textarea
+              value={deskripsi}
+              maxLength={160}
+              rows={2}
+              onChange={(e) => setDeskripsi(e.target.value)}
+              className="mt-1 w-full rounded-md border border-garis bg-kertas-1 p-2 text-base text-tinta"
+            />
           </label>
           <Button disabled={!canStep1} onClick={() => setStep(2)}>
             Lanjut

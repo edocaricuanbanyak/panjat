@@ -4,6 +4,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { Footer } from "@/components/Footer";
 import { KakiTiang } from "@/components/KakiTiang";
 import { Nav } from "@/components/Nav";
+import { Spotlight } from "@/components/Spotlight";
 import { TebakJuara } from "@/components/TebakJuara";
 import { TiangRail } from "@/components/TiangRail";
 import { db } from "@/db";
@@ -57,6 +58,9 @@ export default async function Home() {
         </p>
       </header>
 
+      {entries.length > 0 && (
+        <Spotlight items={entries.map((e) => ({ id: e.id, nama: e.nama, pegangan: e.pegangan }))} />
+      )}
       {entries.length > 0 && <TebakJuara status={tebak} />}
 
       {entries.length === 0 ? (
