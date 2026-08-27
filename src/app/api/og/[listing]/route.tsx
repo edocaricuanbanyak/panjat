@@ -1,37 +1,48 @@
 import { ImageResponse } from "next/og";
+import { and, eq, gt, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { badgesFor } from "@/domain/lencana";
-import { getMomenForListing } from "@/domain/momen";
+import { kategori, listing } from "@/db/schema";
 import { formatRupiah } from "@/lib/format";
 
 export const runtime = "nodejs";
 
-// Palette (§9.6.2). Raw hex is unavoidable in image generation (no CSS vars).
-const C = {
-  kertas: "#F3F0E9",
-  kertas1: "#FFFFFF",
-  tinta: "#1F1B16",
-  tintaRedup: "#7A7267",
-  garis: "#D8D2C4",
-  tiang: "#8A5A32",
-  merah: "#C93A2E",
-};
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/**
- * GET /api/og/{listing} — dynamic flex card (R5). 1200×630 by default;
- * ?story=1 → 1080×1920 for IG Story. Rank/name/grip pulled from the live board.
- */
-export async function GET(req: Request, ctx: { params: Promise<{ listing: string }> }) {
-  const { listing: listingId } = await ctx.params;
-  const story = new URL(req.url).searchParams.get("story") != null;
-  const momen = await getMomenForListing(db, listingId);
+// Design tokens, inlined — satori resolves concrete values, not CSS vars (§9.6.2).
+const KERTAS = "#f3f0e9";
+const KERTAS1 = "#ffffff";
+const TINTA = "#1f1b16";
+const REDUP = "#7a7267";
+const GARIS = "#d8d2c4";
+const MERAH = "#c93a2e";
 
-  const width = story ? 1080 : 1200;
-  const height = story ? 1920 : 630;
-  const nama = momen?.nama ?? "Panjat";
-  const rank = momen?.rank ?? 0;
-  const pegangan = momen ? formatRupiah(momen.pegangan) : "";
-  const badges = ((await badgesFor(db, [listingId])).get(listingId) ?? []).slice(0, 3);
+/** GET /api/og/[id] — 1200×630 share card for a listing (R20-d). */
+export async function GET(_req: Request, { params }: { params: Promise<{ listing: string }> }) {
+  const { listing: id } = await params;
+  if (!UUID.test(id)) return new Response("Not found", { status: 404 });
+
+  const [l] = await db
+    .select({
+      nama: listing.nama,
+      deskripsi: listing.deskripsi,
+      urlNormal: listing.urlNormal,
+      pegangan: listing.peganganCached,
+      status: listing.status,
+      kategoriNama: kategori.nama,
+    })
+    .from(listing)
+    .leftJoin(kategori, eq(kategori.id, listing.kategoriId))
+    .where(eq(listing.id, id))
+    .limit(1);
+  if (!l || l.status !== "tayang") return new Response("Not found", { status: 404 });
+
+  const [{ n }] = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(listing)
+    .where(and(eq(listing.status, "tayang"), gt(listing.peganganCached, l.pegangan)));
+  const rank = Number(n) + 1;
+  const summit = rank <= 3;
+  const host = l.urlNormal.replace(/^https?:\/\//, "").replace(/\/+$/, "");
 
   return new ImageResponse(
     (
@@ -42,70 +53,76 @@ export async function GET(req: Request, ctx: { params: Promise<{ listing: string
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: C.kertas,
-          padding: story ? 96 : 72,
+          padding: 64,
+          background: KERTAS,
+          color: TINTA,
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{ width: 12, height: 40, background: C.tiang, borderRadius: 6 }} />
-          <div style={{ display: "flex", fontSize: 34, fontWeight: 700, color: C.tinta }}>
+        {/* top: wordmark + category */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", fontSize: 34, fontWeight: 800, letterSpacing: -1 }}>
             Panjat
           </div>
+          <div style={{ display: "flex", fontSize: 26, color: REDUP }}>
+            {l.kategoriNama ?? "Papan"}
+          </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div style={{ display: "flex", fontSize: 28, color: C.tintaRedup }}>
-            {rank === 1 ? "Di puncak" : `Peringkat`}
+        {/* middle: rank + logo + name */}
+        <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 132,
+              height: 132,
+              borderRadius: 24,
+              background: KERTAS1,
+              border: `2px solid ${GARIS}`,
+              fontSize: 64,
+              fontWeight: 800,
+              color: summit ? MERAH : TINTA,
+            }}
+          >
+            {l.nama.slice(0, 1).toUpperCase()}
           </div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 20 }}>
-            <div style={{ display: "flex", fontSize: story ? 320 : 200, fontWeight: 800, color: C.merah, lineHeight: 1 }}>
+          <div style={{ display: "flex", flexDirection: "column", maxWidth: 820 }}>
+            <div style={{ display: "flex", fontSize: 34, fontWeight: 700, color: summit ? MERAH : REDUP }}>
               #{rank}
             </div>
-          </div>
-          <div style={{ display: "flex", fontSize: story ? 72 : 64, fontWeight: 700, color: C.tinta }}>
-            {nama}
-          </div>
-          <div style={{ display: "flex", fontSize: 32, color: C.tintaRedup }}>
-            pegangan {pegangan}
-          </div>
-          {badges.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 8 }}>
-              {badges.map((b) => (
-                <div
-                  key={b}
-                  style={{
-                    display: "flex",
-                    fontSize: 24,
-                    color: C.tiang,
-                    border: `2px solid ${C.garis}`,
-                    borderRadius: 999,
-                    padding: "4px 16px",
-                  }}
-                >
-                  {b}
-                </div>
-              ))}
+            <div style={{ display: "flex", fontSize: 76, fontWeight: 800, lineHeight: 1.05 }}>
+              {l.nama.length > 34 ? `${l.nama.slice(0, 33)}…` : l.nama}
             </div>
-          )}
+            {l.deskripsi ? (
+              <div style={{ display: "flex", marginTop: 10, fontSize: 30, color: REDUP }}>
+                {l.deskripsi.length > 70 ? `${l.deskripsi.slice(0, 69)}…` : l.deskripsi}
+              </div>
+            ) : null}
+          </div>
         </div>
 
+        {/* bottom: url + grip */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
-            borderTop: `2px solid ${C.garis}`,
+            alignItems: "flex-end",
+            borderTop: `2px solid ${GARIS}`,
             paddingTop: 28,
-            fontSize: 30,
-            color: C.tinta,
           }}
         >
-          <div style={{ display: "flex" }}>panjat.id</div>
-          <div style={{ display: "flex", color: C.tintaRedup }}>Manjat, atau merosot.</div>
+          <div style={{ display: "flex", fontSize: 30, color: REDUP }}>{host}</div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+            <div style={{ display: "flex", fontSize: 24, color: REDUP }}>pegangan</div>
+            <div style={{ display: "flex", fontSize: 52, fontWeight: 800 }}>
+              {formatRupiah(l.pegangan)}
+            </div>
+          </div>
         </div>
       </div>
     ),
-    { width, height },
+    { width: 1200, height: 630 },
   );
 }
