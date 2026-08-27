@@ -50,8 +50,61 @@ export async function GET(req: Request, { params }: { params: Promise<{ listing:
   const host = l.urlNormal.replace(/^https?:\/\//, "").replace(/\/+$/, "");
   const nama = l.nama.length > 26 ? `${l.nama.slice(0, 25)}…` : l.nama;
 
-  // Instagram-Story card (R5) — 1080×1920 vertical, ready to share from the modal.
+  // Instagram-Story card (R5) — 1080×1920 vertical, personalised by rank so the
+  // sponsor feels the pride: gold summit, silver/bronze podium, or a proud climb.
   if (story) {
+    const [{ total }] = await db
+      .select({ total: sql<number>`count(*)::int` })
+      .from(listing)
+      .where(eq(listing.status, "tayang"));
+    const menyalip = Math.max(0, Number(total) - rank);
+
+    const tier =
+      rank === 1
+        ? {
+            key: "puncak",
+            pill: "PUNCAK",
+            headline: "Kamu di PUNCAK tiang",
+            accent: MERAH,
+            disc: "linear-gradient(145deg, #eac95d 0%, #c8971c 100%)",
+            wash: "linear-gradient(180deg, #f8edca 0%, #f3f0e9 58%)",
+            discText: "#ffffff",
+            stat: `Teratas dari ${Number(total)} pemanjat`,
+          }
+        : rank === 2
+          ? {
+              key: "perak",
+              pill: "JUARA 2",
+              headline: "Podium — Juara 2",
+              accent: "#6f6f6f",
+              disc: "linear-gradient(145deg, #dcdcdc 0%, #9a9a9a 100%)",
+              wash: "linear-gradient(180deg, #ececec 0%, #f3f0e9 58%)",
+              discText: "#ffffff",
+              stat: `Menyalip ${menyalip} pemanjat`,
+            }
+          : rank === 3
+            ? {
+                key: "perunggu",
+                pill: "JUARA 3",
+                headline: "Podium — Juara 3",
+                accent: "#a5622f",
+                disc: "linear-gradient(145deg, #d79256 0%, #a5622f 100%)",
+                wash: "linear-gradient(180deg, #f3e1d2 0%, #f3f0e9 58%)",
+                discText: "#ffffff",
+                stat: `Menyalip ${menyalip} pemanjat`,
+              }
+            : {
+                key: "naik",
+                pill: "MENANJAK",
+                headline: `Kamu naik ke #${rank}`,
+                accent: MERAH,
+                disc: "linear-gradient(145deg, #e2503f 0%, #b81f12 100%)",
+                wash: "linear-gradient(180deg, #fbe3df 0%, #f3f0e9 58%)",
+                discText: "#ffffff",
+                stat: `Menyalip ${menyalip} pemanjat`,
+              };
+    const bigName = l.nama.length > 18 ? `${l.nama.slice(0, 17)}…` : l.nama;
+
     return new ImageResponse(
       (
         <div
@@ -62,50 +115,96 @@ export async function GET(req: Request, { params }: { params: Promise<{ listing:
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "140px 80px",
-            background: KERTAS,
+            padding: "110px 80px",
+            backgroundImage: tier.wash,
             color: TINTA,
             fontFamily: "sans-serif",
             textAlign: "center",
           }}
         >
-          <div style={{ display: "flex", fontSize: 56, fontWeight: 800, letterSpacing: -1 }}>
-            Panjat
+          {/* header: wordmark + tier pill */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
+            <div style={{ display: "flex", fontSize: 44, fontWeight: 800, letterSpacing: -1 }}>
+              Panjat
+            </div>
+            <div
+              style={{
+                display: "flex",
+                padding: "14px 40px",
+                borderRadius: 999,
+                background: tier.accent,
+                color: "#ffffff",
+                fontSize: 34,
+                fontWeight: 800,
+                letterSpacing: 4,
+              }}
+            >
+              {tier.pill}
+            </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 28 }}>
+          {/* hero: medallion with the rank, then name */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 40 }}>
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 260,
-                height: 260,
-                borderRadius: 48,
-                background: KERTAS1,
-                border: `4px solid ${GARIS}`,
-                fontSize: 132,
-                fontWeight: 800,
-                color: summit ? MERAH : TINTA,
+                width: 460,
+                height: 460,
+                borderRadius: 999,
+                backgroundImage: tier.disc,
+                border: "12px solid rgba(255,255,255,0.55)",
+                boxShadow: "0 30px 60px rgba(0,0,0,0.14)",
               }}
             >
-              {l.nama.slice(0, 1).toUpperCase()}
+              <div
+                style={{
+                  display: "flex",
+                  fontSize: rank >= 100 ? 210 : 260,
+                  fontWeight: 800,
+                  color: tier.discText,
+                  letterSpacing: -6,
+                }}
+              >
+                #{rank}
+              </div>
             </div>
-            <div style={{ display: "flex", fontSize: 88, fontWeight: 800, color: summit ? MERAH : REDUP }}>
-              #{rank}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+              <div style={{ display: "flex", fontSize: 46, fontWeight: 700, color: tier.accent }}>
+                {tier.headline}
+              </div>
+              <div style={{ display: "flex", fontSize: 104, fontWeight: 800, lineHeight: 1.0 }}>
+                {bigName}
+              </div>
+              <div style={{ display: "flex", fontSize: 38, color: REDUP }}>{host}</div>
             </div>
-            <div style={{ display: "flex", fontSize: 108, fontWeight: 800, lineHeight: 1.02 }}>
-              {nama}
-            </div>
-            <div style={{ display: "flex", fontSize: 40, color: REDUP }}>{host}</div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-            <div style={{ display: "flex", fontSize: 34, color: REDUP }}>pegangan</div>
-            <div style={{ display: "flex", fontSize: 96, fontWeight: 800 }}>
-              {formatRupiah(l.pegangan)}
+          {/* stats: pegangan + climb, then footer */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 30 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 28,
+                padding: "26px 48px",
+                borderRadius: 40,
+                background: "rgba(255,255,255,0.7)",
+                border: `2px solid ${GARIS}`,
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div style={{ display: "flex", fontSize: 28, color: REDUP }}>pegangan</div>
+                <div style={{ display: "flex", fontSize: 76, fontWeight: 800 }}>
+                  {formatRupiah(l.pegangan)}
+                </div>
+              </div>
             </div>
-            <div style={{ display: "flex", marginTop: 40, fontSize: 40, fontWeight: 700, color: MERAH }}>
+            <div style={{ display: "flex", fontSize: 40, fontWeight: 700, color: tier.accent }}>
+              {tier.stat}
+            </div>
+            <div style={{ display: "flex", marginTop: 16, fontSize: 40, fontWeight: 800, color: MERAH }}>
               panjat.id
             </div>
           </div>
