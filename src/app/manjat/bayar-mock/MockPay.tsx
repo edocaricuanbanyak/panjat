@@ -52,14 +52,14 @@ export function MockPay({ orderId, nominal }: { orderId: string; nominal: number
             Pembayaran simulasi
           </h1>
           <p className="mt-1 font-mono text-xs text-tinta-redup">{orderId}</p>
-          <div className="mt-4 flex items-baseline justify-between rounded-md border border-garis bg-kertas-1 px-4 py-3">
+          <div className="mt-4 flex items-baseline justify-between rounded-xl border border-garis bg-kertas-1 px-4 py-3 shadow-kartu">
             <span className="text-sm text-tinta-redup">Total</span>
             <span className="font-mono tabular text-lg font-semibold text-tinta">
               {formatRupiah(nominal)}
             </span>
           </div>
           {status === "error" && (
-            <p className="mt-3 text-sm text-merah">Gagal: {msg}</p>
+            <p className="mt-3 text-sm text-galat">Gagal: {msg}</p>
           )}
           <Button className="mt-6 w-full" disabled={status === "paying"} onClick={pay}>
             {status === "paying" ? "Memproses…" : "Bayar sekarang (simulasi)"}
