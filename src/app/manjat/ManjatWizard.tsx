@@ -162,13 +162,15 @@ export function ManjatWizard({
       </div>
 
       {error && (
-        <p className="mt-4 rounded-md border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">
+        <p className="mt-4 rounded-xl border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">
           {error}
         </p>
       )}
 
       {step === 1 && (
         <div className="mt-6 flex flex-col gap-4">
+          {/* The one thing to do on this step: paste a link. Everything else is
+              auto-filled and tucked away. */}
           <Input
             label={copy.manjat.urlLabel}
             placeholder={copy.manjat.urlPlaceholder}
@@ -178,9 +180,9 @@ export function ManjatWizard({
             onBlur={prefillFromUrl}
           />
 
-          {/* Auto-filled from the URL — editable, but not required. */}
-          <details className="rounded-md border border-garis bg-kertas-1 p-3" open>
-            <summary className="cursor-pointer text-sm text-tinta-redup">
+          {/* Auto-filled from the URL — collapsed by default; open only to edit. */}
+          <details className="rounded-xl border border-garis bg-kertas-1 p-3">
+            <summary className="cursor-pointer select-none text-sm text-tinta-redup marker:text-tinta-redup">
               {copy.manjat.detailRingkas}
             </summary>
             <div className="mt-3 flex flex-col gap-3">
@@ -228,7 +230,7 @@ export function ManjatWizard({
       {step === 2 && (
         <div className="mt-6 flex flex-col gap-4">
           {express && (
-            <div className="rounded-md bg-kertas-2 px-3 py-2 text-xs text-tinta-redup">
+            <div className="rounded-xl bg-kertas-2 px-3 py-2 text-xs text-tinta-redup">
               {copy.manjat.manjatPrefix} <span className="text-tinta">{nama || url}</span>
               {kategoriSlug && ` · ${kategori.find((k) => k.slug === kategoriSlug)?.nama ?? ""}`}
               {" · "}
@@ -237,49 +239,53 @@ export function ManjatWizard({
               </button>
             </div>
           )}
-          <p className="text-sm text-tinta-redup">{copy.manjat.posisiTanya}</p>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <AmountSelector value={target} onSelect={onSelectTarget} />
-              {target === "nominal" && (
-                <div className="mt-2">
-                  <Input
-                    label={copy.manjat.nominalLabel}
-                    inputMode="numeric"
-                    placeholder={copy.manjat.nominalPlaceholder}
-                    value={nominalInput ? Number(nominalInput).toLocaleString("id-ID") : ""}
-                    onChange={(e) => setNominalInput(e.target.value.replace(/\D/g, ""))}
-                    onBlur={() =>
-                      nominalInput && refreshQuote({ nominal: Number(nominalInput) })
-                    }
-                  />
-                </div>
-              )}
+
+          {/* 1 — choose a target. The pole marker shows where it lands. */}
+          <div>
+            <p className="mb-2 text-sm font-medium text-tinta">{copy.manjat.posisiTanya}</p>
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <AmountSelector value={target} onSelect={onSelectTarget} />
+                {target === "nominal" && (
+                  <div className="mt-2">
+                    <Input
+                      label={copy.manjat.nominalLabel}
+                      inputMode="numeric"
+                      placeholder={copy.manjat.nominalPlaceholder}
+                      value={nominalInput ? Number(nominalInput).toLocaleString("id-ID") : ""}
+                      onChange={(e) => setNominalInput(e.target.value.replace(/\D/g, ""))}
+                      onBlur={() => nominalInput && refreshQuote({ nominal: Number(nominalInput) })}
+                    />
+                  </div>
+                )}
+              </div>
+              <MiniTiang height={quote ? markerHeight(quote.rank) : 0.05} />
             </div>
-            <MiniTiang height={quote ? markerHeight(quote.rank) : 0.05} />
           </div>
 
-          <div className="rounded-md border border-garis bg-kertas-1 p-3">
+          {/* 2 — the price is the anchor of this step: big, centered, with the
+              resulting rank + decay as supporting detail. */}
+          <div className="rounded-xl border border-garis bg-kertas-1 p-4 text-center">
             {loadingQuote ? (
-              <p className="text-sm text-tinta-redup">{copy.manjat.menghitung}</p>
+              <p className="py-2 text-sm text-tinta-redup">{copy.manjat.menghitung}</p>
             ) : quote ? (
-              <div className="flex flex-col gap-1">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-tinta-redup">{copy.manjat.akanBayar}</span>
-                  <span className="font-mono tabular text-lg font-semibold text-tinta">
-                    {formatRupiah(quote.nominal)}
-                  </span>
-                </div>
-                <p className="font-mono tabular text-xs text-tinta-redup">
+              <>
+                <p className="text-xs uppercase tracking-wide text-tinta-redup">
+                  {copy.manjat.posisiPrimer}
+                </p>
+                <p className="mt-0.5 font-mono tabular text-3xl font-bold text-tinta">
+                  {formatRupiah(quote.nominal)}
+                </p>
+                <p className="mt-1 font-mono tabular text-xs text-tinta-redup">
                   {copy.manjat.quoteRingkas(
                     quote.rank,
                     formatRupiah(quote.rosotPerHari),
                     quote.estimasiHari,
                   )}
                 </p>
-              </div>
+              </>
             ) : (
-              <p className="text-sm text-tinta-redup">{copy.manjat.pilihTarget}</p>
+              <p className="py-2 text-sm text-tinta-redup">{copy.manjat.pilihTarget}</p>
             )}
           </div>
 
@@ -295,7 +301,7 @@ export function ManjatWizard({
                 width={1200}
                 height={800}
                 onError={() => setShotFailed(true)}
-                className="w-full rounded-md border border-garis"
+                className="w-full rounded-xl border border-garis"
               />
             </div>
           )}
@@ -325,7 +331,7 @@ export function ManjatWizard({
 
       {step === 3 && quote && (
         <div className="mt-6 flex flex-col gap-4">
-          <dl className="rounded-md border border-garis bg-kertas-1 p-4 text-sm">
+          <dl className="rounded-xl border border-garis bg-kertas-1 p-4 text-sm">
             <div className="flex justify-between py-1">
               <dt className="text-tinta-redup">{copy.manjat.ringkasListing}</dt>
               <dd className="text-tinta">{nama || url}</dd>
@@ -342,9 +348,9 @@ export function ManjatWizard({
                   : copy.manjat.bertahanHari(quote.estimasiHari)}
               </dd>
             </div>
-            <div className="mt-1 flex justify-between border-t border-garis pt-2">
-              <dt className="text-tinta">{copy.manjat.ringkasTotal}</dt>
-              <dd className="font-mono tabular text-lg font-semibold text-tinta">
+            <div className="mt-1 flex items-baseline justify-between border-t border-garis pt-2">
+              <dt className="font-medium text-tinta">{copy.manjat.ringkasTotal}</dt>
+              <dd className="font-mono tabular text-xl font-bold text-tinta">
                 {formatRupiah(quote.nominal)}
               </dd>
             </div>
