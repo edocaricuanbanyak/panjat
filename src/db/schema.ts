@@ -254,3 +254,17 @@ export const lencana = pgTable(
   // A listing earns each badge type at most once (R17).
   (t) => [unique("lencana_listing_jenis").on(t.listingId, t.jenis)],
 );
+
+// --- Dashboard auth -------------------------------------------------------
+// One-time magic-link tokens (§18.2). Sessions are stateless signed cookies
+// (no table). Only the token HASH is stored; raw token lives only in the link.
+export const magicLink = pgTable("magic_link", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  kontakId: uuid("kontak_id")
+    .notNull()
+    .references(() => sponsorKontak.id),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  usedAt: timestamp("used_at", { withTimezone: true }),
+  createdAt: createdAt(),
+});
