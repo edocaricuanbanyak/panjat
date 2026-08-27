@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Anybody, Instrument_Sans, Martian_Mono } from "next/font/google";
+import { copy } from "@/copy";
 import "./globals.css";
 
 // Display: variable width axis is a second data encoding (§9.6.3).
@@ -18,9 +19,8 @@ const martianMono = Martian_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Panjat — papan peringkat berbayar",
-  description:
-    "Bayar untuk manjat. Pegangan paling kuat duduk paling atas. Tiangnya licin — yang berhenti manjat, merosot.",
+  title: `${copy.merek.nama} — papan peringkat berbayar`,
+  description: copy.merek.deskripsiSitus,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/PageShell";
+import { copy } from "@/copy";
 import { MasukForm } from "./MasukForm";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export default async function MasukPage({
         <p className="mt-2 mb-6 text-tinta-redup">Pantau pegangan, klik, dan CPC listing kamu.</p>
         {e === "kadaluarsa" && (
           <p className="mb-4 rounded-lg border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">
-            Tautan tidak valid atau kedaluwarsa. Minta tautan baru.
+            {copy.error.tautanKedaluwarsa}
           </p>
         )}
         <MasukForm />

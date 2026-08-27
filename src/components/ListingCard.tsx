@@ -1,4 +1,5 @@
 import { Crown } from "lucide-react";
+import { copy } from "@/copy";
 import type { BoardEntry } from "@/domain/board";
 import { formatRupiah } from "@/lib/format";
 import { LencanaRow } from "./LencanaRow";
@@ -58,7 +59,7 @@ export function ListingCard({
       {/* Above-center floating action, revealed on hover (pointer devices). */}
       <div className="pointer-events-none absolute -top-3 left-1/2 z-20 hidden -translate-x-1/2 opacity-0 transition-all ease-panjat group-hover:pointer-events-auto group-hover:-top-3.5 group-hover:opacity-100 md:block">
         <ManjatButton url={entry.urlNormal} nominal={salipCost} size="sm" className="h-7 px-2.5 text-xs">
-          Salip {formatRupiah(salipCost)}
+          {copy.papan.salip(formatRupiah(salipCost))}
         </ManjatButton>
       </div>
 
@@ -96,9 +97,7 @@ export function ListingCard({
             </>
           )}
           <span aria-hidden>·</span>
-          <span className="shrink-0 font-mono tabular">
-            {entry.klikHariIni.toLocaleString("id-ID")} klik
-          </span>
+          <span className="shrink-0 font-mono tabular">{copy.papan.klik(entry.klikHariIni)}</span>
         </p>
         {entry.badges.length > 0 && (
           <div className="mt-1">
@@ -115,7 +114,7 @@ export function ListingCard({
         {/* Inline action for touch/small screens; z-10 keeps it above the stretched link. */}
         <span className="relative z-10 md:hidden">
           <ManjatButton url={entry.urlNormal} nominal={salipCost} size="sm" variant="secondary" className="h-7 px-2.5 text-xs">
-            Salip {formatRupiah(salipCost)}
+            {copy.papan.salip(formatRupiah(salipCost))}
           </ManjatButton>
         </span>
       </div>

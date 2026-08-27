@@ -3,6 +3,7 @@
 import { Check, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { copy } from "@/copy";
 import type { FavoritEntry } from "@/lib/favorit";
 import { Button } from "./Button";
 import { Dropdown } from "./Dropdown";
@@ -47,20 +48,20 @@ export function VoteFavorit({
   return (
     <section className="rounded-xl border border-garis/70 bg-kertas px-3.5 py-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-tinta">Pemanjat terfavorit</h3>
+        <h3 className="text-sm font-semibold text-tinta">{copy.favorit.judul}</h3>
         {voted ? (
           <span className="inline-flex items-center gap-1 font-mono text-xs text-hidup">
-            <Check className="size-3.5" aria-hidden /> sudah vote
+            <Check className="size-3.5" aria-hidden /> {copy.favorit.sudahVote}
           </span>
         ) : (
-          <span className="font-mono text-xs text-tinta-redup">vote gratis · 1×/hari</span>
+          <span className="font-mono text-xs text-tinta-redup">{copy.favorit.labelBelumVote}</span>
         )}
       </div>
 
       {/* Weekly prize — motivates the vote, kept as a quiet line. */}
       <p className="mt-1 flex items-center gap-1.5 text-xs text-tinta-redup">
         <Trophy className="size-3.5 shrink-0 text-merah-teks" aria-hidden />
-        Juara minggu ini diposting di Instagram + gratis iklan 1 hari.
+        {copy.favorit.hadiah}
       </p>
 
       {voted ? (
@@ -80,30 +81,28 @@ export function VoteFavorit({
                     {e.nama}
                   </span>
                   <span className="font-mono tabular text-xs text-tinta-redup">
-                    {e.votes.toLocaleString("id-ID")} vote
+                    {copy.favorit.vote_n(e.votes)}
                   </span>
                 </li>
               ))}
             </ol>
           ) : (
-            <p className="mt-3 text-sm text-tinta-redup">Jadilah yang pertama menerima suara.</p>
+            <p className="mt-3 text-sm text-tinta-redup">{copy.favorit.belumAda}</p>
           )}
         </>
       ) : (
         <>
-          <p className="mt-1 text-sm text-tinta-redup">
-            Pilih favoritmu — bukan soal uang, soal selera. Sekali sehari.
-          </p>
+          <p className="mt-1 text-sm text-tinta-redup">{copy.favorit.ajakan}</p>
           <div className="mt-3 flex items-end gap-2">
             <Dropdown
               className="flex-1"
-              placeholder="Pilih listing…"
+              placeholder={copy.favorit.pilihListing}
               value={pick}
               onChange={setPick}
               options={entries.map((e) => ({ value: e.id, label: e.nama }))}
             />
             <Button onClick={vote} disabled={!pick || saving}>
-              {saving ? "…" : "Vote"}
+              {saving ? "…" : copy.favorit.vote}
             </Button>
           </div>
         </>

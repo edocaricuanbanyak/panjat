@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState } from "react";
 import { ManjatWizard } from "@/app/manjat/ManjatWizard";
+import { copy } from "@/copy";
 import { buttonClasses, type ButtonSize, type ButtonVariant } from "./Button";
 import { Modal } from "./Modal";
 
@@ -57,7 +58,7 @@ export function ManjatProvider({
       }}
     >
       {children}
-      <Modal open={state !== null} onClose={() => setState(null)} title="Naik tiang">
+      <Modal open={state !== null} onClose={() => setState(null)} title={copy.manjat.judul}>
         {state && (
           <ManjatWizard
             initialUrl={state.url}

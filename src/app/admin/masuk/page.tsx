@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/PageShell";
+import { copy } from "@/copy";
 import { totpEnabled } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export default async function AdminMasuk({ searchParams }: { searchParams: Promi
         </h1>
         {e && (
           <p className="mt-3 rounded-lg border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">
-            {e === "limit" ? "Terlalu banyak percobaan." : "Password salah."}
+            {e === "limit" ? copy.error.terlaluBanyak : copy.error.passwordSalah}
           </p>
         )}
         <form action="/api/admin/masuk" method="post" className="mt-4 flex flex-col gap-3">

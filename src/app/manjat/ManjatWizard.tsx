@@ -7,12 +7,13 @@ import { Dropdown } from "@/components/Dropdown";
 import { Input } from "@/components/Input";
 import { MiniTiang } from "@/components/MiniTiang";
 import { Steps } from "@/components/Steps";
+import { copy } from "@/copy";
 import type { Quote } from "@/domain/manjat";
 import { formatRupiah } from "@/lib/format";
 
 type Kategori = { slug: string; nama: string };
 
-const STEP_LABELS = ["Detail", "Posisi", "Bayar"];
+const STEP_LABELS: string[] = [...copy.manjat.steps];
 
 async function postManjat(payload: unknown) {
   const res = await fetch("/api/manjat", {

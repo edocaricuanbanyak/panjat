@@ -27,7 +27,7 @@ export async function PageShell({
   return (
     <ManjatProvider kategori={kats}>
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-5 py-2 sm:py-4">
-        <div className="sticky top-0 z-30 -mx-5 border-b border-garis/70 px-5 kaca-header">
+        <div className="sticky top-0 z-30 -mx-5 border-b border-garis/70 bg-kertas px-5">
           {topbar}
           <SiteHeader />
         </div>

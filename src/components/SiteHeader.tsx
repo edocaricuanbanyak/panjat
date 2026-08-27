@@ -1,3 +1,4 @@
+import { copy } from "@/copy";
 import { ManjatButton } from "./ManjatModal";
 
 /**
@@ -13,9 +14,9 @@ export function SiteHeader() {
         className="font-display text-xl font-bold tracking-tight text-tinta"
         style={{ fontStretch: "125%" }}
       >
-        Panjat
+        {copy.merek.nama}
       </a>
-      <ManjatButton size="sm">Manjat</ManjatButton>
+      <ManjatButton size="sm">{copy.nav.manjat}</ManjatButton>
     </header>
   );
 }

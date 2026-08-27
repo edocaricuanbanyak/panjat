@@ -11,6 +11,7 @@ import { Pagination } from "@/components/Pagination";
 import { PasangGratisModal } from "@/components/PasangGratisModal";
 import { Spotlight } from "@/components/Spotlight";
 import { VoteFavorit } from "@/components/VoteFavorit";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { getBoard } from "@/domain/board";
 import { listCategories } from "@/domain/jelajah";
@@ -63,22 +64,21 @@ export default async function Home({
           className="font-display text-5xl font-bold leading-[0.95] text-tinta sm:text-6xl"
           style={{ fontStretch: "130%" }}
         >
-          Panjat terusss.
+          {copy.beranda.heroJudul}
         </h1>
-        <p className="mt-4 max-w-xl text-lg text-tinta-redup">
-          Pegangan paling kuat duduk paling atas. Tiangnya licin — yang berhenti manjat, merosot.
-        </p>
+        <p className="mt-4 max-w-xl text-lg text-tinta-redup">{copy.beranda.heroSub}</p>
         <HeroManjat kategori={kats} />
         <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 font-mono tabular text-xs text-tinta-redup">
           <span className="inline-flex items-center gap-1.5">
             <span className="blink inline-block size-1.5 rounded-full bg-hidup" aria-hidden />
-            <b className="text-tinta">{visitor.online}</b> online
+            <b className="text-tinta">{visitor.online}</b> {copy.beranda.statOnline}
           </span>
           <span>
-            <b className="text-tinta">{visitor.total.toLocaleString("id-ID")}</b> pengunjung
+            <b className="text-tinta">{visitor.total.toLocaleString("id-ID")}</b>{" "}
+            {copy.beranda.statPengunjung}
           </span>
           <span>
-            <b className="text-tinta">{entries.length}</b> peserta manjat
+            <b className="text-tinta">{entries.length}</b> {copy.beranda.statPeserta}
           </span>
         </div>
       </section>
@@ -87,7 +87,7 @@ export default async function Home({
       <section>
         <BoardTabs active="sekarang" className="mb-5" />
         {entries.length === 0 ? (
-          <EmptyState title="Belum ada yang manjat." message="Tiangnya masih kinclong." />
+          <EmptyState title={copy.beranda.papanKosongJudul} message={copy.beranda.papanKosongPesan} />
         ) : page === 1 ? (
           <BoardLive
             initial={{ entries, max }}
@@ -107,7 +107,7 @@ export default async function Home({
       <div className="mt-12">
         <KakiTiang entries={kakiTiang} remaining={sisaSorak} />
         <div className="mt-3 text-xs text-tinta-redup">
-          Punya produk?{" "}
+          {copy.beranda.punyaProduk}{" "}
           <PasangGratisModal kategori={kats} className="text-merah-teks hover:underline" />.
         </div>
       </div>
@@ -115,7 +115,7 @@ export default async function Home({
       {/* CARA MAIN */}
       <section className="mt-14">
         <h2 className="mb-6 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
-          Cara main
+          {copy.beranda.caraMainJudul}
         </h2>
         <CaraMain />
       </section>

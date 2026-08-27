@@ -1,11 +1,12 @@
+import { copy } from "@/copy";
 import { Tabs } from "./Tabs";
 
 type Tab = "sekarang" | "hari-ini" | "jelajah";
 
 const ITEMS = [
-  { key: "sekarang", href: "/", label: "Sepanjang Masa" },
-  { key: "hari-ini", href: "/hari-ini", label: "Hari Ini" },
-  { key: "jelajah", href: "/jelajah", label: "Jelajah" },
+  { key: "sekarang", href: "/", label: copy.nav.sepanjangMasa },
+  { key: "hari-ini", href: "/hari-ini", label: copy.nav.hariIni },
+  { key: "jelajah", href: "/jelajah", label: copy.nav.jelajah },
 ];
 
 /**

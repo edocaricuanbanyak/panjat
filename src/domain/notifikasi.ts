@@ -5,9 +5,9 @@
  * Never touches the ledger, ranking, or clicks.
  */
 import { and, eq, gte } from "drizzle-orm";
+import { copy } from "@/copy";
 import type { Database } from "@/db";
 import { listing, notifikasiLog, sponsorKontak } from "@/db/schema";
-import { formatRupiah } from "@/lib/format";
 import { defaultSenders, signUnsub, type Senders } from "@/lib/notify";
 
 export interface Ambang {
@@ -117,13 +117,16 @@ export async function notifyDrops(
 
     const manjatLink = `/manjat?url=${encodeURIComponent(l.urlNormal)}`;
     const unsubLink = `/notif/unsub?c=${signUnsub(l.kontakId)}`;
-    const headline = `Kamu merosot ke #${drop.toRank}, keluar dari ${tierLabel(drop.thresholdLost)}.`;
-    const body =
-      `${headline}\nPeganganmu sekarang ${formatRupiah(l.pegangan)}.\n` +
-      `Manjat lagi: ${manjatLink}\nBerhenti berlangganan: ${unsubLink}`;
+    const msg = copy.notif.disalip({
+      toRank: drop.toRank,
+      tierLabel: tierLabel(drop.thresholdLost),
+      pegangan: l.pegangan,
+      manjatLink,
+      unsubLink,
+    });
 
     if (l.email) {
-      const r = await senders.email.send(l.email, "Kamu disalip di Panjat", body);
+      const r = await senders.email.send(l.email, copy.notif.disalipSubjek, msg.email);
       await db.insert(notifikasiLog).values({
         kontakId: l.kontakId,
         kanal: "email",
@@ -132,7 +135,7 @@ export async function notifyDrops(
       });
     }
     if (l.wa) {
-      const r = await senders.wa.send(l.wa, `${headline} Manjat lagi: ${manjatLink}`);
+      const r = await senders.wa.send(l.wa, msg.wa);
       await db.insert(notifikasiLog).values({
         kontakId: l.kontakId,
         kanal: "wa",

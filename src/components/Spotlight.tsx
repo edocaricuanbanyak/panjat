@@ -1,3 +1,4 @@
+import { copy } from "@/copy";
 import type { Aktivitas } from "@/lib/aktivitas";
 
 /**
@@ -23,7 +24,7 @@ export function Spotlight({ items }: { items: Aktivitas[] }) {
   return (
     <div className="flex items-center gap-3 overflow-hidden py-1.5">
       <span className="shrink-0 font-mono text-[11px] font-semibold uppercase tracking-wide text-merah-teks">
-        Aktivitas
+        {copy.papan.aktivitas}
       </span>
       <div className="overflow-hidden">
         <div className="ticker-track flex w-max gap-8 whitespace-nowrap">
