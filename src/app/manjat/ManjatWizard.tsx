@@ -63,6 +63,7 @@ export function ManjatWizard({
   const [confirmBig, setConfirmBig] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [shotFailed, setShotFailed] = useState(false);
 
   async function refreshQuote(payload: { target?: TargetChoice; nominal?: number }) {
     setError(null);
@@ -281,6 +282,23 @@ export function ManjatWizard({
               <p className="text-sm text-tinta-redup">{copy.manjat.pilihTarget}</p>
             )}
           </div>
+
+          {/* On-demand site screenshot (R21) so the sponsor confirms the right URL
+              before paying. Loads async as an image; hidden on failure. */}
+          {url.trim() && !shotFailed && (
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-tinta-redup">{copy.manjat.pratinjauSitus}</span>
+              {/* biome-ignore lint/performance/noImgElement: on-demand capture, not a static asset */}
+              <img
+                src={`/api/preview-shot?url=${encodeURIComponent(url)}`}
+                alt={copy.manjat.pratinjauAlt(nama || url)}
+                width={1200}
+                height={800}
+                onError={() => setShotFailed(true)}
+                className="w-full rounded-md border border-garis"
+              />
+            </div>
+          )}
 
           <div className="flex gap-2">
             <Button variant="secondary" onClick={() => setStep(1)}>

@@ -82,6 +82,8 @@ export const copy = {
     ubahDetail: "ubah detail",
     manjatPrefix: "Manjat:",
     posisiTanya: "Mau di posisi berapa? Sistem yang menghitung.",
+    pratinjauSitus: "Pratinjau situsmu",
+    pratinjauAlt: (nama: string) => `Pratinjau situs ${nama}`,
     nominalLabel: "Nominal (Rp)",
     nominalPlaceholder: "25.000",
     akanBayar: "Kamu akan bayar",
