@@ -12,7 +12,7 @@ import { LogoTile } from "./LogoTile";
  */
 export function JuaraKakiTiang({ entry }: { entry: Juara }) {
   return (
-    <div className="mb-5 rounded-2xl border border-emas/50 bg-gradient-to-b from-emas/12 to-kertas-1 p-4 shadow-kartu">
+    <div className="mt-5 rounded-2xl border border-emas/50 bg-gradient-to-b from-emas/12 to-kertas-1 p-4 shadow-kartu">
       <p className="mb-2 flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-tinta-redup">
         <Star className="size-3.5 shrink-0 text-emas" aria-hidden />
         {copy.papan.juaraKakiTiang}

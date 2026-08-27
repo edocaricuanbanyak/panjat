@@ -112,15 +112,15 @@ export default async function Home({
               />
             ) : page === 1 ? (
               <>
-                {/* Weekly free-tier champion rises to the top as a labelled
-                    showcase — never a paid rank (R16). */}
-                {juaraKakiTiang && <JuaraKakiTiang entry={juaraKakiTiang} />}
                 <BoardLive
                   initial={{ entries, max }}
                   middle={
                     <VoteFavorit entries={voteEntries} leaderboard={favorit} myChoice={choice} />
                   }
                 />
+                {/* Weekly free-tier champion sits below rank 20 as a labelled
+                    showcase — never a paid rank (R16). */}
+                {juaraKakiTiang && <JuaraKakiTiang entry={juaraKakiTiang} />}
               </>
             ) : (
               <div className="flex flex-col gap-2.5">
