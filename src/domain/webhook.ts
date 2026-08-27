@@ -22,7 +22,7 @@ export type WebhookOutcome =
   | { status: "rejected"; reason: "bad_signature" | "unknown_order" }
   | { status: "ignored"; reason: "replay" | "pending" }
   | { status: "held"; reason: "amount_mismatch" }
-  | { status: "settled"; drops: Drop[] }
+  | { status: "settled"; drops: Drop[]; listingId: string; nama: string | null; rank: number | null }
   | { status: "failed"; transactionStatus: string };
 
 const FAILURE_STATUSES = new Set(["expire", "cancel", "deny", "failure"]);
@@ -132,7 +132,13 @@ export async function applyNotification(
       // Ranks after the payment + screen; who fell out of a threshold (R3).
       const cfg = await loadRosotConfig(tx);
       const after = new Map((await getRanking(tx)).map((r) => [r.listing.id, r.rank]));
-      return { status: "settled", drops: detectDrops(before, after, cfg.ambang) };
+      return {
+        status: "settled",
+        drops: detectDrops(before, after, cfg.ambang),
+        listingId: trx.listingId,
+        nama: l?.nama ?? null,
+        rank: after.get(trx.listingId) ?? null,
+      };
     }
 
     if (FAILURE_STATUSES.has(ts)) {

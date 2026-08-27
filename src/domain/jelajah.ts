@@ -12,7 +12,7 @@ export type Sort = "terbaru" | "klik" | "sorak";
 export const SORT_LABELS: Record<Sort, string> = {
   terbaru: "Terbaru",
   klik: "Paling diklik minggu ini",
-  sorak: "Paling disorak",
+  sorak: "Paling didukung",
 };
 
 /** Sanitize a visitor-supplied sort (label always visible, no hidden ordering). */

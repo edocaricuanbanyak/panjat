@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { transaksi } from "@/db/schema";
 import { applyNotification } from "@/domain/webhook";
+import { pushAktivitas } from "@/lib/aktivitas";
 import {
   isMock,
   midtransConfig,
@@ -48,5 +49,13 @@ export async function POST(req: Request) {
   };
 
   const outcome = await applyNotification(db, notif, serverKey);
+  if (outcome.status === "settled" && outcome.nama) {
+    await pushAktivitas({
+      jenis: "naik",
+      nama: outcome.nama,
+      id: outcome.listingId,
+      rank: outcome.rank ?? undefined,
+    });
+  }
   return NextResponse.json(outcome);
 }

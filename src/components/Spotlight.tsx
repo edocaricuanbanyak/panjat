@@ -1,38 +1,41 @@
-import { formatRupiah } from "@/lib/format";
+import type { Aktivitas } from "@/lib/aktivitas";
 
 /**
- * Spotlight ticker (§6.4) — a sticky running-text strip giving every listing
- * above-the-fold airtime, not just the summit. The track is duplicated so the
- * marquee loops seamlessly; it pauses on hover and stops under reduced-motion.
+ * Live activity ticker (§6.4) — a sticky running strip of the latest things that
+ * happened on the board (vote, dukung, naik/salip). The track is duplicated so
+ * the marquee loops seamlessly; it pauses on hover and stops under reduced-motion.
  */
-export interface SpotlightItem {
-  id: string;
-  nama: string;
-  pegangan: number;
+function label(a: Aktivitas): string {
+  switch (a.jenis) {
+    case "vote":
+      return "baru divote";
+    case "dukung":
+      return "baru didukung";
+    case "naik":
+      return a.rank ? `naik ke #${a.rank}` : "baru manjat";
+  }
 }
 
-export function Spotlight({ items }: { items: SpotlightItem[] }) {
+export function Spotlight({ items }: { items: Aktivitas[] }) {
   if (items.length === 0) return null;
-  const loop = [...items, ...items]; // duplicate for a seamless wrap
+  const loop = items.length < 6 ? [...items, ...items, ...items] : [...items, ...items];
 
   return (
     <div className="flex items-center gap-3 overflow-hidden py-1.5">
       <span className="shrink-0 font-mono text-[11px] font-semibold uppercase tracking-wide text-merah-teks">
-        Spotlight
+        Aktivitas
       </span>
       <div className="overflow-hidden">
         <div className="ticker-track flex w-max gap-8 whitespace-nowrap">
-          {loop.map((it, i) => (
+          {loop.map((a, i) => (
             <a
-              key={`${it.id}-${i}`}
-              href={`/k/${it.id}?asal=papan`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm hover:text-merah-teks"
+              key={`${a.id}-${i}`}
+              href={`/l/${a.id}`}
+              className="flex items-center gap-1.5 text-sm hover:text-merah-teks"
               aria-hidden={i >= items.length ? true : undefined}
             >
-              <span className="font-display font-semibold text-tinta">{it.nama}</span>
-              <span className="font-mono text-xs text-tinta-redup">{formatRupiah(it.pegangan)}</span>
+              <span className="font-display font-semibold text-tinta">{a.nama}</span>
+              <span className="text-tinta-redup">{label(a)}</span>
             </a>
           ))}
         </div>

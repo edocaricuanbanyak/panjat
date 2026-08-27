@@ -14,6 +14,7 @@ import { db } from "@/db";
 import { getBoard } from "@/domain/board";
 import { listCategories } from "@/domain/jelajah";
 import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
+import { recentAktivitas } from "@/lib/aktivitas";
 import { currentAnon } from "@/lib/anon";
 import { favoritBoard, myFavoritToday } from "@/lib/favorit";
 import { pingVisitor, VID_COOKIE, visitorStats } from "@/lib/presence";
@@ -34,26 +35,26 @@ export default async function Home({
   if (vid) await pingVisitor(vid);
 
   const { entries, max } = await getBoard(db);
-  const [kakiTiang, sisaSorak, kats, visitor, favorit, choice] = await Promise.all([
+  const [kakiTiang, sisaSorak, kats, visitor, favorit, choice, aktivitas] = await Promise.all([
     getKakiTiang(db),
     sorakRemaining(db, anonId, now),
     listCategories(db),
     visitorStats(),
     favoritBoard(db, now, 5),
     myFavoritToday(vid, now),
+    recentAktivitas(20),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(entries.length / PER_PAGE));
   const page = Math.min(Math.max(1, Number((await searchParams).hal) || 1), totalPages);
   const pageEntries = entries.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  const spotlightItems = entries.map((e) => ({ id: e.id, nama: e.nama, pegangan: e.pegangan }));
   const voteEntries = entries.map((e) => ({ id: e.id, nama: e.nama }));
 
   return (
     <PageShell
       manjatKategori={kats}
-      topbar={spotlightItems.length > 0 ? <Spotlight items={spotlightItems} /> : undefined}
+      topbar={aktivitas.length > 0 ? <Spotlight items={aktivitas} /> : undefined}
     >
       {/* HERO — value + the one action */}
       <section className="pt-2 pb-8">

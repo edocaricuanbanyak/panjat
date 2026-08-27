@@ -30,6 +30,9 @@ export function ListingCard({
   const wdth = puncak ? Math.max(105, 130 - (entry.rank - 1) * 10) : 100;
   // Title is owner-editable; show the real URL host so the board stays honest.
   const host = entry.urlNormal.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  // Cost hint to overtake this listing (just above its grip; final amount is
+  // computed in the modal). The board never floors below Rp1.000.
+  const salipCost = entry.pegangan + 1000;
   const medali = puncak
     ? MEDALI[entry.rank as 1 | 2 | 3]
     : undefined;
@@ -43,8 +46,8 @@ export function ListingCard({
         <span
           aria-label={medali.label}
           title={medali.label}
-          style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 68%, 0 100%)" }}
-          className={`absolute left-4 -top-2 z-20 flex h-10 w-6 items-start justify-center pt-1.5 leading-none drop-shadow-md ${medali.bg}`}
+          style={{ clipPath: "polygon(30% 0, 70% 0, 100% 14%, 100% 100%, 50% 70%, 0 100%, 0 14%)" }}
+          className={`absolute left-4 -top-2 z-20 flex h-10 w-6 items-start justify-center rounded-t-md pt-2 leading-none drop-shadow-md ${medali.bg}`}
         >
           {entry.rank === 1 && (
             <Crown className="size-3.5 text-kertas-1" strokeWidth={2.5} aria-hidden />
@@ -55,7 +58,7 @@ export function ListingCard({
       {/* Above-center floating action, revealed on hover (pointer devices). */}
       <div className="pointer-events-none absolute -top-3 left-1/2 z-20 hidden -translate-x-1/2 opacity-0 transition-all ease-panjat group-hover:pointer-events-auto group-hover:-top-3.5 group-hover:opacity-100 md:block">
         <ManjatButton url={entry.urlNormal} size="sm" className="h-7 px-2.5 text-xs">
-          Salip →
+          Salip {formatRupiah(salipCost)}
         </ManjatButton>
       </div>
 
@@ -112,7 +115,7 @@ export function ListingCard({
         {/* Inline action for touch/small screens; z-10 keeps it above the stretched link. */}
         <span className="relative z-10 md:hidden">
           <ManjatButton url={entry.urlNormal} size="sm" variant="secondary" className="h-7 px-2.5 text-xs">
-            Salip
+            Salip {formatRupiah(salipCost)}
           </ManjatButton>
         </span>
       </div>

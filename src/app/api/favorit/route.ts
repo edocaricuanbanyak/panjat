@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { listing } from "@/db/schema";
+import { pushAktivitas } from "@/lib/aktivitas";
 import { voteFavorit } from "@/lib/favorit";
 import { VID_COOKIE } from "@/lib/presence";
 
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
 
   // Only a live listing can be favourited.
   const [l] = await db
-    .select({ id: listing.id })
+    .select({ id: listing.id, nama: listing.nama })
     .from(listing)
     .where(and(eq(listing.id, listingId), eq(listing.status, "tayang")))
     .limit(1);
@@ -37,5 +38,6 @@ export async function POST(req: Request) {
     // Already voted today → 409; anything else is a soft failure.
     return NextResponse.json(result, { status: result.reason === "sudah" ? 409 : 200 });
   }
+  await pushAktivitas({ jenis: "vote", nama: l.nama, id: l.id });
   return NextResponse.json(result);
 }

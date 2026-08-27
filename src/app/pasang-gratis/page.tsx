@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Pasang gratis — Panjat",
-  description: "Pasang listing gratis di Kaki Tiang. Dapat Sorak dari pengunjung.",
+  description: "Pasang listing gratis di Kaki Tiang. Dapat dukungan dari pengunjung.",
 };
 
 export default async function PasangGratisPage() {
@@ -27,7 +27,7 @@ export default async function PasangGratisPage() {
         Pasang gratis
       </h1>
       <p className="mt-2 mb-6 max-w-xl text-tinta-redup">
-        Listing gratis masuk Kaki Tiang di bawah listing berbayar, diurut Sorak pengunjung. Kapan
+        Listing gratis masuk Kaki Tiang di bawah listing berbayar, diurut dukungan pengunjung. Kapan
         pun bisa manjat ke papan berbayar.
       </p>
       <div className="max-w-md">

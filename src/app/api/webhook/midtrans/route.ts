@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { notifyDrops } from "@/domain/notifikasi";
 import { applyNotification } from "@/domain/webhook";
+import { pushAktivitas } from "@/lib/aktivitas";
 import { midtransConfig, type MidtransNotification } from "@/lib/midtrans";
 
 export const runtime = "nodejs";
@@ -24,8 +25,16 @@ export async function POST(req: Request) {
     return NextResponse.json(outcome, { status: code });
   }
   // Notify anyone pushed out of a threshold by this payment (R3), post-commit.
-  if (outcome.status === "settled" && outcome.drops.length > 0) {
-    await notifyDrops(db, outcome.drops);
+  if (outcome.status === "settled") {
+    if (outcome.drops.length > 0) await notifyDrops(db, outcome.drops);
+    if (outcome.nama) {
+      await pushAktivitas({
+        jenis: "naik",
+        nama: outcome.nama,
+        id: outcome.listingId,
+        rank: outcome.rank ?? undefined,
+      });
+    }
   }
   // Handled (settled/held/ignored/failed) → 200 so Midtrans stops retrying.
   return NextResponse.json(outcome, { status: 200 });
