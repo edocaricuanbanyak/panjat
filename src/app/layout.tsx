@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Anybody, Instrument_Sans, Martian_Mono } from "next/font/google";
 import { copy } from "@/copy";
 import "./globals.css";
@@ -21,6 +21,21 @@ const martianMono = Martian_Mono({
 export const metadata: Metadata = {
   title: `${copy.merek.nama} — papan peringkat berbayar`,
   description: copy.merek.deskripsiSitus,
+  applicationName: copy.merek.nama,
+  appleWebApp: {
+    capable: true,
+    title: copy.merek.nama,
+    statusBarStyle: "default",
+  },
+};
+
+// Installed/standalone app feel: paper theme colour on the status bar, cover the
+// notch (safe-area insets are then honoured in the chrome), sane zoom for a11y.
+export const viewport: Viewport = {
+  themeColor: "#f3f0e9",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

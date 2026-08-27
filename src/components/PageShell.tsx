@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { listCategories } from "@/domain/jelajah";
 import { Footer } from "./Footer";
 import { ManjatProvider } from "./ManjatModal";
+import { MobileTabBar } from "./MobileTabBar";
 import { SiteHeader } from "./SiteHeader";
 
 type Kategori = { slug: string; nama: string };
@@ -26,14 +27,15 @@ export async function PageShell({
   const kats = manjatKategori ?? (await listCategories(db));
   return (
     <ManjatProvider kategori={kats}>
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 py-2 sm:px-5 sm:py-4">
-        <div className="sticky top-0 z-30 -mx-4 border-b border-garis/70 bg-kertas px-4 sm:-mx-5 sm:px-5">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))] pt-2 sm:px-5 sm:pt-4 md:pb-4">
+        <div className="sticky top-0 z-30 -mx-4 border-b border-garis/70 bg-kertas px-4 pt-[env(safe-area-inset-top)] sm:-mx-5 sm:px-5">
           {topbar}
           <SiteHeader />
         </div>
         <div className="flex-1 pt-4">{children}</div>
         <Footer />
       </main>
+      <MobileTabBar />
     </ManjatProvider>
   );
 }

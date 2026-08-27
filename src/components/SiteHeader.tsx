@@ -17,7 +17,7 @@ export function SiteHeader() {
         <Logomark className="size-5" />
         {copy.merek.nama}
       </a>
-      <nav className="flex items-center gap-4 font-display text-sm font-semibold">
+      <nav className="hidden items-center gap-4 font-display text-sm font-semibold md:flex">
         <a href="/" className="text-tinta-redup hover:text-tinta">
           {copy.nav.leaderboard}
         </a>

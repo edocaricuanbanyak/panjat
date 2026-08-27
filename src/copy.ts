@@ -24,6 +24,9 @@ export const copy = {
     manjat: "Manjat",
     leaderboard: "Leaderboard",
     statistik: "Statistik",
+    arsip: "Arsip",
+    aturan: "Aturan",
+    papanRingkas: "Papan",
   },
 
   beranda: {
