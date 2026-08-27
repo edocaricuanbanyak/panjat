@@ -7,8 +7,9 @@ import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import type { Database } from "@/db";
 import { kategori, listing, sponsorKontak, transaksi } from "@/db/schema";
-import { loadManjatConfig } from "./config";
+import { loadManjatConfig, loadRosotConfig } from "./config";
 import { getRanking } from "./ranking";
+import { dailyRateForRank, estimateDaysToThreshold } from "./rosot";
 import { normalizeUrl } from "./url";
 import type { SnapClient } from "@/lib/midtrans";
 
@@ -59,11 +60,47 @@ export function nominalForTarget(
   return Math.max(minNaik, needed);
 }
 
-/** Quote the rupiah to reach a target position against the live board. */
-export async function quoteForTarget(db: Database, target: Target): Promise<number> {
-  const [ranking, cfg] = await Promise.all([getRanking(db), loadManjatConfig(db)]);
+export interface Quote {
+  nominal: number;
+  /** Rank this grip would take right now. */
+  rank: number;
+  rosotPerHari: number;
+  /** Whole days it would hold that position under self-decay; null if it never decays. */
+  estimasiHari: number | null;
+}
+
+/**
+ * Price + projection for a target position or a free nominal, against the live
+ * board. Supports R2's target selector and the "estimasi bertahan sebelum bayar".
+ */
+export async function quote(
+  db: Database,
+  input: { target?: Target; nominal?: number },
+): Promise<Quote> {
+  const [ranking, manjatCfg, rosotCfg] = await Promise.all([
+    getRanking(db),
+    loadManjatConfig(db),
+    loadRosotConfig(db),
+  ]);
   const gripsDesc = ranking.map((r) => r.listing.peganganCached);
-  return nominalForTarget(target, gripsDesc, cfg.minimumNaik);
+
+  const nominal =
+    input.target !== undefined
+      ? nominalForTarget(input.target, gripsDesc, manjatCfg.minimumNaik)
+      : Math.max(manjatCfg.minimumNaik, Math.round(input.nominal ?? 0));
+
+  // A new equal grip ranks below existing ones (ties: first-to-reach wins, §5).
+  const rank = gripsDesc.filter((g) => g >= nominal).length + 1;
+  const rate = dailyRateForRank(rank, nominal, rosotCfg);
+  const threshold = Math.max(gripsDesc[rank - 1] ?? 0, manjatCfg.minimumNaik);
+  const hari = estimateDaysToThreshold(nominal, rate, threshold);
+
+  return {
+    nominal,
+    rank,
+    rosotPerHari: Math.round(nominal * rate),
+    estimasiHari: Number.isFinite(hari) ? hari : null,
+  };
 }
 
 export async function createOrTopUp(

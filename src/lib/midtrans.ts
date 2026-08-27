@@ -86,6 +86,20 @@ function enabledPaymentsFor(amount: number): string[] | undefined {
   return undefined; // all enabled
 }
 
+/** Dev-only mock (MIDTRANS_MOCK=true): skip Midtrans, point at a local mock-pay page. */
+export function isMock(): boolean {
+  return process.env.MIDTRANS_MOCK === "true";
+}
+
+export const mockSnapClient: SnapClient = {
+  async createTransaction({ orderId, grossAmount }) {
+    return {
+      token: `mock-${orderId}`,
+      redirectUrl: `/manjat/bayar-mock?order_id=${encodeURIComponent(orderId)}&nominal=${grossAmount}`,
+    };
+  },
+};
+
 /** Default client: real Snap API (sandbox unless MIDTRANS_IS_PRODUCTION=true). */
 export const midtransSnapClient: SnapClient = {
   async createTransaction({ orderId, grossAmount, email, expiryMinutes = 60 }) {

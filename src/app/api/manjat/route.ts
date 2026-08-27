@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { createOrTopUp, quoteForTarget, type Target } from "@/domain/manjat";
-import { midtransSnapClient } from "@/lib/midtrans";
+import { createOrTopUp, quote, type Target } from "@/domain/manjat";
+import { isMock, midtransSnapClient, mockSnapClient } from "@/lib/midtrans";
 
 export const runtime = "nodejs";
 
@@ -9,8 +9,8 @@ const TARGETS: Target[] = ["#1", "top3", "top10"];
 
 /**
  * POST /api/manjat
- *  - { target } (one of #1|top3|top10)      -> returns a rupiah quote
- *  - { url, email, nominal, ... }           -> creates/tops up + Snap invoice
+ *  - no `url`  -> quote: { target } or { nominal } => { nominal, rank, rosotPerHari, estimasiHari }
+ *  - with `url` -> create/top-up + Snap invoice => { orderId, redirectUrl, ... }
  * Grip is granted only later, by the verified webhook.
  */
 export async function POST(req: Request) {
@@ -22,22 +22,29 @@ export async function POST(req: Request) {
   }
 
   try {
-    if (typeof body.target === "string") {
-      if (!TARGETS.includes(body.target as Target)) {
+    // Quote mode (no url).
+    if (typeof body.url !== "string") {
+      const target = body.target as Target | undefined;
+      if (target !== undefined && !TARGETS.includes(target)) {
         return NextResponse.json({ error: "Target tidak dikenal" }, { status: 400 });
       }
-      const nominal = await quoteForTarget(db, body.target as Target);
-      return NextResponse.json({ target: body.target, nominal });
+      if (target === undefined && typeof body.nominal !== "number") {
+        return NextResponse.json({ error: "target atau nominal wajib" }, { status: 400 });
+      }
+      const q = await quote(db, { target, nominal: body.nominal as number | undefined });
+      return NextResponse.json(q);
     }
 
-    if (typeof body.url !== "string" || typeof body.email !== "string") {
-      return NextResponse.json({ error: "url dan email wajib" }, { status: 400 });
+    // Create/top-up mode.
+    if (typeof body.email !== "string") {
+      return NextResponse.json({ error: "email wajib" }, { status: 400 });
     }
     if (typeof body.nominal !== "number") {
       return NextResponse.json({ error: "nominal wajib berupa angka" }, { status: 400 });
     }
 
-    const result = await createOrTopUp(db, midtransSnapClient, {
+    const snap = isMock() ? mockSnapClient : midtransSnapClient;
+    const result = await createOrTopUp(db, snap, {
       url: body.url,
       email: body.email,
       nominal: body.nominal,

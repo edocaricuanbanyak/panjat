@@ -52,3 +52,19 @@ export function decayGripOneHour(grip: number, dailyRate: number, floor: number)
   const next = Math.round(grip * hourlyFactor(dailyRate));
   return Math.max(floor, next);
 }
+
+/**
+ * Rough whole-day estimate of how long a grip stays above `threshold` under
+ * self-decay at `dailyRate` (§6.5: "estimasi bertahan"). Returns Infinity when
+ * grip never decays (floored), 0 when already at/below the threshold. This is an
+ * approximation — it ignores that others decay too and that the tier changes.
+ */
+export function estimateDaysToThreshold(
+  startGrip: number,
+  dailyRate: number,
+  threshold: number,
+): number {
+  if (dailyRate <= 0) return Infinity;
+  if (startGrip <= threshold || threshold <= 0) return 0;
+  return Math.floor(Math.log(threshold / startGrip) / Math.log(1 - dailyRate));
+}

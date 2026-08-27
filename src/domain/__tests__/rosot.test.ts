@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { RosotConfig } from "../rosot";
-import { dailyRateForRank, decayGripOneHour, hourlyFactor } from "../rosot";
+import {
+  dailyRateForRank,
+  decayGripOneHour,
+  estimateDaysToThreshold,
+  hourlyFactor,
+} from "../rosot";
 
 // Mirrors the seeded §6.6 config.
 const cfg: RosotConfig = {
@@ -62,5 +67,19 @@ describe("decayGripOneHour", () => {
   it("never drops below the floor", () => {
     expect(decayGripOneHour(1001, 0.25, 1000)).toBe(1000);
     expect(decayGripOneHour(1200, 0.25, 1000)).toBeGreaterThanOrEqual(1000);
+  });
+});
+
+describe("estimateDaysToThreshold", () => {
+  it("estimates whole days of self-decay down to a threshold", () => {
+    // 100000 @25%/day falling to 70000: 0.75^d = 0.7 → d ≈ 1.24 → 1
+    expect(estimateDaysToThreshold(100_000, 0.25, 70_000)).toBe(1);
+    // 100000 @12%/day to 50000: 0.88^d = 0.5 → d ≈ 5.4 → 5
+    expect(estimateDaysToThreshold(100_000, 0.12, 50_000)).toBe(5);
+  });
+
+  it("returns Infinity when the grip never decays, 0 when already below", () => {
+    expect(estimateDaysToThreshold(1000, 0, 500)).toBe(Infinity);
+    expect(estimateDaysToThreshold(40_000, 0.12, 50_000)).toBe(0);
   });
 });
