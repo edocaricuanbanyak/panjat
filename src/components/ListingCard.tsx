@@ -1,3 +1,4 @@
+import { Crown } from "lucide-react";
 import type { BoardEntry } from "@/domain/board";
 import { formatRupiah } from "@/lib/format";
 import { LencanaRow } from "./LencanaRow";
@@ -5,10 +6,10 @@ import { LogoTile } from "./LogoTile";
 import { ManjatButton } from "./ManjatModal";
 
 // Top-3 podium medals: gold crown, silver, bronze (ribbon-style corner badge).
-const MEDALI: Record<1 | 2 | 3, { bg: string; icon: string; label: string }> = {
-  1: { bg: "pita-emas", icon: "👑", label: "Juara 1 (emas)" },
-  2: { bg: "pita-perak", icon: "", label: "Juara 2 (perak)" },
-  3: { bg: "pita-perunggu", icon: "", label: "Juara 3 (perunggu)" },
+const MEDALI: Record<1 | 2 | 3, { bg: string; label: string }> = {
+  1: { bg: "pita-emas", label: "Juara 1 (emas)" },
+  2: { bg: "pita-perak", label: "Juara 2 (perak)" },
+  3: { bg: "pita-perunggu", label: "Juara 3 (perunggu)" },
 };
 
 /**
@@ -43,9 +44,11 @@ export function ListingCard({
           aria-label={medali.label}
           title={medali.label}
           style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 68%, 0 100%)" }}
-          className={`absolute left-4 -top-2 z-20 flex h-10 w-6 items-start justify-center pt-1.5 text-sm leading-none drop-shadow-md ${medali.bg}`}
+          className={`absolute left-4 -top-2 z-20 flex h-10 w-6 items-start justify-center pt-1.5 leading-none drop-shadow-md ${medali.bg}`}
         >
-          {medali.icon}
+          {entry.rank === 1 && (
+            <Crown className="size-3.5 text-kertas-1" strokeWidth={2.5} aria-hidden />
+          )}
         </span>
       )}
 
@@ -68,11 +71,12 @@ export function ListingCard({
         className={puncak ? "size-11 rounded-md text-lg" : "size-9 rounded-md text-sm"}
       />
       <div className="min-w-0 flex-1">
+        {/* Stretched link: the whole card navigates to the tracked redirect. */}
         <a
           href={`/k/${entry.id}?asal=papan`}
           target="_blank"
           rel="noopener noreferrer"
-          className={`block truncate font-display font-semibold text-tinta hover:text-merah ${puncak ? "text-lg" : "text-base"}`}
+          className={`block truncate font-display font-semibold text-tinta transition-colors group-hover:text-merah after:absolute after:inset-0 ${puncak ? "text-lg" : "text-base"}`}
           style={{ fontStretch: `${wdth}%` }}
         >
           {entry.nama}
@@ -105,8 +109,8 @@ export function ListingCard({
         >
           {formatRupiah(entry.pegangan)}
         </span>
-        {/* Inline action for touch/small screens (no hover). */}
-        <span className="md:hidden">
+        {/* Inline action for touch/small screens; z-10 keeps it above the stretched link. */}
+        <span className="relative z-10 md:hidden">
           <ManjatButton url={entry.urlNormal} size="sm" variant="secondary">
             Salip
           </ManjatButton>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FavoritEntry } from "@/lib/favorit";
@@ -49,6 +50,15 @@ export function VoteFavorit({
         <h3 className="font-display font-semibold text-tinta">Pemanjat terfavorit</h3>
         <span className="font-mono text-xs text-tinta-redup">
           {voted ? "minggu ini" : "vote gratis · 1×/hari"}
+        </span>
+      </div>
+
+      {/* Weekly prize — motivates the vote. */}
+      <div className="mt-2 flex items-start gap-2 rounded-lg bg-kertas-2 px-3 py-2 text-xs text-tinta-redup">
+        <Trophy className="mt-0.5 size-4 shrink-0 text-merah" aria-hidden />
+        <span>
+          Juara <b className="text-tinta">minggu ini</b> diposting di{" "}
+          <b className="text-tinta">Instagram</b> + <b className="text-tinta">gratis iklan 1 hari</b>.
         </span>
       </div>
 

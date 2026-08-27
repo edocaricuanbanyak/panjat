@@ -103,8 +103,8 @@ body {
   border-color: color-mix(in srgb, var(--color-emas) 50%, var(--color-garis));
 }
 .podium-2 {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--color-perak) 15%, var(--color-kertas-1)), var(--color-kertas-1) 70%);
-  border-color: color-mix(in srgb, var(--color-perak) 50%, var(--color-garis));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-perak) 30%, var(--color-kertas-1)), var(--color-kertas-1) 72%);
+  border-color: color-mix(in srgb, var(--color-perak) 70%, var(--color-garis));
 }
 .podium-3 {
   background: linear-gradient(180deg, color-mix(in srgb, var(--color-perunggu) 13%, var(--color-kertas-1)), var(--color-kertas-1) 70%);

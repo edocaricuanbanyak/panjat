@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AmountSelector, type TargetChoice } from "@/components/AmountSelector";
 import { Button } from "@/components/Button";
@@ -154,8 +155,11 @@ export function ManjatWizard({
   return (
     <div className="w-full">
       {onClose ? (
-        <button onClick={onClose} className="text-sm text-tinta-redup hover:text-tinta">
-          ✕ Tutup
+        <button
+          onClick={onClose}
+          className="inline-flex items-center gap-1 text-sm text-tinta-redup hover:text-tinta"
+        >
+          <X className="size-4" aria-hidden /> Tutup
         </button>
       ) : (
         <a href="/" className="text-sm text-tinta-redup hover:text-tinta">

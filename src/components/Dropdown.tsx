@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { fieldClasses } from "./Input";
 
@@ -80,20 +81,10 @@ export function Dropdown({
           <span className={selected ? "text-tinta" : "text-tinta-redup/60"}>
             {selected ? selected.label : placeholder}
           </span>
-          <svg
+          <ChevronDown
             aria-hidden
-            viewBox="0 0 20 20"
             className={`size-4 shrink-0 text-tinta-redup transition-transform ease-panjat ${open ? "rotate-180" : ""}`}
-          >
-            <path
-              d="M6 8l4 4 4-4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          />
         </button>
 
         {open && (
