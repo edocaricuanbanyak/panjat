@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server";
 import { copy } from "@/copy";
 import { db } from "@/db";
-import { GratisError, createGratis } from "@/domain/gratis";
+import { GRATIS_PER_MINGGU, GratisError, createGratis, sisaGratisMingguIni } from "@/domain/gratis";
 import { clientIp } from "@/lib/ip";
 import { rateLimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+/** GET /api/pasang-gratis — remaining Kaki Tiang slots this week (siapa cepat). */
+export async function GET() {
+  const sisa = await sisaGratisMingguIni(db);
+  return NextResponse.json({ sisa, total: GRATIS_PER_MINGGU });
+}
 
 /** POST /api/pasang-gratis { url, nama?, deskripsi?, kategoriSlug?, email? }. */
 export async function POST(req: Request) {

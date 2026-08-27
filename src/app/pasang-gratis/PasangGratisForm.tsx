@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import { copy } from "@/copy";
 import { Dropdown } from "@/components/Dropdown";
@@ -18,6 +18,16 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
   const [previewing, setPreviewing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [kuota, setKuota] = useState<{ sisa: number; total: number } | null>(null);
+
+  // First-come-first-served: how many free slots are left this week.
+  useEffect(() => {
+    fetch("/api/pasang-gratis")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setKuota({ sisa: d.sisa, total: d.total }))
+      .catch(() => {});
+  }, []);
+  const penuh = kuota?.sisa === 0;
 
   async function prefill() {
     if (!url.trim()) return;
@@ -63,8 +73,19 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
   return (
     <div className="flex flex-col gap-4">
       {error && (
-        <p className="rounded-md border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">{error}</p>
+        <p className="rounded-xl border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">{error}</p>
       )}
+
+      {kuota &&
+        (penuh ? (
+          <p className="rounded-xl border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">
+            {copy.pasangGratis.penuh}
+          </p>
+        ) : (
+          <p className="rounded-xl border border-garis bg-kertas-2 px-3 py-2 text-xs text-tinta-redup">
+            {copy.pasangGratis.sisaSlot(kuota.sisa, kuota.total)}
+          </p>
+        ))}
 
       <Input
         label={copy.manjat.urlLabel}
@@ -117,7 +138,7 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <Button disabled={!url.trim() || submitting} onClick={submit}>
+      <Button disabled={!url.trim() || submitting || penuh} onClick={submit}>
         {submitting ? copy.manjat.memproses : copy.pasangGratis.tombol}
       </Button>
     </div>

@@ -270,6 +270,9 @@ export const copy = {
     judulPlaceholder: "Produkku",
     emailHint: "Isi kalau mau kelola listing nanti.",
     tombol: "Pasang di Kaki Tiang",
+    sisaSlot: (sisa: number, total: number) =>
+      `Siapa cepat — sisa ${sisa} dari ${total} slot gratis minggu ini.`,
+    penuh: "Slot gratis minggu ini sudah penuh. Coba lagi minggu depan, atau naik tiang berbayar.",
   },
 
   dasbor: {
