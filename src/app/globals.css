@@ -97,6 +97,20 @@ body {
 .reveal-pop { opacity: 0; animation: puncak-pop 0.6s var(--ease-panjat) forwards; }
 .reveal-wave { animation: puncak-wave 0.8s var(--ease-panjat) 1s; }
 
+/* Podium cards — decorative rank tint (gold/silver/bronze), subtle. */
+.podium-1 {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-emas) 14%, var(--color-kertas-1)), var(--color-kertas-1) 70%);
+  border-color: color-mix(in srgb, var(--color-emas) 50%, var(--color-garis));
+}
+.podium-2 {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-perak) 15%, var(--color-kertas-1)), var(--color-kertas-1) 70%);
+  border-color: color-mix(in srgb, var(--color-perak) 50%, var(--color-garis));
+}
+.podium-3 {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-perunggu) 13%, var(--color-kertas-1)), var(--color-kertas-1) 70%);
+  border-color: color-mix(in srgb, var(--color-perunggu) 45%, var(--color-garis));
+}
+
 /* Podium ribbons — subtle metallic sheen (top-light gradient of each medal). */
 .pita-emas {
   background: linear-gradient(155deg, color-mix(in srgb, var(--color-emas) 78%, white), var(--color-emas) 62%, color-mix(in srgb, var(--color-emas) 80%, black));
