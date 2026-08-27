@@ -66,9 +66,9 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
       )}
 
       <Input
-        label="URL atau @username"
+        label="URL"
         placeholder="produkku.id"
-        hint={previewing ? "Mengambil detail…" : "Cukup tempel URL — sisanya kami isi otomatis."}
+        hint={previewing ? "Mengambil detail…" : "Cukup tempel URL saja — sisanya kami isi otomatis."}
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         onBlur={prefill}

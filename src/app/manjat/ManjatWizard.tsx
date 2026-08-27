@@ -103,25 +103,6 @@ export function ManjatWizard({
     }
   }
 
-  const [suggesting, setSuggesting] = useState(false);
-  async function suggestDesc() {
-    if (!url.trim()) return;
-    setSuggesting(true);
-    try {
-      const res = await fetch("/api/saran", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, nama }),
-      });
-      const data = await res.json();
-      if (data.deskripsi) setDeskripsi(data.deskripsi);
-    } catch {
-      /* best-effort */
-    } finally {
-      setSuggesting(false);
-    }
-  }
-
   const [previewing, setPreviewing] = useState(false);
   async function prefillFromUrl() {
     if (!url.trim()) return;
@@ -186,9 +167,9 @@ export function ManjatWizard({
       {step === 1 && (
         <div className="mt-6 flex flex-col gap-4">
           <Input
-            label="URL atau @username"
+            label="URL"
             placeholder="nyala.id"
-            hint={previewing ? "Mengambil detail…" : "Cukup tempel URL — sisanya kami isi otomatis."}
+            hint={previewing ? "Mengambil detail…" : "Cukup tempel URL saja — sisanya kami isi otomatis."}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             onBlur={prefillFromUrl}
@@ -212,17 +193,7 @@ export function ManjatWizard({
                 options={kategori.map((k) => ({ value: k.slug, label: k.nama }))}
               />
               <label className="block">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-tinta-redup">Deskripsi (160 kar.)</span>
-                  <button
-                    type="button"
-                    onClick={suggestDesc}
-                    disabled={suggesting || !url.trim()}
-                    className="font-mono text-xs text-merah-teks hover:underline disabled:opacity-50"
-                  >
-                    {suggesting ? "…" : "Saran AI"}
-                  </button>
-                </div>
+                <span className="text-sm text-tinta-redup">Deskripsi (160 kar.)</span>
                 <textarea
                   value={deskripsi}
                   maxLength={160}

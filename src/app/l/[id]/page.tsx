@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { buttonClasses } from "@/components/Button";
 import { LencanaRow } from "@/components/LencanaRow";
+import { ManjatButton } from "@/components/ManjatModal";
 import { LogoTile } from "@/components/LogoTile";
 import { PageShell } from "@/components/PageShell";
 import { Sparkline } from "@/components/Sparkline";
@@ -78,9 +79,9 @@ export default async function ListingPublikPage({
         <a href={`/k/${l.id}?asal=jelajah`} target="_blank" rel="noopener noreferrer" className={buttonClasses("primary", "sm")}>
           Kunjungi situs
         </a>
-        <a href={`/manjat?url=${encodeURIComponent(l.urlNormal)}`} className={buttonClasses("secondary", "sm")}>
+        <ManjatButton url={l.urlNormal} variant="secondary" size="sm">
           Salip di papan
-        </a>
+        </ManjatButton>
       </div>
 
       {l.riwayat.length >= 2 && (

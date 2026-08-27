@@ -3,6 +3,9 @@ import { PageShell } from "@/components/PageShell";
 
 export const metadata: Metadata = { title: "Syarat & Ketentuan — Panjat" };
 
+// PageShell fetches categories for the site-wide Manjat modal → render per request.
+export const dynamic = "force-dynamic";
+
 // Draft (§18.7). Requires legal review before public launch.
 export default function KetentuanPage() {
   return (
