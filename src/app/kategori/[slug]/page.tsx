@@ -54,12 +54,12 @@ export default async function KategoriPage({
         <div className="mt-4 flex items-center gap-3 rounded-lg border border-merah/40 bg-merah/5 p-3">
           <LogoTile nama={dir.champion.nama} />
           <div className="min-w-0">
-            <p className="font-mono text-xs text-merah">Juara kategori</p>
+            <p className="font-mono text-xs text-merah-teks">Juara kategori</p>
             <a
               href={`/k/${dir.champion.id}?asal=jelajah`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block truncate font-display font-semibold text-tinta hover:text-merah"
+              className="block truncate font-display font-semibold text-tinta hover:text-merah-teks"
             >
               {dir.champion.nama}
             </a>

@@ -218,7 +218,7 @@ export function ManjatWizard({
                     type="button"
                     onClick={suggestDesc}
                     disabled={suggesting || !url.trim()}
-                    className="font-mono text-xs text-merah hover:underline disabled:opacity-50"
+                    className="font-mono text-xs text-merah-teks hover:underline disabled:opacity-50"
                   >
                     {suggesting ? "…" : "Saran AI"}
                   </button>
@@ -256,7 +256,7 @@ export function ManjatWizard({
               Manjat: <span className="text-tinta">{nama || url}</span>
               {kategoriSlug && ` · ${kategori.find((k) => k.slug === kategoriSlug)?.nama ?? ""}`}
               {" · "}
-              <button onClick={() => setStep(1)} className="text-merah hover:underline">
+              <button onClick={() => setStep(1)} className="text-merah-teks hover:underline">
                 ubah detail
               </button>
             </div>

@@ -14,7 +14,7 @@ export function TebakJuara({ status }: { status: GuessStatus }) {
       <div className="flex items-center justify-between">
         <h2 className="font-display font-semibold text-tinta">Tebak Juara hari ini</h2>
         {status.streak > 0 && (
-          <span className="font-mono text-xs text-merah">Streak {status.streak} hari</span>
+          <span className="font-mono text-xs text-merah-teks">Streak {status.streak} hari</span>
         )}
       </div>
 

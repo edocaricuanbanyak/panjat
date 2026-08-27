@@ -59,7 +59,7 @@ export function VoteFavorit({
 
       {/* Weekly prize — motivates the vote. */}
       <div className="mt-2 flex items-start gap-2 rounded-lg bg-kertas-2 px-3 py-2 text-xs text-tinta-redup">
-        <Trophy className="mt-0.5 size-4 shrink-0 text-merah" aria-hidden />
+        <Trophy className="mt-0.5 size-4 shrink-0 text-merah-teks" aria-hidden />
         <span>
           Juara <b className="text-tinta">minggu ini</b> diposting di{" "}
           <b className="text-tinta">Instagram</b> + <b className="text-tinta">gratis iklan 1 hari</b>.

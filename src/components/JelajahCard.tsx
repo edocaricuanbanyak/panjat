@@ -14,7 +14,7 @@ export function JelajahCard({ card, asal }: { card: Card; asal: "jelajah" | "pen
           href={`/k/${card.id}?asal=${asal}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="block truncate font-display font-semibold text-tinta hover:text-merah"
+          className="block truncate font-display font-semibold text-tinta hover:text-merah-teks"
         >
           {card.nama}
         </a>

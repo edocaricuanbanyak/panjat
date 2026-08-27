@@ -29,7 +29,7 @@ export function KakiTiang({ entries, remaining }: { entries: KakiTiangEntry[]; r
                   href={`/k/${e.id}?asal=papan`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block truncate font-display font-semibold text-tinta hover:text-merah"
+                  className="block truncate font-display font-semibold text-tinta hover:text-merah-teks"
                 >
                   {e.nama}
                 </a>

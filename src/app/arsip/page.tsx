@@ -40,7 +40,7 @@ export default async function ArsipPage() {
             <li key={r.tanggal}>
               <a
                 href={`/hari-ini/${r.tanggal}`}
-                className="flex items-center gap-3 py-3 hover:text-merah"
+                className="flex items-center gap-3 py-3 hover:text-merah-teks"
               >
                 <LogoTile nama={r.nama} />
                 <div className="min-w-0">

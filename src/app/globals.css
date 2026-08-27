@@ -11,15 +11,16 @@
   --color-kertas-1: #ffffff; /* card surface */
   --color-kertas-2: #e9e4d9; /* sunken surface (Kaki Tiang, inputs) */
   --color-tinta: #1f1b16; /* primary text */
-  --color-tinta-redup: #7a7267; /* secondary text */
+  --color-tinta-redup: #665f56; /* secondary text — darkened to pass WCAG AA (4.5:1) */
   --color-garis: #d8d2c4; /* 1px borders */
 
   /* Identity */
   --color-tiang: #8a5a32; /* pole rail, markers, pinang-wood */
   --color-licin: #b9c4c9; /* the slick sheen — the one cool note */
-  --color-merah: #da2e20; /* brand red (merah-putih) — ONLY summit zone + primary action */
-  --color-galat: #c2410c; /* error/danger — deliberately NOT the brand red */
-  --color-hidup: #2e9d5b; /* live/online status — green, status only */
+  --color-merah: #da2e20; /* brand red (merah-putih) — fills/buttons/summit; white-on-merah passes AA */
+  --color-merah-teks: #be2414; /* red as small text (links/labels/rank) — AA-safe 4.5:1 on all paper */
+  --color-galat: #a8380a; /* error/danger — deliberately NOT the brand red; AA-safe everywhere */
+  --color-hidup: #1a6e3c; /* live/online status green — AA-safe as text everywhere */
 
   /* Podium medals (top-3 ribbons only) */
   --color-emas: #c99a2e;

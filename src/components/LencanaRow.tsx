@@ -9,7 +9,7 @@ export function LencanaRow({ badges }: { badges: string[] }) {
           <span
             key={b}
             className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] ${
-              puncak ? "border-merah/40 bg-merah/5 text-merah" : "border-garis bg-kertas-2 text-tinta-redup"
+              puncak ? "border-merah/40 bg-merah/5 text-merah-teks" : "border-garis bg-kertas-2 text-tinta-redup"
             }`}
           >
             {b}

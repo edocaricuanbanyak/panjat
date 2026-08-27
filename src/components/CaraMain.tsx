@@ -13,7 +13,7 @@ export function CaraMain() {
           className="rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu transition-transform ease-panjat hover:-translate-y-0.5"
         >
           <span
-            className="grid size-9 place-items-center rounded-full bg-merah/10 font-display text-lg font-bold text-merah"
+            className="grid size-9 place-items-center rounded-full bg-merah/10 font-display text-lg font-bold text-merah-teks"
             style={{ fontStretch: "120%" }}
           >
             {n}

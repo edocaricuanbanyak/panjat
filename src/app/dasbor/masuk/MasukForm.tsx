@@ -37,7 +37,7 @@ export function MasukForm() {
           Kalau email itu terdaftar, tautan masuk sudah dikirim. Cek kotak masukmu.
         </p>
         {devLink && (
-          <a href={devLink} className="mt-3 block break-all text-sm text-merah hover:underline">
+          <a href={devLink} className="mt-3 block break-all text-sm text-merah-teks hover:underline">
             [dev] buka tautan masuk →
           </a>
         )}

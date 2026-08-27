@@ -19,12 +19,12 @@ export function HariIniBoard({ entries }: { entries: HariIniEntry[] }) {
       <div className="flex items-center gap-3 rounded-lg border border-merah/40 bg-merah/5 p-4">
         <LogoTile nama={champ.nama} className="size-14 rounded-md text-2xl" />
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-xs text-merah">Juara Hari Ini</p>
+          <p className="font-mono text-xs text-merah-teks">Juara Hari Ini</p>
           <a
             href={`/k/${champ.id}?asal=papan`}
             target="_blank"
             rel="noopener noreferrer"
-            className="block truncate font-display text-lg font-semibold text-tinta hover:text-merah"
+            className="block truncate font-display text-lg font-semibold text-tinta hover:text-merah-teks"
           >
             {champ.nama}
           </a>
@@ -53,7 +53,7 @@ export function HariIniBoard({ entries }: { entries: HariIniEntry[] }) {
               href={`/k/${e.id}?asal=papan`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block truncate font-display font-semibold text-tinta hover:text-merah"
+              className="block truncate font-display font-semibold text-tinta hover:text-merah-teks"
             >
               {e.nama}
             </a>

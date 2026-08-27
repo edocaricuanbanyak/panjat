@@ -30,7 +30,7 @@ export default async function DasborIndex() {
       {listings.length === 0 ? (
         <p className="mt-6 text-tinta-redup">
           Belum ada listing atas akun ini.{" "}
-          <a href="/manjat" className="text-merah hover:underline">
+          <a href="/manjat" className="text-merah-teks hover:underline">
             Manjat sekarang
           </a>
           .

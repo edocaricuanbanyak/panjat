@@ -106,7 +106,7 @@ export default async function Home({
         <KakiTiang entries={kakiTiang} remaining={sisaSorak} />
         <p className="mt-3 text-xs text-tinta-redup">
           Punya produk?{" "}
-          <a href="/pasang-gratis" className="text-merah hover:underline">
+          <a href="/pasang-gratis" className="text-merah-teks hover:underline">
             Pasang gratis di Kaki Tiang
           </a>
           .

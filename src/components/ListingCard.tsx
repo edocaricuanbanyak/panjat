@@ -62,7 +62,7 @@ export function ListingCard({
       <div
         className={`shrink-0 text-right font-mono tabular font-semibold ${
           puncak ? "w-12 text-2xl" : "w-9 text-base"
-        } ${entry.rank <= 3 ? "text-merah" : "text-tinta-redup"}`}
+        } ${entry.rank <= 3 ? "text-merah-teks" : "text-tinta-redup"}`}
       >
         #{entry.rank}
       </div>
@@ -76,7 +76,7 @@ export function ListingCard({
           href={`/k/${entry.id}?asal=papan`}
           target="_blank"
           rel="noopener noreferrer"
-          className={`block truncate font-display font-semibold text-tinta transition-colors group-hover:text-merah after:absolute after:inset-0 ${puncak ? "text-lg" : "text-base"}`}
+          className={`block truncate font-display font-semibold text-tinta transition-colors group-hover:text-merah-teks after:absolute after:inset-0 ${puncak ? "text-lg" : "text-base"}`}
           style={{ fontStretch: `${wdth}%` }}
         >
           {entry.nama}

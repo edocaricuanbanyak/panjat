@@ -38,7 +38,7 @@ export function MomenPuncakReveal({
           />
         )}
         <div
-          className="reveal-pop font-display font-extrabold text-merah"
+          className="reveal-pop font-display font-extrabold text-merah-teks"
           style={{ fontStretch: "150%", fontSize: "6rem", lineHeight: 1, animationDelay: "0.1s" }}
         >
           #{rank}

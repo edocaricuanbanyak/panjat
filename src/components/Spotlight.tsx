@@ -17,7 +17,7 @@ export function Spotlight({ items }: { items: SpotlightItem[] }) {
 
   return (
     <div className="flex items-center gap-3 overflow-hidden py-1.5">
-      <span className="shrink-0 font-mono text-[11px] font-semibold uppercase tracking-wide text-merah">
+      <span className="shrink-0 font-mono text-[11px] font-semibold uppercase tracking-wide text-merah-teks">
         Spotlight
       </span>
       <div className="overflow-hidden">
@@ -28,7 +28,7 @@ export function Spotlight({ items }: { items: SpotlightItem[] }) {
               href={`/k/${it.id}?asal=papan`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm hover:text-merah"
+              className="flex items-center gap-2 text-sm hover:text-merah-teks"
               aria-hidden={i >= items.length ? true : undefined}
             >
               <span className="font-display font-semibold text-tinta">{it.nama}</span>

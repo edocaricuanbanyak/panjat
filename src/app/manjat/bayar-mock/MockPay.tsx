@@ -42,7 +42,7 @@ export function MockPay({ orderId, nominal }: { orderId: string; nominal: number
           <p className="mt-2 text-sm text-tinta-redup">
             Pembayaran {formatRupiah(nominal)} dikonfirmasi. Listing kamu sudah tayang di papan.
           </p>
-          <a href="/" className="mt-6 inline-block font-medium text-merah hover:underline">
+          <a href="/" className="mt-6 inline-block font-medium text-merah-teks hover:underline">
             Lihat posisinya di papan →
           </a>
         </>

@@ -78,7 +78,7 @@ export function Dropdown({
           onKeyDown={onKey}
           className={`${fieldClasses} flex cursor-pointer items-center justify-between text-left`}
         >
-          <span className={selected ? "text-tinta" : "text-tinta-redup/60"}>
+          <span className={selected ? "text-tinta" : "text-tinta-redup"}>
             {selected ? selected.label : placeholder}
           </span>
           <ChevronDown
@@ -103,7 +103,7 @@ export function Dropdown({
                     onMouseEnter={() => setActive(i)}
                     className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition ${
                       i === active ? "bg-kertas-2" : ""
-                    } ${on ? "font-medium text-merah" : "text-tinta"}`}
+                    } ${on ? "font-medium text-merah-teks" : "text-tinta"}`}
                   >
                     {o.label}
                     {on && <span aria-hidden>✓</span>}
