@@ -7,6 +7,7 @@ import { and, desc, eq, gte, sql } from "drizzle-orm";
 import type { Database } from "@/db";
 import { klikHarian, listing, moderasiLog, posisiSnapshot, transaksi } from "@/db/schema";
 import { getBoard } from "./board";
+import { badgesFor } from "./lencana";
 import { loadRosotConfig } from "./config";
 import { dailyRateForRank, estimateDaysToThreshold } from "./rosot";
 
@@ -44,6 +45,7 @@ export interface Dashboard {
   cpc: number | null;
   seri7hari: SnapshotPoint[];
   riwayat: PembayaranRow[];
+  badges: string[];
 }
 
 export async function getDashboard(db: Database, listingId: string): Promise<Dashboard | null> {
@@ -97,6 +99,7 @@ export async function getDashboard(db: Database, listingId: string): Promise<Das
   const threshold = Math.max(cfg.kakiTiang, 0);
   const rate = rank !== null ? dailyRateForRank(rank, l.pegangan, cfg) : 0;
   const est = estimateDaysToThreshold(l.pegangan, rate, threshold);
+  const badges = (await badgesFor(db, [l.id])).get(l.id) ?? [];
 
   return {
     listingId: l.id,
@@ -113,6 +116,7 @@ export async function getDashboard(db: Database, listingId: string): Promise<Das
     cpc: cpc(rosotPerHari, klikHariIni),
     seri7hari: seri,
     riwayat: riwayat.map((r) => ({ nominal: r.nominal, metode: r.metode, waktu: r.waktu ?? new Date(0) })),
+    badges,
   };
 }
 

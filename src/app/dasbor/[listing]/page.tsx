@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { buttonClasses } from "@/components/Button";
+import { LencanaRow } from "@/components/LencanaRow";
 import { Sparkline } from "@/components/Sparkline";
 import { StatTile } from "@/components/StatTile";
 import { db } from "@/db";
@@ -35,6 +36,11 @@ export default async function DasborListing({
       <p className="font-mono text-xs text-tinta-redup">
         {d.urlNormal} · {d.status}
       </p>
+      {d.badges.length > 0 && (
+        <div className="mt-3">
+          <LencanaRow badges={d.badges} />
+        </div>
+      )}
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <StatTile label="Pegangan" value={formatRupiah(d.pegangan)} />

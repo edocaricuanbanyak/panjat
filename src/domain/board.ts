@@ -7,6 +7,7 @@ import { and, eq } from "drizzle-orm";
 import type { Database } from "@/db";
 import { kategori, klikHarian, listing } from "@/db/schema";
 import { loadRosotConfig } from "./config";
+import { badgesFor } from "./lencana";
 import { computeRanks } from "./ranking";
 import { dailyRateForRank } from "./rosot";
 
@@ -20,6 +21,7 @@ export interface BoardEntry {
   pegangan: number;
   klikHariIni: number;
   rosotPerHari: number;
+  badges: string[];
 }
 
 export interface Board {
@@ -53,6 +55,8 @@ export async function getBoard(db: Database): Promise<Board> {
     loadRosotConfig(db),
   ]);
 
+  const badges = await badgesFor(db, rows.map((r) => r.id));
+
   const entries = computeRanks(rows).map(({ rank, listing: r }) => ({
     rank,
     id: r.id,
@@ -63,6 +67,7 @@ export async function getBoard(db: Database): Promise<Board> {
     pegangan: r.peganganCached,
     klikHariIni: r.klikHariIni ?? 0,
     rosotPerHari: Math.round(r.peganganCached * dailyRateForRank(rank, r.peganganCached, cfg)),
+    badges: badges.get(r.id) ?? [],
   }));
 
   return { entries, max: entries[0]?.pegangan ?? 0 };

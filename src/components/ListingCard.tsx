@@ -3,6 +3,7 @@ import { formatRupiah } from "@/lib/format";
 import { buttonClasses } from "./Button";
 import { CategoryChip } from "./CategoryChip";
 import { EstimateLabel } from "./EstimateLabel";
+import { LencanaRow } from "./LencanaRow";
 import { LogoTile } from "./LogoTile";
 import { PeganganBar } from "./PeganganBar";
 import { RankBadge } from "./RankBadge";
@@ -67,6 +68,11 @@ export function ListingCard({
             {entry.klikHariIni} klik hari ini
           </span>
         </div>
+        {entry.badges.length > 0 && (
+          <div className="mt-2">
+            <LencanaRow badges={entry.badges} />
+          </div>
+        )}
       </div>
       <div className="flex shrink-0 flex-col items-end gap-2">
         <span

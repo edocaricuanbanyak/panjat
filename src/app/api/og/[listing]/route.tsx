@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { db } from "@/db";
+import { badgesFor } from "@/domain/lencana";
 import { getMomenForListing } from "@/domain/momen";
 import { formatRupiah } from "@/lib/format";
 
@@ -30,6 +31,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ listing: string
   const nama = momen?.nama ?? "Panjat";
   const rank = momen?.rank ?? 0;
   const pegangan = momen ? formatRupiah(momen.pegangan) : "";
+  const badges = ((await badgesFor(db, [listingId])).get(listingId) ?? []).slice(0, 3);
 
   return new ImageResponse(
     (
@@ -67,6 +69,25 @@ export async function GET(req: Request, ctx: { params: Promise<{ listing: string
           <div style={{ display: "flex", fontSize: 32, color: C.tintaRedup }}>
             pegangan {pegangan}
           </div>
+          {badges.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 8 }}>
+              {badges.map((b) => (
+                <div
+                  key={b}
+                  style={{
+                    display: "flex",
+                    fontSize: 24,
+                    color: C.tiang,
+                    border: `2px solid ${C.garis}`,
+                    borderRadius: 999,
+                    padding: "4px 16px",
+                  }}
+                >
+                  {b}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div
