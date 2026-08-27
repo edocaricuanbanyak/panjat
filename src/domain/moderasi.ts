@@ -193,3 +193,12 @@ export async function rejectListing(db: Database, listingId: string, alasan = "d
     await logModerasi(tx, { listingId, aktor: "manusia", keputusan: "tolak", alasan, sebelum: "ditahan", sesudah: "ditolak" });
   });
 }
+
+/** Take a tayang listing down on a verified URL-ownership claim (§18.6). */
+export async function turunkanListing(db: Database, listingId: string, alasan = "klaim pemilik URL"): Promise<void> {
+  await db.transaction(async (tx) => {
+    await tx.update(listing).set({ status: "diturunkan" }).where(eq(listing.id, listingId));
+    await refundListing(tx, listingId, `turunkan:${listingId}`);
+    await logModerasi(tx, { listingId, aktor: "manusia", keputusan: "diturunkan", alasan, sebelum: "tayang", sesudah: "diturunkan" });
+  });
+}

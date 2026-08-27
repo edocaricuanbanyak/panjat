@@ -114,6 +114,12 @@ export default async function ListingPublikPage({
         </section>
       )}
 
+      <p className="mt-6 text-xs text-tinta-redup">
+        <a href={`/lapor?listing=${l.id}`} className="hover:text-tinta">
+          Laporkan / klaim listing ini
+        </a>
+      </p>
+
       <Footer />
     </main>
   );

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { approveListing, rejectListing } from "@/domain/moderasi";
+import { approveListing, rejectListing, turunkanListing } from "@/domain/moderasi";
 import { currentAdmin } from "@/lib/admin";
 
 export const runtime = "nodejs";
@@ -16,6 +16,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ listing: strin
 
   if (aksi === "approve") await approveListing(db, listingId);
   else if (aksi === "reject") await rejectListing(db, listingId);
+  else if (aksi === "turunkan") await turunkanListing(db, listingId);
 
   return NextResponse.redirect(new URL("/admin", req.url), { status: 303 });
 }

@@ -268,6 +268,19 @@ export const lencana = pgTable(
   (t) => [unique("lencana_listing_jenis").on(t.listingId, t.jenis)],
 );
 
+// Reports & URL-ownership claims (R8 "tombol lapor", §18.6). Decided by a human.
+export const laporan = pgTable("laporan", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listing.id),
+  jenis: text("jenis").notNull(), // lapor | klaim
+  pesan: text("pesan"),
+  kontak: text("kontak"),
+  status: text("status").notNull().default("baru"), // baru | ditutup
+  createdAt: createdAt(),
+});
+
 // --- Dashboard auth -------------------------------------------------------
 // One-time magic-link tokens (§18.2). Sessions are stateless signed cookies
 // (no table). Only the token HASH is stored; raw token lives only in the link.

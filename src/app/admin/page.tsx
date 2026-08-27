@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { LogoTile } from "@/components/LogoTile";
 import { db } from "@/db";
 import { getModerationQueue } from "@/domain/admin";
+import { getLaporanTerbuka } from "@/domain/laporan";
 import { formatRupiah } from "@/lib/format";
 import { currentAdmin } from "@/lib/admin";
 
@@ -10,7 +11,7 @@ export const metadata = { robots: { index: false } };
 
 export default async function AdminPage() {
   if (!(await currentAdmin())) redirect("/admin/masuk");
-  const queue = await getModerationQueue(db);
+  const [queue, laporan] = await Promise.all([getModerationQueue(db), getLaporanTerbuka(db)]);
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-8">
@@ -57,6 +58,40 @@ export default async function AdminPage() {
           ))}
         </ul>
       )}
+
+      <h2 className="mt-10 font-display font-semibold text-tinta">
+        Laporan & klaim ({laporan.length})
+      </h2>
+      {laporan.length === 0 ? (
+        <p className="mt-2 text-sm text-tinta-redup">Tidak ada laporan terbuka.</p>
+      ) : (
+        <ul className="mt-3 flex flex-col gap-3">
+          {laporan.map((r) => (
+            <li key={r.id} className="rounded-lg border border-garis bg-kertas-1 p-3">
+              <p className="font-mono text-xs text-tinta-redup">
+                {r.jenis === "klaim" ? "KLAIM URL" : "LAPORAN"} ·{" "}
+                <a href={`/l/${r.listingId}`} className="hover:text-tinta">{r.nama}</a> ({r.urlNormal})
+              </p>
+              {r.pesan && <p className="mt-1 text-sm text-tinta">{r.pesan}</p>}
+              {r.kontak && <p className="text-xs text-tinta-redup">Kontak: {r.kontak}</p>}
+              <div className="mt-3 flex gap-2">
+                <form action={`/api/admin/${r.listingId}/moderasi`} method="post">
+                  <input type="hidden" name="aksi" value="turunkan" />
+                  <button className="h-9 rounded-md border border-merah/40 px-3 text-sm text-merah">
+                    Turunkan + refund
+                  </button>
+                </form>
+                <form action={`/api/admin/laporan/${r.id}`} method="post">
+                  <button className="h-9 rounded-md border border-garis px-3 text-sm text-tinta-redup">
+                    Tutup laporan
+                  </button>
+                </form>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 }
+
