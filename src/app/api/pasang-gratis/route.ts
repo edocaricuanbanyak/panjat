@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { GratisError, createGratis } from "@/domain/gratis";
 import { clientIp } from "@/lib/ip";
@@ -10,17 +11,17 @@ export const runtime = "nodejs";
 export async function POST(req: Request) {
   const rl = await rateLimit(`gratis:${clientIp(req.headers)}`, 5, 3600);
   if (!rl.ok) {
-    return NextResponse.json({ error: "Terlalu banyak listing gratis. Coba lagi nanti." }, { status: 429 });
+    return NextResponse.json({ error: copy.error.terlaluBanyakGratis }, { status: 429 });
   }
 
   let body: Record<string, unknown>;
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Body JSON tidak valid" }, { status: 400 });
+    return NextResponse.json({ error: copy.error.bodyTidakValid }, { status: 400 });
   }
   if (typeof body.url !== "string" || !body.url.trim()) {
-    return NextResponse.json({ error: "URL wajib" }, { status: 400 });
+    return NextResponse.json({ error: copy.error.urlWajib }, { status: 400 });
   }
 
   try {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { createOrTopUp, quote, type Target } from "@/domain/manjat";
 import { clientIp } from "@/lib/ip";
@@ -20,7 +21,7 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Body JSON tidak valid" }, { status: 400 });
+    return NextResponse.json({ error: copy.error.bodyTidakValid }, { status: 400 });
   }
 
   try {
@@ -28,10 +29,10 @@ export async function POST(req: Request) {
     if (typeof body.url !== "string") {
       const target = body.target as Target | undefined;
       if (target !== undefined && !TARGETS.includes(target)) {
-        return NextResponse.json({ error: "Target tidak dikenal" }, { status: 400 });
+        return NextResponse.json({ error: copy.error.targetTidakDikenal }, { status: 400 });
       }
       if (target === undefined && typeof body.nominal !== "number") {
-        return NextResponse.json({ error: "target atau nominal wajib" }, { status: 400 });
+        return NextResponse.json({ error: copy.error.targetWajib }, { status: 400 });
       }
       const q = await quote(db, { target, nominal: body.nominal as number | undefined });
       return NextResponse.json(q);
@@ -40,10 +41,10 @@ export async function POST(req: Request) {
     // Create/top-up mode — rate-limit invoice creation per IP (§18.4).
     const rl = await rateLimit(`manjat:${clientIp(req.headers)}`, 10, 60);
     if (!rl.ok) {
-      return NextResponse.json({ error: "Terlalu banyak permintaan. Coba lagi sebentar." }, { status: 429 });
+      return NextResponse.json({ error: copy.error.terlaluBanyakPermintaan }, { status: 429 });
     }
     if (typeof body.nominal !== "number") {
-      return NextResponse.json({ error: "nominal wajib berupa angka" }, { status: 400 });
+      return NextResponse.json({ error: copy.error.nominalWajib }, { status: 400 });
     }
 
     const snap = isMock() ? mockSnapClient : midtransSnapClient;

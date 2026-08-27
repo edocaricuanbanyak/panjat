@@ -137,6 +137,9 @@ export const copy = {
   pasangGratis: {
     judul: "Pasang gratis",
     subJudul: "Listing gratis di Kaki Tiang, diurut dukungan pengunjung.",
+    urlPlaceholder: "produkku.id",
+    judulPlaceholder: "Produkku",
+    emailHint: "Isi kalau mau kelola listing nanti.",
     tombol: "Pasang di Kaki Tiang",
   },
 
@@ -165,6 +168,11 @@ export const copy = {
     terlaluBanyak: "Terlalu banyak percobaan. Tunggu sebentar sebelum mencoba lagi.",
     kunjunganTakDikenal: "Kunjunganmu belum dikenali. Muat ulang halaman lalu coba lagi.",
     sudahVoteHariIni: "Kamu sudah vote hari ini. Besok bisa vote lagi.",
+    terlaluBanyakPermintaan: "Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi.",
+    terlaluBanyakGratis: "Terlalu banyak listing gratis dari sini. Coba lagi nanti.",
+    targetTidakDikenal: "Target posisi tidak dikenal. Pilih ulang targetnya.",
+    targetWajib: "Pilih target posisi atau isi nominal dulu.",
+    urlTidakValid: "URL tidak valid. Cek lagi alamatnya lalu coba lagi.",
   },
 
   /**

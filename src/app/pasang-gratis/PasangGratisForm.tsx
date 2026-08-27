@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/Button";
+import { copy } from "@/copy";
 import { Dropdown } from "@/components/Dropdown";
 import { Input } from "@/components/Input";
 
@@ -51,10 +52,10 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Gagal");
+      if (!res.ok) throw new Error(data.error ?? copy.error.gagalProses);
       window.location.href = `/l/${data.listingId}`;
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Gagal");
+      setError(e instanceof Error ? e.message : copy.error.gagalProses);
       setSubmitting(false);
     }
   }
@@ -66,9 +67,9 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
       )}
 
       <Input
-        label="URL"
-        placeholder="produkku.id"
-        hint={previewing ? "Mengambil detail…" : "Cukup tempel URL saja — sisanya kami isi otomatis."}
+        label={copy.manjat.urlLabel}
+        placeholder={copy.pasangGratis.urlPlaceholder}
+        hint={previewing ? copy.manjat.urlHintMemuat : copy.manjat.urlHint}
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         onBlur={prefill}
@@ -76,19 +77,26 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
 
       <details className="rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu" open>
         <summary className="cursor-pointer text-sm font-medium text-tinta-redup">
-          Detail (terisi otomatis)
+          {copy.manjat.detailRingkas}
         </summary>
         <div className="mt-3 flex flex-col gap-3">
-          <Input label="Judul" placeholder="Produkku" value={nama} onChange={(e) => setNama(e.target.value)} />
+          <Input
+            label={copy.manjat.judulListing}
+            placeholder={copy.pasangGratis.judulPlaceholder}
+            value={nama}
+            onChange={(e) => setNama(e.target.value)}
+          />
           <Dropdown
-            label="Kategori"
+            label={copy.manjat.kategori}
             placeholder="—"
             value={kategoriSlug}
             onChange={setKategoriSlug}
             options={kategori.map((k) => ({ value: k.slug, label: k.nama }))}
           />
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-tinta-redup">Deskripsi (160 kar.)</span>
+            <span className="mb-1 block text-sm font-medium text-tinta-redup">
+              {copy.manjat.deskripsi}
+            </span>
             <textarea
               value={deskripsi}
               maxLength={160}
@@ -101,16 +109,16 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
       </details>
 
       <Input
-        label="Email (opsional)"
+        label={copy.manjat.emailOpsional}
         type="email"
-        placeholder="kamu@email.com"
-        hint="Isi kalau mau kelola listing nanti."
+        placeholder={copy.manjat.emailPlaceholder}
+        hint={copy.pasangGratis.emailHint}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
 
       <Button disabled={!url.trim() || submitting} onClick={submit}>
-        {submitting ? "Memproses…" : "Pasang di Kaki Tiang"}
+        {submitting ? copy.manjat.memproses : copy.pasangGratis.tombol}
       </Button>
     </div>
   );

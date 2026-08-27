@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { copy } from "@/copy";
 import { getPreview } from "@/domain/preview";
 import { clientIp } from "@/lib/ip";
 import { rateLimit } from "@/lib/ratelimit";
@@ -14,12 +15,12 @@ export async function GET(req: Request) {
   const ip = clientIp(req.headers);
   const rl = await rateLimit(`preview:${ip}`, 10, 60);
   if (!rl.ok) {
-    return NextResponse.json({ error: "Terlalu banyak permintaan" }, { status: 429 });
+    return NextResponse.json({ error: copy.error.terlaluBanyakPermintaan }, { status: 429 });
   }
 
   const url = new URL(req.url).searchParams.get("url") ?? "";
   if (!url.trim()) {
-    return NextResponse.json({ error: "url wajib" }, { status: 400 });
+    return NextResponse.json({ error: copy.error.urlWajib }, { status: 400 });
   }
 
   try {
@@ -27,7 +28,7 @@ export async function GET(req: Request) {
     return NextResponse.json(preview);
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "URL tidak valid" },
+      { error: err instanceof Error ? err.message : copy.error.urlTidakValid },
       { status: 400 },
     );
   }
