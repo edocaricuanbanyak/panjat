@@ -157,7 +157,10 @@ export const copy = {
     menyalip: (n: number) => `menyalip ${n} pemanjat`,
     share: (rank: number) => `Aku #${rank} di Panjat!`,
     kartuAlt: (nama: string) => `Kartu ${nama}`,
-    lihatPapan: "Lihat papan",
+    lihatPapan: "Lihat leaderboard",
+    pilihUkuran: "Pilih ukuran kartu",
+    unduh: "Unduh kartu",
+    mengunduh: "Menyiapkan…",
   },
 
   privasi: {

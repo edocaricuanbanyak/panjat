@@ -177,6 +177,20 @@ body {
   animation: dukung-plus 720ms var(--ease-panjat) forwards;
 }
 
+/* Confetti burst — celebration after a successful payment. */
+@keyframes confetti-fall {
+  0% { opacity: 1; transform: translate(0, -12vh) rotate(0deg); }
+  100% { opacity: 0.85; transform: translate(var(--drift), 112vh) rotate(var(--rot)); }
+}
+.confetti-piece {
+  position: absolute;
+  top: 0;
+  border-radius: 2px;
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.3, 0.2, 0.4, 1);
+  animation-fill-mode: forwards;
+}
+
 /* Live-board slot-in — the KAMU row settles into place when your rank changes. */
 @keyframes manjat-slot {
   0% { opacity: 0; transform: translateY(-6px); background-color: color-mix(in srgb, var(--color-merah) 22%, transparent); }

@@ -1,7 +1,9 @@
 "use client";
 
 import { ShareButton } from "./ShareButton";
+import { ShareCard } from "./ShareCard";
 import { buttonClasses } from "@/components/Button";
+import { Confetti } from "@/components/Confetti";
 import { copy } from "@/copy";
 
 /**
@@ -26,6 +28,7 @@ export function MomenPuncakReveal({
 }) {
   return (
     <>
+      <Confetti />
       <p className="reveal font-mono text-xs uppercase tracking-wide text-tinta-redup">
         {copy.momen.eyebrow}
       </p>
@@ -57,14 +60,9 @@ export function MomenPuncakReveal({
         {overtaken > 0 && <> · {copy.momen.menyalip(overtaken)}</>}
       </p>
 
-      <img
-        src={`/api/og/${listingId}?story=1`}
-        alt={copy.momen.kartuAlt(nama)}
-        width={270}
-        height={480}
-        className="reveal mt-6 rounded-lg border border-garis shadow-sm"
-        style={{ animationDelay: "0.85s" }}
-      />
+      <div className="reveal mt-6 w-full" style={{ animationDelay: "0.85s" }}>
+        <ShareCard listingId={listingId} nama={nama} />
+      </div>
 
       <div
         className="reveal mt-6 flex w-full max-w-xs flex-col gap-2"

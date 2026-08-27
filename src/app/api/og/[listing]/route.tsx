@@ -24,7 +24,9 @@ const MERAH = "#da2e20";
 export async function GET(req: Request, { params }: { params: Promise<{ listing: string }> }) {
   const { listing: id } = await params;
   if (!UUID.test(id)) return new Response("Not found", { status: 404 });
-  const story = new URL(req.url).searchParams.get("story") === "1";
+  const params2 = new URL(req.url).searchParams;
+  const story = params2.get("story") === "1";
+  const ratio = params2.get("ratio"); // 9x16 | 1x1 | 4x3 | 16x9
 
   const [l] = await db
     .select({
@@ -52,7 +54,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ listing:
 
   // Instagram-Story card (R5) — 1080×1920 vertical, personalised by rank so the
   // sponsor feels the pride: gold summit, silver/bronze podium, or a proud climb.
-  if (story) {
+  if (story || ratio) {
     const [{ total }] = await db
       .select({ total: sql<number>`count(*)::int` })
       .from(listing)
@@ -105,113 +107,121 @@ export async function GET(req: Request, { params }: { params: Promise<{ listing:
               };
     const bigName = l.nama.length > 18 ? `${l.nama.slice(0, 17)}…` : l.nama;
 
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "110px 80px",
-            backgroundImage: tier.wash,
-            color: TINTA,
-            fontFamily: "sans-serif",
-            textAlign: "center",
-          }}
-        >
-          {/* header: wordmark + tier pill */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
-            <div style={{ display: "flex", fontSize: 44, fontWeight: 800, letterSpacing: -1 }}>
-              Panjat
-            </div>
-            <div
-              style={{
-                display: "flex",
-                padding: "14px 40px",
-                borderRadius: 999,
-                background: tier.accent,
-                color: "#ffffff",
-                fontSize: 34,
-                fontWeight: 800,
-                letterSpacing: 4,
-              }}
-            >
-              {tier.pill}
-            </div>
-          </div>
+    // Aspect-ratio presets. `story=1` and no ratio → the 9:16 story.
+    const PRESETS: Record<string, { w: number; h: number; disc: number; rankF: number; nameF: number; land: boolean; pad: string }> = {
+      "9x16": { w: 1080, h: 1920, disc: 460, rankF: 250, nameF: 100, land: false, pad: "110px 80px" },
+      "1x1": { w: 1080, h: 1080, disc: 340, rankF: 188, nameF: 82, land: false, pad: "70px 70px" },
+      "4x3": { w: 1200, h: 900, disc: 400, rankF: 210, nameF: 84, land: true, pad: "70px 80px" },
+      "16x9": { w: 1200, h: 675, disc: 330, rankF: 176, nameF: 74, land: true, pad: "60px 80px" },
+    };
+    const P = PRESETS[ratio ?? ""] ?? PRESETS["9x16"];
+    const rankFont = rank >= 100 ? Math.round(P.rankF * 0.78) : P.rankF;
+    const tall = P.h >= 1400;
 
-          {/* hero: medallion with the rank, then name */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 40 }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 460,
-                height: 460,
-                borderRadius: 999,
-                backgroundImage: tier.disc,
-                border: "12px solid rgba(255,255,255,0.55)",
-                boxShadow: "0 30px 60px rgba(0,0,0,0.14)",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  fontSize: rank >= 100 ? 210 : 260,
-                  fontWeight: 800,
-                  color: tier.discText,
-                  letterSpacing: -6,
-                }}
-              >
-                #{rank}
-              </div>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-              <div style={{ display: "flex", fontSize: 46, fontWeight: 700, color: tier.accent }}>
-                {tier.headline}
-              </div>
-              <div style={{ display: "flex", fontSize: 104, fontWeight: 800, lineHeight: 1.0 }}>
-                {bigName}
-              </div>
-              <div style={{ display: "flex", fontSize: 38, color: REDUP }}>{host}</div>
-            </div>
+    const pill = (
+      <div
+        style={{
+          display: "flex",
+          padding: "12px 34px",
+          borderRadius: 999,
+          background: tier.accent,
+          color: "#ffffff",
+          fontSize: 30,
+          fontWeight: 800,
+          letterSpacing: 4,
+        }}
+      >
+        {tier.pill}
+      </div>
+    );
+    const medallion = (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: P.disc,
+          height: P.disc,
+          borderRadius: 999,
+          backgroundImage: tier.disc,
+          border: "10px solid rgba(255,255,255,0.55)",
+          boxShadow: "0 24px 50px rgba(0,0,0,0.14)",
+          flexShrink: 0,
+        }}
+      >
+        <div style={{ display: "flex", fontSize: rankFont, fontWeight: 800, color: tier.discText, letterSpacing: -6 }}>
+          #{rank}
+        </div>
+      </div>
+    );
+    const card = P.land ? (
+      // Landscape (16:9 / 4:3): medallion left, details right.
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          gap: 64,
+          padding: P.pad,
+          backgroundImage: tier.wash,
+          color: TINTA,
+          fontFamily: "sans-serif",
+        }}
+      >
+        {medallion}
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+            <div style={{ display: "flex", fontSize: 40, fontWeight: 800, letterSpacing: -1 }}>Panjat</div>
+            {pill}
           </div>
-
-          {/* stats: pegangan + climb, then footer */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 30 }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 28,
-                padding: "26px 48px",
-                borderRadius: 40,
-                background: "rgba(255,255,255,0.7)",
-                border: `2px solid ${GARIS}`,
-              }}
-            >
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <div style={{ display: "flex", fontSize: 28, color: REDUP }}>pegangan</div>
-                <div style={{ display: "flex", fontSize: 76, fontWeight: 800 }}>
-                  {formatRupiah(l.pegangan)}
-                </div>
-              </div>
-            </div>
-            <div style={{ display: "flex", fontSize: 40, fontWeight: 700, color: tier.accent }}>
-              {tier.stat}
-            </div>
-            <div style={{ display: "flex", marginTop: 16, fontSize: 40, fontWeight: 800, color: MERAH }}>
-              panjat.id
-            </div>
+          <div style={{ display: "flex", fontSize: 40, fontWeight: 700, color: tier.accent }}>{tier.headline}</div>
+          <div style={{ display: "flex", fontSize: P.nameF, fontWeight: 800, lineHeight: 1.0 }}>{bigName}</div>
+          <div style={{ display: "flex", fontSize: 32, color: REDUP }}>{host}</div>
+          <div style={{ display: "flex", marginTop: 8, fontSize: 38, fontWeight: 700, color: tier.accent }}>
+            {tier.stat}
+          </div>
+          <div style={{ display: "flex", marginTop: 6, fontSize: 34, fontWeight: 800, color: MERAH }}>panjat.id</div>
+        </div>
+      </div>
+    ) : (
+      // Portrait / square (9:16 / 1:1): centered vertical stack.
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: tall ? "space-between" : "center",
+          gap: tall ? 0 : 30,
+          padding: P.pad,
+          backgroundImage: tier.wash,
+          color: TINTA,
+          fontFamily: "sans-serif",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
+          <div style={{ display: "flex", fontSize: 42, fontWeight: 800, letterSpacing: -1 }}>Panjat</div>
+          {pill}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: tall ? 36 : 24 }}>
+          {medallion}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+            <div style={{ display: "flex", fontSize: 42, fontWeight: 700, color: tier.accent }}>{tier.headline}</div>
+            <div style={{ display: "flex", fontSize: P.nameF, fontWeight: 800, lineHeight: 1.0 }}>{bigName}</div>
+            <div style={{ display: "flex", fontSize: 34, color: REDUP }}>{host}</div>
           </div>
         </div>
-      ),
-      { width: 1080, height: 1920 },
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 22 }}>
+          <div style={{ display: "flex", fontSize: 42, fontWeight: 700, color: tier.accent }}>{tier.stat}</div>
+          <div style={{ display: "flex", fontSize: 38, fontWeight: 800, color: MERAH }}>panjat.id</div>
+        </div>
+      </div>
     );
+
+    return new ImageResponse(card, { width: P.w, height: P.h });
   }
 
   return new ImageResponse(
