@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AmountSelector, type TargetChoice } from "@/components/AmountSelector";
 import { Button } from "@/components/Button";
 import { Dropdown } from "@/components/Dropdown";
-import { Input } from "@/components/Input";
+import { Input, textareaClasses } from "@/components/Input";
 import { MiniTiang } from "@/components/MiniTiang";
 import { Steps } from "@/components/Steps";
 import { copy } from "@/copy";
@@ -204,7 +204,7 @@ export function ManjatWizard({
                   maxLength={160}
                   rows={2}
                   onChange={(e) => setDeskripsi(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-garis bg-kertas-1 p-2 text-base text-tinta"
+                  className={`mt-1 ${textareaClasses}`}
                 />
               </label>
             </div>

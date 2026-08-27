@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
+import { buttonClasses } from "@/components/Button";
+import { fieldClasses, textareaClasses } from "@/components/Input";
 import { PageShell } from "@/components/PageShell";
 import { copy } from "@/copy";
 import { db } from "@/db";
@@ -30,20 +32,20 @@ export default async function LaporPage({ searchParams }: { searchParams: Promis
         <input type="hidden" name="listingId" value={id} />
         <label className="block">
           <span className="mb-1 block text-sm font-medium text-tinta-redup">{copy.lapor.jenis}</span>
-          <select name="jenis" className="h-11 w-full rounded-lg border border-garis bg-kertas-1 px-3.5 text-base text-tinta shadow-kartu focus-visible:border-merah focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah/25">
+          <select name="jenis" className={fieldClasses}>
             <option value="lapor">{copy.lapor.jenisLapor}</option>
             <option value="klaim">{copy.lapor.jenisKlaim}</option>
           </select>
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-medium text-tinta-redup">{copy.lapor.pesan}</span>
-          <textarea name="pesan" rows={3} className="w-full rounded-lg border border-garis bg-kertas-1 p-2.5 text-base text-tinta shadow-kartu focus-visible:border-merah focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah/25" />
+          <textarea name="pesan" rows={3} className={textareaClasses} />
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-medium text-tinta-redup">{copy.lapor.kontak}</span>
-          <input name="kontak" placeholder={copy.lapor.kontakPlaceholder} className="h-11 w-full rounded-lg border border-garis bg-kertas-1 px-3.5 text-base text-tinta shadow-kartu focus-visible:border-merah focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah/25" />
+          <input name="kontak" placeholder={copy.lapor.kontakPlaceholder} className={fieldClasses} />
         </label>
-        <button className="h-11 rounded-lg bg-merah px-5 text-sm font-medium text-kertas-1 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah">{copy.lapor.kirim}</button>
+        <button className={buttonClasses("primary", "md")}>{copy.lapor.kirim}</button>
       </form>
       <a href={`/l/${id}`} className="mt-6 inline-block text-sm text-tinta-redup hover:text-tinta">{copy.lapor.kembali}</a>
     </PageShell>

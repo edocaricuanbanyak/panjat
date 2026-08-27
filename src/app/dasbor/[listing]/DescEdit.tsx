@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/Button";
+import { textareaClasses } from "@/components/Input";
 
 export function DescEdit({ listingId, initial }: { listingId: string; initial: string }) {
   const [value, setValue] = useState(initial);
@@ -36,7 +37,7 @@ export function DescEdit({ listingId, initial }: { listingId: string; initial: s
           setValue(e.target.value);
           setStatus("idle");
         }}
-        className="w-full rounded-md border border-garis bg-kertas-1 p-2 text-base text-tinta focus-visible:outline-2 focus-visible:outline-merah"
+        className={textareaClasses}
       />
       <div className="flex items-center gap-3">
         <Button size="sm" disabled={status === "saving"} onClick={save}>

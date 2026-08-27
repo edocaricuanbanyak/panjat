@@ -142,7 +142,7 @@ export function Dropdown({
                   aria-selected={on}
                   onClick={() => choose(o.value)}
                   onMouseEnter={() => setActive(i)}
-                  className={`flex cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition ${
+                  className={`flex cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-base transition sm:py-2 sm:text-sm ${
                     i === active ? "bg-kertas-2" : ""
                   } ${on ? "font-medium text-merah-teks" : "text-tinta"}`}
                 >

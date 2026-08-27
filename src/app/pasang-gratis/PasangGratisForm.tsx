@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/Button";
 import { copy } from "@/copy";
 import { Dropdown } from "@/components/Dropdown";
-import { Input } from "@/components/Input";
+import { Input, textareaClasses } from "@/components/Input";
 
 type Kategori = { slug: string; nama: string };
 
@@ -102,7 +102,7 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
               maxLength={160}
               rows={2}
               onChange={(e) => setDeskripsi(e.target.value)}
-              className="w-full rounded-lg border border-garis bg-kertas-1 p-2.5 text-base text-tinta shadow-kartu focus-visible:border-merah focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah/25"
+              className={textareaClasses}
             />
           </label>
         </div>
