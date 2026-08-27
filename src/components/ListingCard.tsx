@@ -123,16 +123,33 @@ export function ListingCard({
               <LencanaRow badges={entry.badges.slice(0, 2)} />
             </div>
           )}
+          {/* Mobile: pegangan (left) + Salip (right) on one tidy line under the
+              name — replaces the cramped right-justified cluster. */}
+          <div className="mt-2 flex items-center justify-between gap-2 sm:hidden">
+            <span className="font-mono tabular text-base font-semibold text-tinta">
+              {formatRupiah(entry.pegangan)}
+            </span>
+            <span className="relative z-10 shrink-0">
+              <ManjatButton
+                url={entry.urlNormal}
+                nominal={salipCost}
+                size="sm"
+                variant="secondary"
+                className="h-7 px-3 text-xs"
+              >
+                {copy.papan.salipSingkat}
+              </ManjatButton>
+            </span>
+          </div>
         </div>
       </div>
-      <div className="flex shrink-0 items-center justify-end gap-3 sm:gap-3">
+      {/* Desktop (sm+): pegangan on the far right; tablet keeps an inline Salip. */}
+      <div className="hidden shrink-0 items-center justify-end gap-3 sm:flex">
         <span
           className={`font-mono tabular font-semibold text-tinta ${puncak ? "text-lg sm:text-xl" : "text-base"}`}
         >
           {formatRupiah(entry.pegangan)}
         </span>
-        {/* Inline action for touch/small screens; short label so it never crushes
-            the name. z-10 keeps it above the stretched link. */}
         <span className="relative z-10 md:hidden">
           <ManjatButton url={entry.urlNormal} nominal={salipCost} size="sm" variant="secondary" className="h-7 px-2.5 text-xs">
             {copy.papan.salipSingkat}
