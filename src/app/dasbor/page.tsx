@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { PageShell } from "@/components/PageShell";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { listMyListings } from "@/domain/dashboard";
 import { formatRupiah } from "@/lib/format";
@@ -20,18 +21,18 @@ export default async function DasborIndex() {
           className="font-display text-3xl font-bold text-tinta sm:text-4xl"
           style={{ fontStretch: "125%" }}
         >
-          Dasbor
+          {copy.dasbor.judul}
         </h1>
         <form action="/api/dasbor/keluar" method="post">
-          <button className="text-sm text-tinta-redup hover:text-tinta">Keluar</button>
+          <button className="text-sm text-tinta-redup hover:text-tinta">{copy.dasbor.keluar}</button>
         </form>
       </div>
 
       {listings.length === 0 ? (
         <p className="mt-6 text-tinta-redup">
-          Belum ada listing atas akun ini.{" "}
+          {copy.dasbor.belumAdaListing}{" "}
           <a href="/manjat" className="text-merah-teks hover:underline">
-            Manjat sekarang
+            {copy.dasbor.manjatSekarang}
           </a>
           .
         </p>

@@ -2,6 +2,7 @@ import { CheckCircle2 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { LogoTile } from "@/components/LogoTile";
 import { PageShell } from "@/components/PageShell";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { getModerationQueue } from "@/domain/admin";
 import { getLaporanTerbuka } from "@/domain/laporan";
@@ -31,17 +32,17 @@ export default async function AdminPage() {
           className="font-display text-3xl font-bold text-tinta sm:text-4xl"
           style={{ fontStretch: "125%" }}
         >
-          Antrean moderasi
+          {copy.admin.judulAntrean}
         </h1>
         <form action="/api/admin/keluar" method="post">
-          <button className="text-sm text-tinta-redup hover:text-tinta">Keluar</button>
+          <button className="text-sm text-tinta-redup hover:text-tinta">{copy.admin.keluar}</button>
         </form>
       </div>
-      <p className="mt-2 text-tinta-redup">{queue.length} listing menunggu keputusan.</p>
+      <p className="mt-2 text-tinta-redup">{copy.admin.menunggu(queue.length)}</p>
 
       {queue.length === 0 ? (
         <p className="mt-6 flex items-center gap-2 text-sm text-tinta-redup">
-          <CheckCircle2 className="size-4 text-hidup" aria-hidden /> Antrean kosong.
+          <CheckCircle2 className="size-4 text-hidup" aria-hidden /> {copy.admin.kosong}
         </p>
       ) : (
         <ul className="mt-6 flex flex-col gap-3">
@@ -57,15 +58,15 @@ export default async function AdminPage() {
                 </div>
               </div>
               {q.deskripsi && <p className="mt-2 text-sm text-tinta-redup">{q.deskripsi}</p>}
-              {q.alasan && <p className="mt-1 text-xs text-galat">Alasan: {q.alasan}</p>}
+              {q.alasan && <p className="mt-1 text-xs text-galat">{copy.admin.alasan(q.alasan)}</p>}
               <div className="mt-3 flex gap-2">
                 <form action={`/api/admin/${q.id}/moderasi`} method="post">
                   <input type="hidden" name="aksi" value="approve" />
-                  <button className={approveBtn}>Loloskan</button>
+                  <button className={approveBtn}>{copy.admin.loloskan}</button>
                 </form>
                 <form action={`/api/admin/${q.id}/moderasi`} method="post">
                   <input type="hidden" name="aksi" value="reject" />
-                  <button className={dangerBtn}>Tolak + refund</button>
+                  <button className={dangerBtn}>{copy.admin.tolak}</button>
                 </form>
               </div>
             </li>
@@ -74,16 +75,16 @@ export default async function AdminPage() {
       )}
 
       <h2 className="mt-10 font-display text-lg font-semibold text-tinta">
-        Laporan & klaim ({laporan.length})
+        {copy.admin.laporanJudul(laporan.length)}
       </h2>
       {laporan.length === 0 ? (
-        <p className="mt-2 text-sm text-tinta-redup">Tidak ada laporan terbuka.</p>
+        <p className="mt-2 text-sm text-tinta-redup">{copy.admin.tidakAdaLaporan}</p>
       ) : (
         <ul className="mt-3 flex flex-col gap-3">
           {laporan.map((r) => (
             <li key={r.id} className="rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu">
               <p className="font-mono text-xs text-tinta-redup">
-                {r.jenis === "klaim" ? "KLAIM URL" : "LAPORAN"} ·{" "}
+                {r.jenis === "klaim" ? copy.admin.klaimUrl : copy.admin.laporan} ·{" "}
                 <a href={`/l/${r.listingId}`} className="hover:text-tinta">{r.nama}</a> ({r.urlNormal})
               </p>
               {r.pesan && <p className="mt-1 text-sm text-tinta">{r.pesan}</p>}
@@ -91,10 +92,10 @@ export default async function AdminPage() {
               <div className="mt-3 flex gap-2">
                 <form action={`/api/admin/${r.listingId}/moderasi`} method="post">
                   <input type="hidden" name="aksi" value="turunkan" />
-                  <button className={dangerBtn}>Turunkan + refund</button>
+                  <button className={dangerBtn}>{copy.admin.turunkan}</button>
                 </form>
                 <form action={`/api/admin/laporan/${r.id}`} method="post">
-                  <button className={neutralBtn}>Tutup laporan</button>
+                  <button className={neutralBtn}>{copy.admin.tutupLaporan}</button>
                 </form>
               </div>
             </li>

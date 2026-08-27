@@ -17,9 +17,9 @@ export default async function MasukPage({
           className="font-display text-3xl font-bold text-tinta sm:text-4xl"
           style={{ fontStretch: "125%" }}
         >
-          Masuk dasbor
+          {copy.dasbor.masukJudul}
         </h1>
-        <p className="mt-2 mb-6 text-tinta-redup">Pantau pegangan, klik, dan CPC listing kamu.</p>
+        <p className="mt-2 mb-6 text-tinta-redup">{copy.dasbor.masukSub}</p>
         {e === "kadaluarsa" && (
           <p className="mb-4 rounded-lg border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">
             {copy.error.tautanKedaluwarsa}
