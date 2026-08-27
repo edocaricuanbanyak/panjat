@@ -14,10 +14,13 @@
     "rosot:run": "tsx src/jobs/rosot.ts",
     "manjat:sim": "tsx src/jobs/manjat-sim.ts",
     "klik:sim": "tsx src/jobs/klik-sim.ts",
+    "moderate:run": "tsx src/jobs/moderate.ts",
+    "moderasi:sim": "tsx src/jobs/moderasi-sim.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "next": "16.3.3",

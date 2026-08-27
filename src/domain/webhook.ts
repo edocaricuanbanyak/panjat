@@ -13,6 +13,7 @@ import {
 } from "@/lib/midtrans";
 import { BOARD_LOCK_KEY } from "./constants";
 import { appendLedger, gripFromLedger } from "./ledger";
+import { screenListing } from "./moderasi";
 
 export type WebhookOutcome =
   | { status: "rejected"; reason: "bad_signature" | "unknown_order" }
@@ -83,15 +84,21 @@ export async function applyNotification(
       });
       const grip = await gripFromLedger(tx, trx.listingId);
       const [l] = await tx
-        .select({ status: listing.status })
+        .select({
+          status: listing.status,
+          nama: listing.nama,
+          deskripsi: listing.deskripsi,
+          urlNormal: listing.urlNormal,
+        })
         .from(listing)
         .where(eq(listing.id, trx.listingId))
         .limit(1);
+      const baru = l?.status === "menunggu_bayar";
       await tx
         .update(listing)
         .set({
           peganganCached: grip,
-          ...(l?.status === "menunggu_bayar" ? { status: "tayang" as const } : {}),
+          ...(baru ? { status: "tayang" as const } : {}),
         })
         .where(eq(listing.id, trx.listingId));
       await tx
@@ -103,6 +110,18 @@ export async function applyNotification(
           rawPayload: notif,
         })
         .where(eq(transaksi.orderId, notif.order_id));
+      // Layer-1 moderation screen — risky content never stays publicly tayang (R8).
+      if (l) {
+        await screenListing(tx, {
+          listingId: trx.listingId,
+          nama: l.nama,
+          deskripsi: l.deskripsi,
+          urlNormal: l.urlNormal,
+          grip,
+          baru,
+          orderId: notif.order_id,
+        });
+      }
       return { status: "settled" };
     }
 
