@@ -37,12 +37,13 @@ export function ListingCard({
     <article
       className={`group relative flex items-center gap-4 rounded-xl px-4 transition-all ease-panjat hover:z-10 ${puncak ? "py-3.5" : "py-3"}`}
     >
-      {/* Podium ribbon — top-left, overlapping the corner (top-3 only). */}
+      {/* Podium ribbon — a little pennant hanging over the top-left (top-3 only). */}
       {medali && (
         <span
           aria-label={medali.label}
           title={medali.label}
-          className={`absolute -left-2 -top-2 z-20 grid size-6 place-items-center rounded-full text-xs font-bold leading-none text-kertas-1 shadow-kartu ring-2 ring-kertas-1 ${medali.bg}`}
+          style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%)" }}
+          className={`absolute left-3 -top-1.5 z-20 flex h-9 w-6 items-start justify-center pt-1 text-xs font-bold leading-none text-kertas-1 drop-shadow ${medali.bg}`}
         >
           {medali.icon}
         </span>

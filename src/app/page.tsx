@@ -73,10 +73,10 @@ export default async function Home({
             <b className="text-tinta">{visitor.online}</b> online
           </span>
           <span>
-            <b className="text-tinta">{visitor.total.toLocaleString("id-ID")}</b> visitor
+            <b className="text-tinta">{visitor.total.toLocaleString("id-ID")}</b> pengunjung
           </span>
           <span>
-            <b className="text-tinta">{entries.length}</b> peserta
+            <b className="text-tinta">{entries.length}</b> peserta manjat
           </span>
         </div>
       </section>
