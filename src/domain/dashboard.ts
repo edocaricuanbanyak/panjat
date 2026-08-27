@@ -43,6 +43,7 @@ export interface Dashboard {
   klikTotal: number;
   klikHariIni: number;
   cpc: number | null;
+  screenshotUrl: string | null;
   seri7hari: SnapshotPoint[];
   riwayat: PembayaranRow[];
   badges: string[];
@@ -57,6 +58,7 @@ export async function getDashboard(db: Database, listingId: string): Promise<Das
       deskripsi: listing.deskripsi,
       status: listing.status,
       pegangan: listing.peganganCached,
+      screenshotUrl: listing.screenshotUrl,
     })
     .from(listing)
     .where(eq(listing.id, listingId))
@@ -114,6 +116,7 @@ export async function getDashboard(db: Database, listingId: string): Promise<Das
     klikTotal,
     klikHariIni,
     cpc: cpc(rosotPerHari, klikHariIni),
+    screenshotUrl: l.screenshotUrl,
     seri7hari: seri,
     riwayat: riwayat.map((r) => ({ nominal: r.nominal, metode: r.metode, waktu: r.waktu ?? new Date(0) })),
     badges,
