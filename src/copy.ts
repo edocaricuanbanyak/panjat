@@ -22,7 +22,7 @@ export const copy = {
     hariIni: "Hari Ini",
     jelajah: "Jelajah",
     manjat: "Manjat",
-    leaderboard: "Papan",
+    leaderboard: "Leaderboard",
     statistik: "Statistik",
   },
 

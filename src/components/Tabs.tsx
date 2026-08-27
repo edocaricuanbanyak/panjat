@@ -64,6 +64,10 @@ export function Tabs({
       {inner}
     </div>
   ) : (
-    <nav className={`flex gap-6 border-b border-garis ${className}`}>{inner}</nav>
+    <nav
+      className={`flex gap-6 overflow-x-auto border-b border-garis whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
+    >
+      {inner}
+    </nav>
   );
 }
