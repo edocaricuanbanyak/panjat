@@ -14,7 +14,7 @@ const KERTAS1 = "#ffffff";
 const TINTA = "#1f1b16";
 const REDUP = "#7a7267";
 const GARIS = "#d8d2c4";
-const MERAH = "#c93a2e";
+const MERAH = "#da2e20";
 
 /** GET /api/og/[id] — 1200×630 share card for a listing (R20-d). */
 export async function GET(_req: Request, { params }: { params: Promise<{ listing: string }> }) {
