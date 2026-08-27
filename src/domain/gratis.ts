@@ -16,7 +16,7 @@ export interface GratisInput {
   nama?: string;
   deskripsi?: string;
   kategoriSlug?: string;
-  email: string;
+  email?: string;
 }
 
 export async function createGratis(db: Database, input: GratisInput): Promise<{ listingId: string }> {
@@ -30,15 +30,14 @@ export async function createGratis(db: Database, input: GratisInput): Promise<{ 
       .limit(1);
     if (existing) throw new GratisError("URL ini sudah terdaftar.");
 
+    const email = input.email?.trim() || null;
     let kontakId: string;
-    const [k] = await tx
-      .select({ id: sponsorKontak.id })
-      .from(sponsorKontak)
-      .where(eq(sponsorKontak.email, input.email))
-      .limit(1);
-    if (k) kontakId = k.id;
+    const found = email
+      ? await tx.select({ id: sponsorKontak.id }).from(sponsorKontak).where(eq(sponsorKontak.email, email)).limit(1)
+      : [];
+    if (found[0]) kontakId = found[0].id;
     else {
-      const [ins] = await tx.insert(sponsorKontak).values({ email: input.email }).returning({ id: sponsorKontak.id });
+      const [ins] = await tx.insert(sponsorKontak).values({ email }).returning({ id: sponsorKontak.id });
       kontakId = ins.id;
     }
 
