@@ -57,6 +57,13 @@
       "when": 1787840823433,
       "tag": "0007_ambiguous_network",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787842576646,
+      "tag": "0008_easy_longshot",
+      "breakpoints": true
     }
   ]
 }

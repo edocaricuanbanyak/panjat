@@ -131,6 +131,26 @@ export const transaksi = pgTable(
   (t) => [check("transaksi_nominal_nonneg", sql`${t.nominal} >= 0`)],
 );
 
+// Jaga Posisi (§13.1, F4) — auto top-up to keep a listing at a target tier via a
+// recurring card/e-wallet token (never a stored balance). One config per listing.
+// `budget_sisa` caps total auto-spend; `token` is the Midtrans recurring token
+// (null = not linked yet). Auto-charges settle via the normal verified webhook,
+// so grip still activates only there.
+export const jagaPosisi = pgTable(
+  "jaga_posisi",
+  {
+    listingId: uuid("listing_id")
+      .primaryKey()
+      .references(() => listing.id),
+    target: text("target").notNull(), // "top1" | "top3" | "top10"
+    budgetSisa: bigint("budget_sisa", { mode: "number" }).notNull().default(0),
+    token: text("token"),
+    aktif: boolean("aktif").notNull().default(true),
+    createdAt: createdAt(),
+  },
+  (t) => [check("jaga_budget_nonneg", sql`${t.budgetSisa} >= 0`)],
+);
+
 // --- Clicks (append-only; hashed IP only, R10) ----------------------------
 
 export const klik = pgTable("klik", {

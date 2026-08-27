@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { buttonClasses } from "@/components/Button";
 import { LencanaRow } from "@/components/LencanaRow";
@@ -6,10 +7,12 @@ import { Sparkline } from "@/components/Sparkline";
 import { StatTile } from "@/components/StatTile";
 import { copy } from "@/copy";
 import { db } from "@/db";
+import { jagaPosisi } from "@/db/schema";
 import { getDashboard, ownsListing } from "@/domain/dashboard";
 import { formatRupiah, formatWIB } from "@/lib/format";
 import { currentKontak } from "@/lib/session";
 import { DescEdit } from "./DescEdit";
+import { JagaPosisiPanel } from "./JagaPosisiPanel";
 import { ScreenshotPanel } from "./ScreenshotPanel";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +30,12 @@ export default async function DasborListing({
 
   const d = await getDashboard(db, listingId);
   if (!d) notFound();
+
+  const [jaga] = await db
+    .select({ target: jagaPosisi.target, budgetSisa: jagaPosisi.budgetSisa, aktif: jagaPosisi.aktif })
+    .from(jagaPosisi)
+    .where(eq(jagaPosisi.listingId, listingId))
+    .limit(1);
 
   return (
     <PageShell>
@@ -81,6 +90,13 @@ export default async function DasborListing({
         <a href={`/manjat?url=${encodeURIComponent(d.urlNormal)}`} className={buttonClasses("primary", "md")}>
           {copy.dasbor.manjatLagi}
         </a>
+      </section>
+
+      <section className="mt-6">
+        <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+          {copy.dasbor.jagaJudul}
+        </h2>
+        <JagaPosisiPanel listingId={d.listingId} jaga={jaga ?? null} />
       </section>
 
       <section className="mt-6">
