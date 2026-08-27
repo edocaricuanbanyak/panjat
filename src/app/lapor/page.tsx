@@ -45,7 +45,7 @@ export default async function LaporPage({ searchParams }: { searchParams: Promis
           <span className="mb-1 block text-sm font-medium text-tinta-redup">Kontak kamu (untuk verifikasi klaim)</span>
           <input name="kontak" placeholder="email atau WA" className="h-11 w-full rounded-lg border border-garis bg-kertas-1 px-3.5 text-base text-tinta shadow-kartu focus-visible:border-merah focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah/25" />
         </label>
-        <button className="h-11 rounded-lg bg-merah px-5 text-sm font-medium text-kertas-1 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:brightness-105">Kirim</button>
+        <button className="h-11 rounded-lg bg-merah px-5 text-sm font-medium text-kertas-1 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah">Kirim</button>
       </form>
       <a href={`/l/${id}`} className="mt-6 inline-block text-sm text-tinta-redup hover:text-tinta">← Kembali</a>
     </PageShell>

@@ -1,3 +1,4 @@
+import { CheckCircle2 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { LogoTile } from "@/components/LogoTile";
 import { PageShell } from "@/components/PageShell";
@@ -10,12 +11,14 @@ import { currentAdmin } from "@/lib/admin";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false } };
 
+const focusRing =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah";
 const approveBtn =
-  "h-9 rounded-lg bg-tinta px-3.5 text-sm font-medium text-kertas-1 shadow-kartu transition hover:brightness-110";
+  `h-9 rounded-lg bg-tinta px-3.5 text-sm font-medium text-kertas-1 shadow-kartu transition hover:brightness-110 ${focusRing}`;
 const dangerBtn =
-  "h-9 rounded-lg border border-galat/50 px-3.5 text-sm font-medium text-galat transition hover:bg-galat/10";
+  `h-9 rounded-lg border border-galat/50 px-3.5 text-sm font-medium text-galat transition hover:bg-galat/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-galat`;
 const neutralBtn =
-  "h-9 rounded-lg border border-garis px-3.5 text-sm text-tinta-redup transition hover:bg-kertas-2";
+  `h-9 rounded-lg border border-garis px-3.5 text-sm text-tinta-redup transition hover:bg-kertas-2 ${focusRing}`;
 
 export default async function AdminPage() {
   if (!(await currentAdmin())) redirect("/admin/masuk");
@@ -37,7 +40,9 @@ export default async function AdminPage() {
       <p className="mt-2 text-tinta-redup">{queue.length} listing menunggu keputusan.</p>
 
       {queue.length === 0 ? (
-        <p className="mt-6 text-sm text-tinta-redup">Antrean kosong. 🎉</p>
+        <p className="mt-6 flex items-center gap-2 text-sm text-tinta-redup">
+          <CheckCircle2 className="size-4 text-hidup" aria-hidden /> Antrean kosong.
+        </p>
       ) : (
         <ul className="mt-6 flex flex-col gap-3">
           {queue.map((q) => (

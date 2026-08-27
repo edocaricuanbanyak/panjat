@@ -29,7 +29,7 @@ export default async function AdminMasuk({ searchParams }: { searchParams: Promi
           {twoFactor && (
             <input name="code" inputMode="numeric" required placeholder="Kode 2FA (6 digit)" className={field} />
           )}
-          <button className="h-11 rounded-lg bg-merah px-4 text-sm font-medium text-kertas-1 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:brightness-105">
+          <button className="h-11 rounded-lg bg-merah px-4 text-sm font-medium text-kertas-1 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah">
             Masuk
           </button>
         </form>

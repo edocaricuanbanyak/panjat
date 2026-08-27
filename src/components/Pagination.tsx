@@ -3,7 +3,8 @@ export function Pagination({ page, totalPages }: { page: number; totalPages: num
   if (totalPages <= 1) return null;
 
   const href = (p: number) => (p <= 1 ? "/" : `/?hal=${p}`);
-  const btn = "rounded-lg border border-garis bg-kertas-1 px-3 py-1.5 shadow-kartu transition hover:bg-kertas-2";
+  const btn =
+    "rounded-lg border border-garis bg-kertas-1 px-3 py-1.5 shadow-kartu transition hover:bg-kertas-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah";
   const off = "rounded-lg px-3 py-1.5 text-tinta-redup/40";
 
   return (

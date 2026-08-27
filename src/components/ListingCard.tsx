@@ -85,7 +85,7 @@ export function ListingCard({
           <p className="truncate text-sm text-tinta-redup">{entry.deskripsi}</p>
         )}
         <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
-          <span className="truncate font-mono text-tinta-redup/80">{host}</span>
+          <span className="truncate font-mono text-tinta-redup">{host}</span>
           {entry.kategoriNama && (
             <>
               <span aria-hidden>·</span>
