@@ -20,7 +20,7 @@ export interface ManjatInput {
   nama?: string;
   deskripsi?: string;
   kategoriSlug?: string;
-  email: string;
+  email?: string;
   wa?: string;
   nominal: number;
 }
@@ -129,19 +129,19 @@ export async function createOrTopUp(
       );
     }
 
-    // Identity is bound to email/WA, no account (R2).
+    // Identity is bound to email, no account (R2). Email is optional; without it
+    // the sponsor just can't open the dashboard until they add one.
+    const email = input.email?.trim() || null;
     let kontakId: string;
-    const [existingKontak] = await tx
-      .select({ id: sponsorKontak.id })
-      .from(sponsorKontak)
-      .where(eq(sponsorKontak.email, input.email))
-      .limit(1);
-    if (existingKontak) {
-      kontakId = existingKontak.id;
+    const existingKontak = email
+      ? await tx.select({ id: sponsorKontak.id }).from(sponsorKontak).where(eq(sponsorKontak.email, email)).limit(1)
+      : [];
+    if (existingKontak[0]) {
+      kontakId = existingKontak[0].id;
     } else {
       const [k] = await tx
         .insert(sponsorKontak)
-        .values({ email: input.email, wa: input.wa })
+        .values({ email, wa: input.wa })
         .returning({ id: sponsorKontak.id });
       kontakId = k.id;
     }

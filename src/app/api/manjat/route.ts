@@ -42,9 +42,6 @@ export async function POST(req: Request) {
     if (!rl.ok) {
       return NextResponse.json({ error: "Terlalu banyak permintaan. Coba lagi sebentar." }, { status: 429 });
     }
-    if (typeof body.email !== "string") {
-      return NextResponse.json({ error: "email wajib" }, { status: 400 });
-    }
     if (typeof body.nominal !== "number") {
       return NextResponse.json({ error: "nominal wajib berupa angka" }, { status: 400 });
     }
@@ -52,12 +49,11 @@ export async function POST(req: Request) {
     const snap = isMock() ? mockSnapClient : midtransSnapClient;
     const result = await createOrTopUp(db, snap, {
       url: body.url,
-      email: body.email,
+      email: typeof body.email === "string" ? body.email : undefined,
       nominal: body.nominal,
       nama: typeof body.nama === "string" ? body.nama : undefined,
       deskripsi: typeof body.deskripsi === "string" ? body.deskripsi : undefined,
       kategoriSlug: typeof body.kategoriSlug === "string" ? body.kategoriSlug : undefined,
-      wa: typeof body.wa === "string" ? body.wa : undefined,
     });
     return NextResponse.json(result);
   } catch (err) {

@@ -72,6 +72,27 @@ export interface Preview {
   nama: string;
   deskripsi: string | null;
   logoUrl: string | null;
+  kategoriSlug: string | null;
+}
+
+// Keyword → category guess (best-effort; user can change it).
+const KATEGORI_KEYWORDS: [string, RegExp][] = [
+  ["ai-tools", /\b(ai|gpt|llm|machine learning|chatbot|generatif|generative)\b/i],
+  ["fintech", /\b(keuangan|pembayaran|dompet|invoice|pinjam|fintech|bank|finansial)\b/i],
+  ["ecommerce", /\b(toko|belanja|jual|beli|produk|e-?commerce|katalog|olshop)\b/i],
+  ["edukasi", /\b(belajar|kursus|edukasi|sekolah|siswa|tryout|utbk|les|kelas)\b/i],
+  ["game", /\b(game|gim|bermain|gaming)\b/i],
+  ["konten", /\b(konten|artikel|blog|video|podcast|media|berita|newsletter)\b/i],
+  ["produktivitas", /\b(produktivitas|catatan|to-?do|tugas|jadwal|absensi|notes?)\b/i],
+  ["komunitas", /\b(komunitas|forum|grup|kumpul|community)\b/i],
+  ["marketplace", /\b(marketplace|platform jual)\b/i],
+  ["jasa", /\b(jasa|layanan|service|freelance)\b/i],
+  ["saas", /\b(saas|aplikasi|dashboard|kasir|pos|crm|erp|manajemen|tools?)\b/i],
+];
+
+function guessKategori(text: string): string | null {
+  for (const [slug, re] of KATEGORI_KEYWORDS) if (re.test(text)) return slug;
+  return null;
 }
 
 const CACHE_TTL = 24 * 3600;
@@ -94,18 +115,27 @@ export async function getPreview(inputUrl: string): Promise<Preview> {
 
   // Social handles (x.com/..., instagram, tiktok) block scrapers — skip (R2).
   const social = /^(x\.com|instagram\.com|tiktok\.com)\//.test(urlNormal);
-  let preview: Preview = { urlNormal, nama: fallbackName, deskripsi: null, logoUrl: null };
+  let preview: Preview = {
+    urlNormal,
+    nama: fallbackName,
+    deskripsi: null,
+    logoUrl: null,
+    kategoriSlug: guessKategori(urlNormal),
+  };
 
   if (!social) {
     try {
       const { finalUrl, html, contentType } = await safeFetch(`https://${urlNormal}`);
       if (contentType.includes("html")) {
         const og = parseOg(html, finalUrl);
+        const nama = og.title ?? fallbackName;
+        const deskripsi = og.description?.slice(0, 160) ?? null;
         preview = {
           urlNormal,
-          nama: og.title ?? fallbackName,
-          deskripsi: og.description?.slice(0, 160) ?? null,
+          nama,
+          deskripsi,
           logoUrl: og.logo,
+          kategoriSlug: guessKategori(`${nama} ${deskripsi ?? ""} ${urlNormal}`),
         };
       }
     } catch {

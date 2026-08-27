@@ -42,7 +42,6 @@ export function ManjatWizard({
   const [url, setUrl] = useState(initialUrl);
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
-  const [wa, setWa] = useState("");
   const [kategoriSlug, setKategoriSlug] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
 
@@ -84,10 +83,9 @@ export function ManjatWizard({
     try {
       const result = await postManjat({
         url,
-        email,
+        email: email || undefined,
         nominal: quote.nominal,
         nama: nama || undefined,
-        wa: wa || undefined,
         kategoriSlug: kategoriSlug || undefined,
         deskripsi: deskripsi || undefined,
       });
@@ -117,21 +115,27 @@ export function ManjatWizard({
     }
   }
 
+  const [previewing, setPreviewing] = useState(false);
   async function prefillFromUrl() {
     if (!url.trim()) return;
+    setPreviewing(true);
     try {
       const res = await fetch(`/api/preview?url=${encodeURIComponent(url)}`);
       if (!res.ok) return;
       const p = await res.json();
-      // Never overwrite what the user already typed.
+      // Auto-fill; never overwrite what the user already typed/picked.
       setNama((n) => n || p.nama || "");
       setDeskripsi((d) => d || p.deskripsi || "");
+      if (p.kategoriSlug) setKategoriSlug((k) => k || p.kategoriSlug);
     } catch {
       /* preview is best-effort; the pay flow never waits on it */
+    } finally {
+      setPreviewing(false);
     }
   }
 
-  const canStep1 = url.trim() !== "" && email.trim() !== "";
+  // Only the URL is required; the rest is auto-filled and editable.
+  const canStep1 = url.trim() !== "";
   const bigAmount = (quote?.nominal ?? 0) > 200_000;
 
   return (
@@ -167,66 +171,69 @@ export function ManjatWizard({
           <Input
             label="URL atau @username"
             placeholder="nyala.id"
-            hint="Kami isi nama & deskripsi otomatis dari URL-mu."
+            hint={previewing ? "Mengambil detail…" : "Cukup tempel URL — sisanya kami isi otomatis."}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             onBlur={prefillFromUrl}
           />
+
+          {/* Auto-filled from the URL — editable, but not required. */}
+          <details className="rounded-md border border-garis bg-kertas-1 p-3" open>
+            <summary className="cursor-pointer text-sm text-tinta-redup">Detail (terisi otomatis)</summary>
+            <div className="mt-3 flex flex-col gap-3">
+              <Input
+                label="Judul"
+                placeholder="Nyala Analytics"
+                value={nama}
+                onChange={(e) => setNama(e.target.value)}
+              />
+              <label className="block">
+                <span className="text-sm text-tinta-redup">Kategori</span>
+                <select
+                  className="mt-1 h-11 w-full rounded-md border border-garis bg-kertas-1 px-3 text-base text-tinta"
+                  value={kategoriSlug}
+                  onChange={(e) => setKategoriSlug(e.target.value)}
+                >
+                  <option value="">—</option>
+                  {kategori.map((k) => (
+                    <option key={k.slug} value={k.slug}>
+                      {k.nama}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-tinta-redup">Deskripsi (160 kar.)</span>
+                  <button
+                    type="button"
+                    onClick={suggestDesc}
+                    disabled={suggesting || !url.trim()}
+                    className="font-mono text-xs text-merah hover:underline disabled:opacity-50"
+                  >
+                    {suggesting ? "…" : "Saran AI"}
+                  </button>
+                </div>
+                <textarea
+                  value={deskripsi}
+                  maxLength={160}
+                  rows={2}
+                  onChange={(e) => setDeskripsi(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-garis bg-kertas-1 p-2 text-base text-tinta"
+                />
+              </label>
+            </div>
+          </details>
+
           <Input
-            label="Nama listing"
-            placeholder="Nyala Analytics"
-            value={nama}
-            onChange={(e) => setNama(e.target.value)}
-          />
-          <Input
-            label="Email"
+            label="Email (opsional)"
             type="email"
             placeholder="kamu@email.com"
-            hint="Untuk dasbor dan notifikasi. Tanpa akun."
+            hint="Isi kalau mau akses dasbor & notifikasi. Tanpa akun."
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Input
-            label="WhatsApp (opsional)"
-            placeholder="+62…"
-            value={wa}
-            onChange={(e) => setWa(e.target.value)}
-          />
-          <label className="block">
-            <span className="text-sm text-tinta-redup">Kategori (opsional)</span>
-            <select
-              className="mt-1 h-11 w-full rounded-md border border-garis bg-kertas-1 px-3 text-base text-tinta"
-              value={kategoriSlug}
-              onChange={(e) => setKategoriSlug(e.target.value)}
-            >
-              <option value="">—</option>
-              {kategori.map((k) => (
-                <option key={k.slug} value={k.slug}>
-                  {k.nama}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-tinta-redup">Deskripsi (160 kar.)</span>
-              <button
-                type="button"
-                onClick={suggestDesc}
-                disabled={suggesting || !url.trim()}
-                className="font-mono text-xs text-merah hover:underline disabled:opacity-50"
-              >
-                {suggesting ? "…" : "Saran AI"}
-              </button>
-            </div>
-            <textarea
-              value={deskripsi}
-              maxLength={160}
-              rows={2}
-              onChange={(e) => setDeskripsi(e.target.value)}
-              className="mt-1 w-full rounded-md border border-garis bg-kertas-1 p-2 text-base text-tinta"
-            />
-          </label>
+
           <Button disabled={!canStep1} onClick={() => setStep(2)}>
             Lanjut
           </Button>
