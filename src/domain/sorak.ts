@@ -63,7 +63,10 @@ export interface KakiTiangEntry {
 
 /** Free listings, ordered by Sorak (never above paid — a separate tier). */
 export async function getKakiTiang(db: Database): Promise<KakiTiangEntry[]> {
-  const sorakCount = sql<number>`(select count(*)::int from ${sorak} where ${sorak.listingId} = ${listing.id})`;
+  // Fully-qualified columns: in a SELECT-list sql fragment drizzle strips table
+  // qualifiers, so `${listing.id}` would resolve to sorak.id inside the subquery
+  // and always count 0. Reference both sides explicitly.
+  const sorakCount = sql<number>`(select count(*)::int from "sorak" where "sorak"."listing_id" = "listing"."id")`;
   return db
     .select({
       id: listing.id,

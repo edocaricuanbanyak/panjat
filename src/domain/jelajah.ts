@@ -138,7 +138,9 @@ export async function categoryDirectory(
     .limit(1);
 
   const klikMinggu = sql`(select coalesce(sum(jumlah_valid), 0) from klik_harian where klik_harian.listing_id = ${listing.id} and tanggal >= (now() at time zone 'utc')::date - 7)`;
-  const sorakCount = sql`(select count(*) from ${sorak} where ${sorak.listingId} = ${listing.id})`;
+  // Qualify explicitly: `sorak` has its own `id`, so an unqualified `${listing.id}`
+  // in a SELECT-list fragment would bind to sorak.id and always count 0.
+  const sorakCount = sql`(select count(*) from "sorak" where "sorak"."listing_id" = "listing"."id")`;
   const orderBy =
     sort === "klik"
       ? [sql`${klikMinggu} desc`, desc(listing.createdAt)]
