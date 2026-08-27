@@ -10,9 +10,10 @@ const rupiah = new Intl.NumberFormat("id-ID", {
   maximumFractionDigits: 0,
 });
 
-/** 30000 -> "Rp30.000". */
+/** 30000 -> "Rp30.000" (no space between the symbol and the number). */
 export function formatRupiah(amount: number): string {
-  return rupiah.format(amount);
+  // Intl (id-ID) yields "Rp 100.000"; strip the space after the symbol.
+  return rupiah.format(amount).replace(/^(Rp)\s*/u, "$1");
 }
 
 const wibDateTime = new Intl.DateTimeFormat("id-ID", {

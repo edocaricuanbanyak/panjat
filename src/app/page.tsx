@@ -38,7 +38,7 @@ export default async function Home() {
           className="font-display text-5xl font-bold leading-[0.95] text-tinta sm:text-6xl"
           style={{ fontStretch: "130%" }}
         >
-          Bayar untuk manjat.
+          Sekuat peganganmu.
         </h1>
         <p className="mt-4 max-w-xl text-lg text-tinta-redup">
           Pegangan paling kuat duduk paling atas. Tiangnya licin — yang berhenti manjat, merosot.

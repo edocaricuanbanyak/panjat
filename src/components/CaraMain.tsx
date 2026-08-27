@@ -6,16 +6,19 @@ export function CaraMain() {
     ["3", "Naik — lalu merosot", "Tiangnya licin, semua turun pelan. Manjat lagi kalau mau bertahan."],
   ];
   return (
-    <ol className="grid gap-6 sm:grid-cols-3">
+    <ol className="grid gap-3 sm:grid-cols-3">
       {steps.map(([n, judul, ket]) => (
-        <li key={n}>
+        <li
+          key={n}
+          className="rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu transition-transform ease-panjat hover:-translate-y-0.5"
+        >
           <span
-            className="font-display text-3xl font-bold text-tinta-redup/50"
-            style={{ fontStretch: "125%" }}
+            className="grid size-9 place-items-center rounded-full bg-merah/10 font-display text-lg font-bold text-merah"
+            style={{ fontStretch: "120%" }}
           >
             {n}
           </span>
-          <p className="mt-1 font-display font-semibold text-tinta">{judul}</p>
+          <p className="mt-3 font-display font-semibold text-tinta">{judul}</p>
           <p className="mt-1 text-sm text-tinta-redup">{ket}</p>
         </li>
       ))}

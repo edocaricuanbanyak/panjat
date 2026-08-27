@@ -44,7 +44,7 @@ export function DescEdit({ listingId, initial }: { listingId: string; initial: s
         </Button>
         <span className="font-mono text-xs text-tinta-redup">{value.length}/160</span>
         {status === "saved" && <span className="text-xs text-tinta-redup">Tersimpan ✓</span>}
-        {status === "error" && <span className="text-xs text-merah">{msg}</span>}
+        {status === "error" && <span className="text-xs text-galat">{msg}</span>}
       </div>
       <p className="text-xs text-tinta-redup">URL tidak bisa diubah. Maks 2× ubah / 24 jam.</p>
     </div>

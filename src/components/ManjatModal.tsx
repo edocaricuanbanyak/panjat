@@ -63,11 +63,11 @@ export function ManjatProvider({
       {children}
       {state && (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-tinta/40 p-4 sm:items-center"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 kaca-overlay sm:items-center"
           onClick={() => setState(null)}
         >
           <div
-            className="w-full max-w-md rounded-lg border border-garis bg-kertas p-5 shadow-lg"
+            className="w-full max-w-md rounded-xl border border-garis/80 bg-kertas p-5 shadow-naik"
             onClick={(e) => e.stopPropagation()}
           >
             <ManjatWizard

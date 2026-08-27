@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AmountSelector, type TargetChoice } from "@/components/AmountSelector";
 import { Button } from "@/components/Button";
+import { Dropdown } from "@/components/Dropdown";
 import { Input } from "@/components/Input";
 import { MiniTiang } from "@/components/MiniTiang";
 import { Steps } from "@/components/Steps";
@@ -173,7 +174,7 @@ export function ManjatWizard({
       </div>
 
       {error && (
-        <p className="mt-4 rounded-md border border-merah/40 bg-merah/10 px-3 py-2 text-sm text-merah">
+        <p className="mt-4 rounded-md border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">
           {error}
         </p>
       )}
@@ -199,21 +200,13 @@ export function ManjatWizard({
                 value={nama}
                 onChange={(e) => setNama(e.target.value)}
               />
-              <label className="block">
-                <span className="text-sm text-tinta-redup">Kategori</span>
-                <select
-                  className="mt-1 h-11 w-full rounded-md border border-garis bg-kertas-1 px-3 text-base text-tinta"
-                  value={kategoriSlug}
-                  onChange={(e) => setKategoriSlug(e.target.value)}
-                >
-                  <option value="">—</option>
-                  {kategori.map((k) => (
-                    <option key={k.slug} value={k.slug}>
-                      {k.nama}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <Dropdown
+                label="Kategori"
+                placeholder="—"
+                value={kategoriSlug}
+                onChange={setKategoriSlug}
+                options={kategori.map((k) => ({ value: k.slug, label: k.nama }))}
+              />
               <label className="block">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-tinta-redup">Deskripsi (160 kar.)</span>

@@ -12,14 +12,11 @@ import { ListingCard } from "./ListingCard";
  */
 export function BoardLive({ initial }: { initial: Board }) {
   const [board, setBoard] = useState<Board>(initial);
-  const [live, setLive] = useState(false);
   const [announce, setAnnounce] = useState("");
   const topRef = useRef<string | undefined>(initial.entries[0]?.id);
 
   useEffect(() => {
     const es = new EventSource("/api/board/stream");
-    es.onopen = () => setLive(true);
-    es.onerror = () => setLive(false);
     es.onmessage = (ev) => {
       const next = JSON.parse(ev.data) as Board;
       const prevTop = topRef.current;
@@ -50,26 +47,22 @@ export function BoardLive({ initial }: { initial: Board }) {
 
   return (
     <div className="flex flex-1 flex-col gap-4">
-      <div className="flex items-center gap-1.5 font-mono text-xs text-tinta-redup">
-        <span
-          className={`inline-block size-1.5 rounded-full ${live ? "bg-merah" : "bg-garis"}`}
-          aria-hidden
-        />
-        {live ? "papan hidup" : "menyambungkan…"}
-      </div>
-
       {/* Board updates must not be read row-by-row (R20-e). */}
       <div aria-live="off">
-        {/* Summit zone — the top three sit on paper, hairline-divided. */}
-        <section className="divide-y divide-garis rounded-lg border border-garis bg-kertas-1 px-4">
+        {/* Summit zone — the top three each get their own card (podium). */}
+        <section className="grid gap-3">
           {puncak.map((e) => (
-            <div key={e.id} style={{ viewTransitionName: `vt-${e.id}` } as React.CSSProperties}>
+            <div
+              key={e.id}
+              style={{ viewTransitionName: `vt-${e.id}` } as React.CSSProperties}
+              className="rounded-2xl border border-garis bg-kertas-1 shadow-kartu"
+            >
               <ListingCard entry={e} max={board.max} density="puncak" />
             </div>
           ))}
         </section>
         {sisa.length > 0 && (
-          <section className="mt-4 divide-y divide-garis px-4">
+          <section className="mt-5 flex flex-col gap-2.5">
             {sisa.map((e) => (
               <div key={e.id} style={{ viewTransitionName: `vt-${e.id}` } as React.CSSProperties}>
                 <ListingCard entry={e} max={board.max} />

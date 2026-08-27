@@ -12,7 +12,7 @@ export default async function AdminMasuk({ searchParams }: { searchParams: Promi
         Admin
       </h1>
       {e && (
-        <p className="mt-3 rounded-md border border-merah/40 bg-merah/10 px-3 py-2 text-sm text-merah">
+        <p className="mt-3 rounded-md border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">
           {e === "limit" ? "Terlalu banyak percobaan." : "Password salah."}
         </p>
       )}

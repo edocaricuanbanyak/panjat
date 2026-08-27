@@ -56,7 +56,7 @@ export function MasukForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      {error && <p className="text-sm text-merah">{error}</p>}
+      {error && <p className="text-sm text-galat">{error}</p>}
       <Button type="submit" disabled={status === "sending"}>
         {status === "sending" ? "Mengirim…" : "Kirim tautan masuk"}
       </Button>

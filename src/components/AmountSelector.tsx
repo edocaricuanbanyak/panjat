@@ -28,9 +28,9 @@ export function AmountSelector({
             type="button"
             onClick={() => onSelect(o.key)}
             aria-pressed={active}
-            className={`flex h-16 flex-col items-start justify-center rounded-md border px-3 text-left transition-colors ${
+            className={`flex h-16 flex-col items-start justify-center rounded-xl border px-3.5 text-left shadow-kartu transition-all ease-panjat hover:-translate-y-px ${
               active
-                ? "border-merah bg-kertas-1 ring-1 ring-merah"
+                ? "border-merah bg-kertas-1 ring-2 ring-merah/30"
                 : "border-garis bg-kertas-1 hover:bg-kertas-2"
             }`}
           >

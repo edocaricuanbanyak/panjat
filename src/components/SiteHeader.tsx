@@ -7,7 +7,7 @@ import { ManjatButton } from "./ManjatModal";
  */
 export function SiteHeader() {
   return (
-    <header className="flex items-center justify-between py-4">
+    <header className="sticky top-0 z-30 -mx-5 mb-2 flex items-center justify-between border-b border-garis/70 px-5 py-3 kaca-header">
       <a
         href="/"
         className="font-display text-xl font-bold tracking-tight text-tinta"

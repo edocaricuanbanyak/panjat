@@ -17,7 +17,7 @@ export default async function MasukPage({
         Pantau pegangan, klik, dan CPC listing kamu.
       </p>
       {e === "kadaluarsa" && (
-        <p className="mb-4 rounded-md border border-merah/40 bg-merah/10 px-3 py-2 text-sm text-merah">
+        <p className="mb-4 rounded-md border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">
           Tautan tidak valid atau kedaluwarsa. Minta tautan baru.
         </p>
       )}

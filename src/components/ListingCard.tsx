@@ -5,10 +5,10 @@ import { LogoTile } from "./LogoTile";
 import { ManjatButton } from "./ManjatModal";
 
 /**
- * One climber, as an editorial row: big rank numeral · logo · name · grip · Salip.
- * Summit (top 3) is larger, shows the description, and carries the flag-red rank
- * (§9.6.2 — merah only in the summit zone). Rows are hairline-divided by the
- * containing list, not individually boxed.
+ * One climber, as an editorial row: #rank · logo · name · grip. On hover the row
+ * lifts into focus and a Salip button floats in above-center (outbid-style);
+ * on touch the button sits inline. Summit (top 3) is larger, shows the
+ * description, and carries the flag-red rank (§9.6.2 — merah = summit only).
  */
 export function ListingCard({
   entry,
@@ -22,13 +22,22 @@ export function ListingCard({
   const wdth = puncak ? Math.max(105, 130 - (entry.rank - 1) * 10) : 100;
 
   return (
-    <article className={`flex items-center gap-4 ${puncak ? "py-3.5" : "py-3"}`}>
+    <article
+      className={`group relative flex items-center gap-4 rounded-xl px-3 transition-all ease-panjat hover:z-10 ${puncak ? "py-3.5" : "py-3"}`}
+    >
+      {/* Above-center floating action, revealed on hover (pointer devices). */}
+      <div className="pointer-events-none absolute -top-3.5 left-1/2 z-20 hidden -translate-x-1/2 opacity-0 transition-all ease-panjat group-hover:pointer-events-auto group-hover:-top-4 group-hover:opacity-100 md:block">
+        <ManjatButton url={entry.urlNormal} size="sm">
+          Salip {entry.nama} →
+        </ManjatButton>
+      </div>
+
       <div
         className={`shrink-0 text-right font-mono tabular font-semibold ${
-          puncak ? "w-10 text-2xl" : "w-8 text-base"
+          puncak ? "w-12 text-2xl" : "w-9 text-base"
         } ${entry.rank <= 3 ? "text-merah" : "text-tinta-redup"}`}
       >
-        {entry.rank}
+        #{entry.rank}
       </div>
       <LogoTile
         nama={entry.nama}
@@ -61,9 +70,12 @@ export function ListingCard({
         >
           {formatRupiah(entry.pegangan)}
         </span>
-        <ManjatButton url={entry.urlNormal} size="sm" variant="secondary">
-          Salip
-        </ManjatButton>
+        {/* Inline action for touch/small screens (no hover). */}
+        <span className="md:hidden">
+          <ManjatButton url={entry.urlNormal} size="sm" variant="secondary">
+            Salip
+          </ManjatButton>
+        </span>
       </div>
     </article>
   );
