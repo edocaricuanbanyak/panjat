@@ -29,7 +29,7 @@ jobs:
     steps:
       - name: Trigger cron endpoint
         env:
-          BASE: https://panjat.id # works once the domain is live on Vercel
+          BASE: https://www.panjat.id # the direct-serving domain (apex 308→www strips auth on redirect)
           SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           case "${{ github.event.schedule }}" in
