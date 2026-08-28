@@ -47,6 +47,12 @@ export const metadata: Metadata = {
     title: `${copy.merek.nama} — ${copy.merek.tagline}`,
     description: copy.merek.deskripsiSitus,
   },
+  // Google Search Console (URL-prefix "HTML tag" method). Set the token as the
+  // GOOGLE_SITE_VERIFICATION env and the <meta> appears — nudges Google to crawl,
+  // which is what refreshes the Search/s2 favicon.
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 // Installed/standalone app feel: paper theme colour on the status bar, cover the
