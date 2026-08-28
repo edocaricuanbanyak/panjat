@@ -3,8 +3,7 @@
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
-import { Dropdown } from "@/components/Dropdown";
-import { fieldClasses, Input, textareaClasses } from "@/components/Input";
+import { fieldClasses, Input } from "@/components/Input";
 import { LogoTile } from "@/components/LogoTile";
 import { copy } from "@/copy";
 import type { Quote } from "@/domain/manjat";
@@ -269,38 +268,6 @@ export function ManjatWizard({
             </div>
           )}
 
-          {/* Auto-filled from the URL — collapsed by default; open only to edit. */}
-          <details className="rounded-xl border border-garis bg-kertas-1 p-3">
-            <summary className="cursor-pointer select-none text-sm text-tinta-redup marker:text-tinta-redup">
-              {copy.manjat.detailRingkas}
-            </summary>
-            <div className="mt-3 flex flex-col gap-3">
-              <Input
-                label={copy.manjat.judulListing}
-                placeholder={copy.manjat.judulPlaceholder}
-                value={nama}
-                onChange={(e) => setNama(e.target.value)}
-              />
-              <Dropdown
-                label={copy.manjat.kategori}
-                placeholder="—"
-                value={kategoriSlug}
-                onChange={setKategoriSlug}
-                options={kategori.map((k) => ({ value: k.slug, label: k.nama }))}
-              />
-              <label className="block">
-                <span className="text-sm text-tinta-redup">{copy.manjat.deskripsi}</span>
-                <textarea
-                  value={deskripsi}
-                  maxLength={160}
-                  rows={2}
-                  onChange={(e) => setDeskripsi(e.target.value)}
-                  className={`mt-1 ${textareaClasses}`}
-                />
-              </label>
-            </div>
-          </details>
-
           <Input
             label={copy.manjat.emailOpsional}
             type="email"
@@ -327,7 +294,17 @@ export function ManjatWizard({
               onClick={() => setStep(1)}
               className="flex w-full items-center gap-3 rounded-xl border border-garis bg-kertas-1 p-2.5 text-left"
             >
-              <LogoTile nama={nama || host} className="size-10 shrink-0 rounded-lg text-base" />
+              {logoUrl && !logoFailed ? (
+                // biome-ignore lint/performance/noImgElement: remote site logo, not a static asset
+                <img
+                  src={logoUrl}
+                  alt=""
+                  onError={() => setLogoFailed(true)}
+                  className="size-10 shrink-0 rounded-lg border border-garis bg-kertas-1 object-contain"
+                />
+              ) : (
+                <LogoTile nama={nama || host} className="size-10 shrink-0 rounded-lg text-base" />
+              )}
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-tinta">{nama || host}</p>
                 <p className="truncate font-mono text-xs text-tinta-redup">{host}</p>
