@@ -1,7 +1,7 @@
 "use client";
 
-import { ArrowLeft, Globe, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowLeft, Check, Globe, Loader2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
 import { Dropdown } from "@/components/Dropdown";
 import { fieldClasses, Input, textareaClasses } from "@/components/Input";
@@ -147,6 +147,14 @@ export function ManjatWizard({
   const [prefilled, setPrefilled] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoFailed, setLogoFailed] = useState(false);
+  const urlRef = useRef<HTMLInputElement>(null);
+  function clearUrl() {
+    setUrl("");
+    setPrefilled(false);
+    setLogoUrl(null);
+    setLogoFailed(false);
+    urlRef.current?.focus();
+  }
   async function prefillFromUrl() {
     if (!url.trim() || previewing) return;
     setPreviewing(true);
@@ -217,20 +225,21 @@ export function ManjatWizard({
               {copy.manjat.urlLabel}
             </span>
             <div className="relative">
-              <span className="absolute left-2.5 top-1/2 flex -translate-y-1/2 items-center">
+              <span className="absolute left-3 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center">
                 {logoUrl && !logoFailed ? (
                   // biome-ignore lint/performance/noImgElement: remote site logo, not a static asset
                   <img
                     src={logoUrl}
                     alt=""
                     onError={() => setLogoFailed(true)}
-                    className="size-6 rounded border border-garis bg-kertas-1 object-contain"
+                    className="max-h-6 max-w-6 object-contain"
                   />
                 ) : (
                   <Globe className="size-5 text-tinta-redup" aria-hidden />
                 )}
               </span>
               <input
+                ref={urlRef}
                 inputMode="url"
                 placeholder={copy.manjat.urlPlaceholder}
                 value={url}
@@ -246,12 +255,28 @@ export function ManjatWizard({
                   }
                 }}
                 onBlur={prefillFromUrl}
-                className={`${fieldClasses} pl-11 pr-10`}
+                className={`${fieldClasses} pl-11 pr-11`}
               />
-              <span className="absolute right-3.5 top-1/2 -translate-y-1/2">
-                {previewing && (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                {previewing ? (
                   <Loader2 className="size-5 animate-spin text-tinta-redup" aria-hidden />
-                )}
+                ) : url.trim() ? (
+                  <button
+                    type="button"
+                    onClick={clearUrl}
+                    aria-label={copy.manjat.hapusUrl}
+                    className="group/clr flex size-6 items-center justify-center rounded-full hover:bg-kertas-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah"
+                  >
+                    {prefilled ? (
+                      <>
+                        <Check className="size-5 text-hidup group-hover/clr:hidden" aria-hidden />
+                        <X className="hidden size-5 text-tinta-redup group-hover/clr:block" aria-hidden />
+                      </>
+                    ) : (
+                      <X className="size-5 text-tinta-redup" aria-hidden />
+                    )}
+                  </button>
+                ) : null}
               </span>
             </div>
             <span

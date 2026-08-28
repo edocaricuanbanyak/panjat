@@ -76,6 +76,7 @@ export const copy = {
     urlHintMemuat: "Mengambil detail…",
     detailTerisi: "Detail terisi",
     cekLink: "Mengecek link & mengisi detail…",
+    hapusUrl: "Hapus & tulis ulang",
     detailRingkas: "Judul, kategori & deskripsi — ketuk untuk ubah",
     posisiPrimer: "Kamu akan bayar",
     judulListing: "Judul",
