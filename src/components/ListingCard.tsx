@@ -1,4 +1,3 @@
-import { Crown } from "lucide-react";
 import { copy } from "@/copy";
 import type { BoardEntry } from "@/domain/board";
 import { formatRupiah } from "@/lib/format";
@@ -42,20 +41,6 @@ export function ListingCard({
     <article
       className={`group relative flex flex-col gap-1.5 rounded-xl px-3 transition-all ease-panjat hover:z-10 sm:flex-row sm:items-center sm:gap-4 sm:px-4 ${puncak ? "py-3.5" : "py-3"}`}
     >
-      {/* Podium ribbon — a little pennant hanging over the top-left (top-3 only). */}
-      {medali && (
-        <span
-          aria-label={medali.label}
-          title={medali.label}
-          style={{ clipPath: "polygon(10% 0, 90% 0, 100% 8%, 100% 100%, 50% 72%, 0 100%, 0 8%)" }}
-          className={`absolute left-4 -top-2 z-20 flex h-10 w-6 items-start justify-center pt-2 leading-none drop-shadow-md ${medali.bg}`}
-        >
-          {entry.rank === 1 && (
-            <Crown className="size-3.5 text-kertas-1" strokeWidth={2.5} aria-hidden />
-          )}
-        </span>
-      )}
-
       {/* Above-center floating action, revealed on hover (pointer devices). */}
       <div className="pointer-events-none absolute -top-3 left-1/2 z-20 hidden -translate-x-1/2 opacity-0 transition-all ease-panjat group-hover:pointer-events-auto group-hover:-top-3.5 group-hover:opacity-100 md:block">
         <ManjatButton nominal={salipCost} size="sm" className="h-7 px-2.5 text-xs">
@@ -81,36 +66,58 @@ export function ListingCard({
       {/* Rank + logo + the listing block. On sm+ the wrapper dissolves (contents)
           into the editorial row. */}
       <div className="flex min-w-0 items-center gap-3 sm:contents">
-        <div
-          className={`shrink-0 text-right font-mono tabular font-semibold ${
-            puncak ? "w-10 text-xl sm:w-12 sm:text-2xl" : "w-9 text-base"
-          } ${entry.rank <= 3 ? "text-merah-teks" : "text-tinta-redup"}`}
-        >
-          #{entry.rank}
+        {/* Rank 4+ shows the number inline; the podium wears its medal as a badge
+            on the logo, freeing the whole row width for a one-line title. */}
+        {!puncak && (
+          <div className="w-9 shrink-0 text-right font-mono tabular text-base font-semibold text-tinta-redup">
+            #{entry.rank}
+          </div>
+        )}
+        <div className="relative shrink-0">
+          <SiteLogo
+            urlNormal={entry.urlNormal}
+            nama={entry.nama}
+            className={puncak ? "size-12 rounded-md text-lg" : "size-9 rounded-md text-sm"}
+          />
+          {medali && (
+            <span
+              aria-label={medali.label}
+              title={medali.label}
+              className={`absolute -left-2 -top-2 flex size-6 items-center justify-center rounded-full font-display text-xs font-bold text-kertas-1 shadow-kartu ring-2 ring-kertas ${medali.bg}`}
+            >
+              {entry.rank}
+            </span>
+          )}
         </div>
-        <SiteLogo
-          urlNormal={entry.urlNormal}
-          nama={entry.nama}
-          className={puncak ? "size-11 rounded-md text-lg" : "size-9 rounded-md text-sm"}
-        />
         <div className="min-w-0 flex-1">
-          {/* Title stretches across the line; grip (pegangan) sits at its end. */}
-          <div className="flex items-baseline gap-2">
+          {/* Podium: title owns a full line (1 line, same font). Rank 4+: title
+              stretches with the grip pinned to the end of the line. */}
+          {puncak ? (
             <a
               href={`/k/${entry.id}?asal=papan`}
               target="_blank"
               rel="noopener noreferrer"
-              className={`min-w-0 flex-1 truncate font-display font-semibold text-tinta transition-colors group-hover:text-merah-teks after:absolute after:inset-0 ${puncak ? "text-lg" : "text-base"}`}
+              className="block truncate font-display text-lg font-semibold text-tinta transition-colors after:absolute after:inset-0 group-hover:text-merah-teks"
               style={{ fontStretch: `${wdth}%` }}
             >
               {entry.nama}
             </a>
-            <span
-              className={`shrink-0 font-mono tabular font-semibold text-tinta ${puncak ? "text-base sm:text-lg" : "text-sm sm:text-base"}`}
-            >
-              {formatRupiah(entry.pegangan)}
-            </span>
-          </div>
+          ) : (
+            <div className="flex items-baseline gap-2">
+              <a
+                href={`/k/${entry.id}?asal=papan`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="min-w-0 flex-1 truncate font-display text-base font-semibold text-tinta transition-colors after:absolute after:inset-0 group-hover:text-merah-teks"
+                style={{ fontStretch: `${wdth}%` }}
+              >
+                {entry.nama}
+              </a>
+              <span className="shrink-0 font-mono tabular text-sm font-semibold text-tinta sm:text-base">
+                {formatRupiah(entry.pegangan)}
+              </span>
+            </div>
+          )}
 
           {/* Description — full card width; 2 lines on the podium, 1 line below. */}
           {entry.deskripsi && (
@@ -121,6 +128,13 @@ export function ListingCard({
             >
               {entry.deskripsi}
             </p>
+          )}
+
+          {/* Podium: grip on its own line, prominent (§9.6.2 — summit = merah). */}
+          {puncak && (
+            <span className="mt-1 block font-mono tabular text-lg font-bold text-merah-teks">
+              {formatRupiah(entry.pegangan)}
+            </span>
           )}
 
           <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
