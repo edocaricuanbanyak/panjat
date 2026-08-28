@@ -79,9 +79,7 @@ export default async function Home({
           {copy.beranda.heroJudul}
         </h1>
         <p className="mt-3 max-w-xl text-base text-tinta-redup sm:text-lg">{copy.beranda.heroSub}</p>
-        <HeroManjat kategori={kats} />
-        {/* Live social proof — the USP. Prominent but on one compact line, so the
-            top-3 board stays above the fold. */}
+        {/* Live social proof — the USP, leading into the CTA (one compact line). */}
         <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5">
           <div className="inline-flex items-center gap-1.5">
             <span className="blink inline-block size-1.5 rounded-full bg-hidup" aria-hidden />
@@ -103,6 +101,7 @@ export default async function Home({
             <dt className="text-xs text-tinta-redup">{copy.beranda.statPeserta}</dt>
           </div>
         </dl>
+        <HeroManjat kategori={kats} />
       </section>
 
       {/* PAPAN — three in-place tabs (no page navigation) */}
