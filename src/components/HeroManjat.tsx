@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Dropdown } from "./Dropdown";
 import { fieldClasses } from "./Input";
+import { KategoriIcon } from "./KategoriIcon";
 import { useManjat } from "./ManjatModal";
 
 type Kategori = { slug: string; nama: string };
@@ -36,7 +37,11 @@ export function HeroManjat({ kategori }: { kategori: Kategori[] }) {
         placeholder="Kategori"
         value={kategoriSlug}
         onChange={setKategoriSlug}
-        options={kategori.map((k) => ({ value: k.slug, label: k.nama }))}
+        options={kategori.map((k) => ({
+          value: k.slug,
+          label: k.nama,
+          icon: <KategoriIcon slug={k.slug} className="size-4 shrink-0 text-tinta-redup" />,
+        }))}
       />
       <button
         onClick={go}

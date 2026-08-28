@@ -19,6 +19,7 @@ const entry = (over: Partial<BoardEntry> = {}): BoardEntry => ({
   urlNormal: "nyala.id",
   deskripsi: "Analitik web ramah privasi tanpa cookie, buatan Indonesia.",
   kategoriNama: "SaaS",
+  kategoriSlug: "saas",
   pegangan: 98_808,
   klikHariIni: 412,
   rosotPerHari: 24_702,

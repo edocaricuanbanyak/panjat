@@ -18,6 +18,7 @@ export interface BoardEntry {
   urlNormal: string;
   deskripsi: string | null;
   kategoriNama: string | null;
+  kategoriSlug: string | null;
   pegangan: number;
   klikHariIni: number;
   rosotPerHari: number;
@@ -45,6 +46,7 @@ export async function getBoard(db: Database): Promise<Board> {
         createdAt: listing.createdAt,
         screenshotUrl: listing.screenshotUrl,
         kategoriNama: kategori.nama,
+        kategoriSlug: kategori.slug,
         klikHariIni: klikHarian.jumlahValid,
       })
       .from(listing)
@@ -66,6 +68,7 @@ export async function getBoard(db: Database): Promise<Board> {
     urlNormal: r.urlNormal,
     deskripsi: r.deskripsi,
     kategoriNama: r.kategoriNama,
+    kategoriSlug: r.kategoriSlug,
     pegangan: r.peganganCached,
     klikHariIni: r.klikHariIni ?? 0,
     rosotPerHari: Math.round(r.peganganCached * dailyRateForRank(rank, r.peganganCached, cfg)),

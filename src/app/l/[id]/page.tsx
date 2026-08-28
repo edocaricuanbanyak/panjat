@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { buttonClasses } from "@/components/Button";
 import { LencanaRow } from "@/components/LencanaRow";
+import { KategoriIcon } from "@/components/KategoriIcon";
 import { ManjatButton } from "@/components/ManjatModal";
 import { copy } from "@/copy";
 import { LogoTile } from "@/components/LogoTile";
@@ -57,7 +58,11 @@ export default async function ListingPublikPage({
             {l.kategoriSlug && (
               <>
                 {" · "}
-                <a href={`/kategori/${l.kategoriSlug}`} className="hover:text-tinta">
+                <a
+                  href={`/kategori/${l.kategoriSlug}`}
+                  className="inline-flex items-center gap-1 align-middle hover:text-tinta"
+                >
+                  <KategoriIcon slug={l.kategoriSlug} className="size-3.5" />
                   {l.kategoriNama}
                 </a>
               </>

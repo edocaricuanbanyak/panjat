@@ -5,6 +5,7 @@ import { Button } from "@/components/Button";
 import { copy } from "@/copy";
 import { Dropdown } from "@/components/Dropdown";
 import { Input, textareaClasses } from "@/components/Input";
+import { KategoriIcon } from "@/components/KategoriIcon";
 
 type Kategori = { slug: string; nama: string };
 
@@ -112,7 +113,11 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
             placeholder="—"
             value={kategoriSlug}
             onChange={setKategoriSlug}
-            options={kategori.map((k) => ({ value: k.slug, label: k.nama }))}
+            options={kategori.map((k) => ({
+              value: k.slug,
+              label: k.nama,
+              icon: <KategoriIcon slug={k.slug} className="size-4 shrink-0 text-tinta-redup" />,
+            }))}
           />
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-tinta-redup">

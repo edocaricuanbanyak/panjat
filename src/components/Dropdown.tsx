@@ -1,10 +1,10 @@
 "use client";
 
 import { Check, ChevronDown } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { fieldClasses } from "./Input";
 
-export type DropdownOption = { value: string; label: string };
+export type DropdownOption = { value: string; label: string; icon?: ReactNode };
 
 /**
  * Custom dropdown (not a native <select>): a field-styled trigger + a popover
@@ -116,8 +116,9 @@ export function Dropdown({
           onKeyDown={onKey}
           className={`${fieldClasses} flex cursor-pointer items-center justify-between gap-2 text-left`}
         >
-          <span className={`truncate ${selected ? "text-tinta" : "text-tinta-redup"}`}>
-            {selected ? selected.label : placeholder}
+          <span className={`flex min-w-0 items-center gap-2 truncate ${selected ? "text-tinta" : "text-tinta-redup"}`}>
+            {selected?.icon}
+            <span className="truncate">{selected ? selected.label : placeholder}</span>
           </span>
           <ChevronDown
             aria-hidden
@@ -146,7 +147,10 @@ export function Dropdown({
                     i === active ? "bg-kertas-2" : ""
                   } ${on ? "font-medium text-merah-teks" : "text-tinta"}`}
                 >
-                  <span className="truncate">{o.label}</span>
+                  <span className="flex min-w-0 items-center gap-2 truncate">
+                    {o.icon}
+                    <span className="truncate">{o.label}</span>
+                  </span>
                   {on && <Check className="size-4 shrink-0" aria-hidden />}
                 </li>
               );

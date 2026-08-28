@@ -1,4 +1,5 @@
 import type { JelajahCard as Card } from "@/domain/jelajah";
+import { KategoriIcon } from "./KategoriIcon";
 import { LogoTile } from "./LogoTile";
 
 /**
@@ -23,7 +24,8 @@ export function JelajahCard({ card, asal }: { card: Card; asal: "jelajah" | "pen
         )}
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-tinta-redup">
           {card.kategoriSlug && (
-            <a href={`/kategori/${card.kategoriSlug}`} className="hover:text-tinta">
+            <a href={`/kategori/${card.kategoriSlug}`} className="inline-flex items-center gap-1 hover:text-tinta">
+              <KategoriIcon slug={card.kategoriSlug} className="size-3.5" />
               {card.kategoriNama}
             </a>
           )}

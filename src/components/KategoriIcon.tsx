@@ -30,6 +30,11 @@ const ICONS: Record<string, LucideIcon> = {
   marketplace: Store,
 };
 
+/** The lucide component for a slug — for surfaces that need the raw icon (e.g. satori/OG). */
+export function kategoriLucide(slug: string | null): LucideIcon {
+  return slug === null ? LayoutGrid : (ICONS[slug] ?? Tag);
+}
+
 export function KategoriIcon({
   slug,
   className = "size-4",
@@ -37,6 +42,6 @@ export function KategoriIcon({
   slug: string | null;
   className?: string;
 }) {
-  const Icon = slug === null ? LayoutGrid : (ICONS[slug] ?? Tag);
+  const Icon = kategoriLucide(slug);
   return <Icon className={className} aria-hidden />;
 }

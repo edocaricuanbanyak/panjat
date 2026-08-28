@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
 import { Dropdown } from "@/components/Dropdown";
 import { fieldClasses, Input, textareaClasses } from "@/components/Input";
+import { KategoriIcon } from "@/components/KategoriIcon";
 import { LogoTile } from "@/components/LogoTile";
 import { copy } from "@/copy";
 import type { Quote } from "@/domain/manjat";
@@ -312,7 +313,11 @@ export function ManjatWizard({
             placeholder="—"
             value={kategoriSlug}
             onChange={setKategoriSlug}
-            options={kategori.map((k) => ({ value: k.slug, label: k.nama }))}
+            options={kategori.map((k) => ({
+              value: k.slug,
+              label: k.nama,
+              icon: <KategoriIcon slug={k.slug} className="size-4 shrink-0 text-tinta-redup" />,
+            }))}
           />
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-tinta-redup">

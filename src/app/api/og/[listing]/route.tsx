@@ -1,7 +1,8 @@
 import { ImageResponse } from "next/og";
 import { and, eq, gt, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { listing } from "@/db/schema";
+import { kategori, listing } from "@/db/schema";
+import { kategoriIconDataUri } from "@/lib/kategori-svg";
 import { safeFetchBuffer } from "@/lib/ssrf";
 
 export const runtime = "nodejs";
@@ -84,8 +85,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ listing:
       pegangan: listing.peganganCached,
       status: listing.status,
       screenshotUrl: listing.screenshotUrl,
+      kategoriNama: kategori.nama,
+      kategoriSlug: kategori.slug,
     })
     .from(listing)
+    .leftJoin(kategori, eq(kategori.id, listing.kategoriId))
     .where(eq(listing.id, id))
     .limit(1);
   if (!l || l.status !== "tayang") return new Response("Not found", { status: 404 });
@@ -243,6 +247,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ listing:
     <div style={{ display: "flex", fontSize: P.land ? 38 : 44, fontWeight: 800, letterSpacing: -1 }}>Panjat</div>
   );
 
+  // Category chip (icon + name). satori can't render a lucide component directly, so
+  // the icon is a standalone SVG data URI (drawn by resvg) built from lucide paths.
+  const kategoriChip = l.kategoriNama ? (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, color: REDUP, fontSize: 28 }}>
+      {/* biome-ignore lint/performance/noImgElement: satori renders to a raster, not the DOM */}
+      <img src={kategoriIconDataUri(l.kategoriSlug, REDUP, 30)} width={30} height={30} alt="" />
+      <div style={{ display: "flex" }}>{l.kategoriNama}</div>
+    </div>
+  ) : null;
+
   const card = P.land ? (
     // Landscape (default / 4:3 / 16:9): hero left, details right.
     <div
@@ -266,6 +280,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ listing:
         </div>
         <div style={{ display: "flex", fontSize: P.nameF, fontWeight: 800, lineHeight: 1.0 }}>{bigName}</div>
         <div style={{ display: "flex", fontSize: 30, color: REDUP }}>{host}</div>
+        {kategoriChip}
         <div style={{ display: "flex", marginTop: 6, fontSize: 34, fontWeight: 700, color: tier.accent }}>
           {tier.stat}
         </div>
@@ -298,6 +313,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ listing:
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
           <div style={{ display: "flex", fontSize: P.nameF, fontWeight: 800, lineHeight: 1.0 }}>{bigName}</div>
           <div style={{ display: "flex", fontSize: 32, color: REDUP }}>{host}</div>
+          {kategoriChip}
         </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>

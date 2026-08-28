@@ -33,7 +33,7 @@ export async function PageShell({
           <SiteHeader />
         </div>
         <div className="flex-1 pt-4">{children}</div>
-        <Footer />
+        <Footer kategori={kats} />
       </main>
       <MobileTabBar />
     </ManjatProvider>

@@ -1,6 +1,7 @@
 import { copy } from "@/copy";
 import type { BoardEntry } from "@/domain/board";
 import { formatRupiah } from "@/lib/format";
+import { KategoriIcon } from "./KategoriIcon";
 import { LencanaRow } from "./LencanaRow";
 import { SiteLogo } from "./SiteLogo";
 import { ManjatButton } from "./ManjatModal";
@@ -125,8 +126,9 @@ export function ListingCard({
           <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
             <span className="truncate font-mono text-tinta-redup">{host}</span>
             {entry.kategoriNama && (
-              <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
+              <span className="hidden shrink-0 items-center gap-1 sm:flex">
                 <span aria-hidden>·</span>
+                <KategoriIcon slug={entry.kategoriSlug} className="size-3.5 text-tinta-redup" />
                 {entry.kategoriNama}
               </span>
             )}
