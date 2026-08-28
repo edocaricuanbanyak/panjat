@@ -232,7 +232,7 @@ export function ManjatWizard({
                     src={logoUrl}
                     alt=""
                     onError={() => setLogoFailed(true)}
-                    className="max-h-6 max-w-6 object-contain"
+                    className="size-6 rounded-full border border-garis bg-kertas-1 object-contain p-0.5"
                   />
                 ) : (
                   <Globe className="size-5 text-tinta-redup" aria-hidden />
@@ -345,10 +345,10 @@ export function ManjatWizard({
                   src={logoUrl}
                   alt=""
                   onError={() => setLogoFailed(true)}
-                  className="size-10 shrink-0 rounded-lg border border-garis bg-kertas-1 object-contain"
+                  className="size-10 shrink-0 rounded-full border border-garis bg-kertas-1 object-contain p-1"
                 />
               ) : (
-                <LogoTile nama={nama || host} className="size-10 shrink-0 rounded-lg text-base" />
+                <LogoTile nama={nama || host} className="size-10 shrink-0 rounded-full text-base" />
               )}
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-tinta">{nama || host}</p>
