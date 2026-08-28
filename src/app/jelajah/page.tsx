@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { BoardTabs } from "@/components/BoardTabs";
 import { JelajahCard } from "@/components/JelajahCard";
+import { KategoriIcon } from "@/components/KategoriIcon";
 import { PageShell } from "@/components/PageShell";
 import { db } from "@/db";
 import { listCategories, searchListings } from "@/domain/jelajah";
@@ -60,8 +61,9 @@ export default async function JelajahPage({
               <a
                 key={k.slug}
                 href={`/kategori/${k.slug}`}
-                className="inline-flex h-8 items-center rounded-full border border-garis bg-kertas-1 px-3 text-sm text-tinta-redup hover:bg-kertas-2"
+                className="inline-flex h-8 items-center gap-1.5 rounded-full border border-garis bg-kertas-1 px-3 text-sm text-tinta-redup hover:bg-kertas-2"
               >
+                <KategoriIcon slug={k.slug} className="size-3.5" />
                 {k.nama}
               </a>
             ))}

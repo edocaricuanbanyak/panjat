@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { BoardTabs } from "@/components/BoardTabs";
 import { JelajahCard } from "@/components/JelajahCard";
+import { KategoriIcon } from "@/components/KategoriIcon";
 import { LogoTile } from "@/components/LogoTile";
 import { PageShell } from "@/components/PageShell";
 import { db } from "@/db";
@@ -43,9 +44,10 @@ export default async function KategoriPage({
     <PageShell>
       <BoardTabs active="jelajah" className="mb-5" />
       <h1
-        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
+        className="flex items-center gap-2.5 font-display text-3xl font-bold text-tinta sm:text-4xl"
         style={{ fontStretch: "125%" }}
       >
+        <KategoriIcon slug={slug} className="size-7 shrink-0 text-merah-teks sm:size-8" />
         {dir.kategori.nama}
       </h1>
       {dir.kategori.intro && <p className="mt-2 max-w-xl text-tinta-redup">{dir.kategori.intro}</p>}

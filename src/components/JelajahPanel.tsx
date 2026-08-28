@@ -5,6 +5,7 @@ import { copy } from "@/copy";
 import type { JelajahCard as Card } from "@/domain/jelajah";
 import { fieldClasses } from "./Input";
 import { JelajahCard } from "./JelajahCard";
+import { KategoriIcon } from "./KategoriIcon";
 
 type Kategori = { slug: string; nama: string };
 
@@ -31,7 +32,7 @@ export function JelajahPanel({ items, categories }: { items: Card[]; categories:
   }, [items, q, cat]);
 
   const chip = (on: boolean) =>
-    `inline-flex h-8 items-center rounded-full border px-3 text-sm transition ${
+    `inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-sm transition ${
       on
         ? "border-merah bg-merah text-kertas-1"
         : "border-garis bg-kertas-1 text-tinta-redup hover:bg-kertas-2"
@@ -49,6 +50,7 @@ export function JelajahPanel({ items, categories }: { items: Card[]; categories:
       {/* Selectable category chips */}
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" onClick={() => setCat(null)} className={chip(cat === null)}>
+          <KategoriIcon slug={null} className="size-3.5" />
           {copy.jelajah.semua}
         </button>
         {categories.map((k) => (
@@ -58,6 +60,7 @@ export function JelajahPanel({ items, categories }: { items: Card[]; categories:
             onClick={() => setCat((c) => (c === k.slug ? null : k.slug))}
             className={chip(cat === k.slug)}
           >
+            <KategoriIcon slug={k.slug} className="size-3.5" />
             {k.nama}
           </button>
         ))}
