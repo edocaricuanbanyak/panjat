@@ -78,8 +78,8 @@ export function ListingCard({
         </div>
       )}
 
-      {/* Mobile: rank + logo + name share the top line (name gets full width);
-          on sm+ this wrapper dissolves (contents) into the original editorial row. */}
+      {/* Rank + logo + the listing block. On sm+ the wrapper dissolves (contents)
+          into the editorial row. */}
       <div className="flex min-w-0 items-center gap-3 sm:contents">
         <div
           className={`shrink-0 text-right font-mono tabular font-semibold ${
@@ -94,63 +94,67 @@ export function ListingCard({
           className={puncak ? "size-11 rounded-md text-lg" : "size-9 rounded-md text-sm"}
         />
         <div className="min-w-0 flex-1">
-        {/* Stretched link: the whole card navigates to the tracked redirect. */}
-        <a
-          href={`/k/${entry.id}?asal=papan`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`block truncate font-display font-semibold text-tinta transition-colors group-hover:text-merah-teks after:absolute after:inset-0 ${puncak ? "text-lg" : "text-base"}`}
-          style={{ fontStretch: `${wdth}%` }}
-        >
-          {entry.nama}
-        </a>
-        {entry.deskripsi && (
-          <p className={`line-clamp-2 text-tinta-redup ${puncak ? "text-sm" : "text-xs sm:text-sm"}`}>
-            {entry.deskripsi}
-          </p>
-        )}
-        <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
-          <span className="truncate font-mono text-tinta-redup">{host}</span>
-          {/* Category is secondary — hide it below sm so the name/host keep room. */}
-          {entry.kategoriNama && (
-            <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
-              <span aria-hidden>·</span>
-              {entry.kategoriNama}
+          {/* Title stretches across the line; grip (pegangan) sits at its end. */}
+          <div className="flex items-baseline gap-2">
+            <a
+              href={`/k/${entry.id}?asal=papan`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`min-w-0 flex-1 truncate font-display font-semibold text-tinta transition-colors group-hover:text-merah-teks after:absolute after:inset-0 ${puncak ? "text-lg" : "text-base"}`}
+              style={{ fontStretch: `${wdth}%` }}
+            >
+              {entry.nama}
+            </a>
+            <span
+              className={`shrink-0 font-mono tabular font-semibold text-tinta ${puncak ? "text-base sm:text-lg" : "text-sm sm:text-base"}`}
+            >
+              {formatRupiah(entry.pegangan)}
             </span>
+          </div>
+
+          {/* Description — full card width; 2 lines on the podium, 1 line below. */}
+          {entry.deskripsi && (
+            <p
+              className={`mt-0.5 text-tinta-redup ${
+                puncak ? "line-clamp-2 text-sm" : "line-clamp-1 text-xs sm:text-sm"
+              }`}
+            >
+              {entry.deskripsi}
+            </p>
           )}
-          <span aria-hidden>·</span>
-          <span className="shrink-0 font-mono tabular">{copy.papan.klik(entry.klikHariIni)}</span>
-        </p>
+
+          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
+            <span className="truncate font-mono text-tinta-redup">{host}</span>
+            {entry.kategoriNama && (
+              <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
+                <span aria-hidden>·</span>
+                {entry.kategoriNama}
+              </span>
+            )}
+            <span aria-hidden>·</span>
+            <span className="shrink-0 font-mono tabular">{copy.papan.klik(entry.klikHariIni)}</span>
+          </p>
+
           {entry.badges.length > 0 && (
             <div className="mt-1">
               <LencanaRow badges={entry.badges.slice(0, 2)} />
             </div>
           )}
-          {/* Mobile: pegangan, then a full-width red Salip CTA right below it. */}
-          <div className="mt-2 flex flex-col gap-1.5 sm:hidden">
-            <span className="font-mono tabular text-base font-semibold text-tinta">
-              {formatRupiah(entry.pegangan)}
-            </span>
-            <span className="relative z-10">
-              <ManjatButton nominal={salipCost} size="sm" className="h-9 w-full">
-                {copy.papan.salip(formatRupiah(salipCost))}
-              </ManjatButton>
-            </span>
+
+          {/* Mobile: full-width red Salip CTA. */}
+          <div className="relative z-10 mt-2 sm:hidden">
+            <ManjatButton nominal={salipCost} size="sm" className="h-9 w-full">
+              {copy.papan.salip(formatRupiah(salipCost))}
+            </ManjatButton>
           </div>
         </div>
       </div>
-      {/* Desktop (sm+): pegangan on the far right; tablet keeps an inline Salip. */}
-      <div className="hidden shrink-0 items-center justify-end gap-3 sm:flex">
-        <span
-          className={`font-mono tabular font-semibold text-tinta ${puncak ? "text-lg sm:text-xl" : "text-base"}`}
-        >
-          {formatRupiah(entry.pegangan)}
-        </span>
-        <span className="relative z-10 md:hidden">
-          <ManjatButton nominal={salipCost} size="sm" variant="secondary" className="h-7 px-2.5 text-xs">
-            {copy.papan.salipSingkat}
-          </ManjatButton>
-        </span>
+
+      {/* Tablet (sm–md) inline Salip; desktop uses the hover button above. */}
+      <div className="relative z-10 hidden shrink-0 items-center sm:flex md:hidden">
+        <ManjatButton nominal={salipCost} size="sm" variant="secondary" className="h-7 px-2.5 text-xs">
+          {copy.papan.salipSingkat}
+        </ManjatButton>
       </div>
     </article>
   );
