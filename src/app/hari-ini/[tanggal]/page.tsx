@@ -26,7 +26,11 @@ export default async function ArsipHariIni({
   params: Promise<{ tanggal: string }>;
 }) {
   const { tanggal } = await params;
-  if (!DATE.test(tanggal)) notFound();
+  // Guard the format AND that it's a real calendar date — "9999-99-99" passes the
+  // regex but would otherwise crash the day-window math (500 → should be 404).
+  if (!DATE.test(tanggal) || Number.isNaN(new Date(`${tanggal}T00:00:00+07:00`).getTime())) {
+    notFound();
+  }
 
   const { start, end } = wibDayWindow(tanggal);
   const entries = await getPapanHariIni(db, start, end);

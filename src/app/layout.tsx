@@ -22,7 +22,7 @@ const martianMono = Martian_Mono({
 });
 
 export const metadata: Metadata = {
-  title: `${copy.merek.nama} — papan peringkat berbayar`,
+  title: `${copy.merek.nama} — ${copy.merek.tagline}`,
   description: copy.merek.deskripsiSitus,
   applicationName: copy.merek.nama,
   appleWebApp: {

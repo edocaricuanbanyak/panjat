@@ -7,6 +7,7 @@ import { HeroManjat } from "@/components/HeroManjat";
 import { HomeTabs } from "@/components/HomeTabs";
 import { JelajahPanel } from "@/components/JelajahPanel";
 import { JuaraKakiTiang } from "@/components/JuaraKakiTiang";
+import { JuaraTerfavorit } from "@/components/JuaraTerfavorit";
 import { KakiTiang } from "@/components/KakiTiang";
 import { ListingCard } from "@/components/ListingCard";
 import { PageShell } from "@/components/PageShell";
@@ -18,7 +19,7 @@ import { db } from "@/db";
 import { getBoard } from "@/domain/board";
 import { jelajahAll, listCategories } from "@/domain/jelajah";
 import { getHariIni } from "@/domain/papan-hari-ini";
-import { getJuaraKakiTiangArsip } from "@/domain/juara-mingguan";
+import { getJuaraKakiTiangArsip, getJuaraTerfavoritArsip } from "@/domain/juara-mingguan";
 import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
 import { currentAnon } from "@/lib/anon";
 import { favoritBoard, myFavoritToday } from "@/lib/favorit";
@@ -32,7 +33,7 @@ const PER_PAGE = 20;
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ hal?: string }>;
+  searchParams: Promise<{ hal?: string; baru?: string }>;
 }) {
   const now = new Date();
   const anonId = await currentAnon();
@@ -43,6 +44,7 @@ export default async function Home({
   const [
     kakiTiang,
     juaraKakiTiang,
+    juaraTerfavorit,
     sisaSorak,
     kats,
     visitor,
@@ -53,6 +55,7 @@ export default async function Home({
   ] = await Promise.all([
     getKakiTiang(db),
     getJuaraKakiTiangArsip(db),
+    getJuaraTerfavoritArsip(db),
     sorakRemaining(db, anonId, now),
     listCategories(db),
     visitorStats(),
@@ -62,8 +65,9 @@ export default async function Home({
     jelajahAll(db),
   ]);
 
+  const sp = await searchParams;
   const totalPages = Math.max(1, Math.ceil(entries.length / PER_PAGE));
-  const page = Math.min(Math.max(1, Number((await searchParams).hal) || 1), totalPages);
+  const page = Math.min(Math.max(1, Number(sp.hal) || 1), totalPages);
   const pageEntries = entries.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   const voteEntries = entries.map((e) => ({ id: e.id, nama: e.nama, urlNormal: e.urlNormal }));
@@ -124,6 +128,7 @@ export default async function Home({
                 {/* Weekly free-tier champion sits below rank 20 as a labelled
                     showcase — never a paid rank (R16). */}
                 {juaraKakiTiang && <JuaraKakiTiang entry={juaraKakiTiang} />}
+                {juaraTerfavorit && <JuaraTerfavorit entry={juaraTerfavorit} />}
               </>
             ) : (
               <div className="flex flex-col gap-2.5">
@@ -146,7 +151,7 @@ export default async function Home({
 
       {/* KAKI TIANG (gratis) */}
       <div className="mt-12">
-        <KakiTiang entries={kakiTiang} remaining={sisaSorak} />
+        <KakiTiang entries={kakiTiang} remaining={sisaSorak} baruId={sp.baru ?? null} />
         <div className="mt-3 text-xs text-tinta-redup">
           {copy.beranda.punyaProduk}{" "}
           <PasangGratisModal kategori={kats} className="text-merah-teks hover:underline" />.

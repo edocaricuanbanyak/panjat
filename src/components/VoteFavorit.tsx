@@ -99,7 +99,7 @@ export function VoteFavorit({
                 }`}
               >
                 <span className="font-sans tabular text-xs text-tinta-redup">#{i + 1}</span>
-                <SiteLogo urlNormal={e.urlNormal} nama={e.nama} className="size-9 rounded-md text-sm" />
+                <SiteLogo listingId={e.id} nama={e.nama} className="size-9 rounded-md text-sm" />
                 <span className="w-full truncate font-display text-sm font-semibold text-tinta">
                   {e.nama}
                 </span>
@@ -120,7 +120,7 @@ export function VoteFavorit({
           <div ref={boxRef} className="relative mt-3">
             {picked ? (
               <SiteLogo
-                urlNormal={picked.urlNormal}
+                listingId={picked.id}
                 nama={picked.nama}
                 className="pointer-events-none absolute left-2.5 top-1/2 size-5 -translate-y-1/2 rounded text-[10px]"
               />
@@ -175,7 +175,7 @@ export function VoteFavorit({
                             on ? "bg-merah/8" : "hover:bg-kertas-2"
                           }`}
                         >
-                          <SiteLogo urlNormal={e.urlNormal} nama={e.nama} className="size-7 rounded-md text-xs" />
+                          <SiteLogo listingId={e.id} nama={e.nama} className="size-7 rounded-md text-xs" />
                           <span className="min-w-0 flex-1 truncate text-tinta">{e.nama}</span>
                           {on && <Check className="size-4 shrink-0 text-merah-teks" aria-hidden />}
                         </button>

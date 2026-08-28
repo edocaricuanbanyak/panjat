@@ -7,7 +7,6 @@ export const metadata: Metadata = { title: copy.ketentuan.metaTitle };
 // PageShell fetches categories for the site-wide Manjat modal → render per request.
 export const dynamic = "force-dynamic";
 
-// Draft (§18.7). Requires legal review before public launch.
 export default function KetentuanPage() {
   return (
     <PageShell>
@@ -32,7 +31,7 @@ export default function KetentuanPage() {
             {teks}
           </p>
         ))}
-        <p className="text-xs">{copy.ketentuan.draf}</p>
+        <p className="mt-1 text-xs">{copy.ketentuan.diperbarui}</p>
       </div>
     </PageShell>
   );

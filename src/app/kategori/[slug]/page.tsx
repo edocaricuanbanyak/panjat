@@ -4,8 +4,9 @@ import { eq } from "drizzle-orm";
 import { BoardTabs } from "@/components/BoardTabs";
 import { JelajahCard } from "@/components/JelajahCard";
 import { KategoriIcon } from "@/components/KategoriIcon";
-import { LogoTile } from "@/components/LogoTile";
+import { SiteLogo } from "@/components/SiteLogo";
 import { PageShell } from "@/components/PageShell";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { kategori } from "@/db/schema";
 import { categoryDirectory, KATEGORI_INTRO, parseSort, SORT_LABELS, type Sort } from "@/domain/jelajah";
@@ -53,10 +54,10 @@ export default async function KategoriPage({
       {dir.kategori.intro && <p className="mt-2 max-w-xl text-tinta-redup">{dir.kategori.intro}</p>}
 
       {dir.champion && (
-        <div className="mt-4 flex items-center gap-3 rounded-lg border border-merah/40 bg-merah/5 p-3">
-          <LogoTile nama={dir.champion.nama} />
+        <div className="mt-4 flex items-center gap-3 rounded-lg border border-emas/50 bg-emas/8 p-3">
+          <SiteLogo listingId={dir.champion.id} nama={dir.champion.nama} />
           <div className="min-w-0">
-            <p className="font-mono text-xs text-merah-teks">Juara kategori</p>
+            <p className="font-mono text-xs text-tinta-redup">{copy.jelajah.juaraKategori}</p>
             <a
               href={`/k/${dir.champion.id}?asal=jelajah`}
               target="_blank"
@@ -67,7 +68,7 @@ export default async function KategoriPage({
             </a>
           </div>
           <a href="/" className="ml-auto shrink-0 font-mono text-xs text-tinta-redup hover:text-tinta">
-            di papan →
+            {copy.jelajah.diPapan}
           </a>
         </div>
       )}

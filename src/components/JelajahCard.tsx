@@ -9,7 +9,7 @@ import { SiteLogo } from "./SiteLogo";
 export function JelajahCard({ card, asal }: { card: Card; asal: "jelajah" | "pencarian" }) {
   return (
     <article className="flex gap-3 rounded-lg border border-garis bg-kertas-1 p-3">
-      <SiteLogo urlNormal={card.urlNormal} nama={card.nama} />
+      <SiteLogo listingId={card.id} nama={card.nama} />
       <div className="min-w-0 flex-1">
         <a
           href={`/k/${card.id}?asal=${asal}`}

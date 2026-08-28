@@ -294,11 +294,9 @@ export function ManjatWizard({
                 ) : null}
               </span>
             </div>
-            <span
-              className={`mt-1 block text-xs ${previewing ? "text-merah-teks" : "text-tinta-redup"}`}
-            >
-              {previewing ? copy.manjat.cekLink : copy.manjat.urlHint}
-            </span>
+            {previewing && (
+              <span className="mt-1 block text-xs text-merah-teks">{copy.manjat.cekLink}</span>
+            )}
           </label>
 
           {/* Prefilled from the URL, but editable — tweak before you go up. */}

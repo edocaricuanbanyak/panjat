@@ -1,25 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Check, Globe, Loader2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
-import { copy } from "@/copy";
 import { Dropdown } from "@/components/Dropdown";
-import { Input, textareaClasses } from "@/components/Input";
+import { fieldClasses, Input, textareaClasses } from "@/components/Input";
 import { KategoriIcon } from "@/components/KategoriIcon";
+import { copy } from "@/copy";
 
 type Kategori = { slug: string; nama: string };
 
-/** Free listing: URL only required; judul/deskripsi/kategori auto-filled (R16). */
+/** Free listing: URL only required; judul/deskripsi/kategori auto-filled (R16).
+ *  Same form + behavior as the paid Manjat wizard's detail step — the only
+ *  difference is there's no payment step (grip stays Rp0). */
 export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
   const [url, setUrl] = useState("");
   const [nama, setNama] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
   const [kategoriSlug, setKategoriSlug] = useState("");
   const [email, setEmail] = useState("");
-  const [previewing, setPreviewing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [kuota, setKuota] = useState<{ sisa: number; total: number } | null>(null);
+
+  const [previewing, setPreviewing] = useState(false);
+  const [prefilled, setPrefilled] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoFailed, setLogoFailed] = useState(false);
+  const urlRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLTextAreaElement>(null);
 
   // First-come-first-served: how many free slots are left this week.
   useEffect(() => {
@@ -30,18 +39,44 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
   }, []);
   const penuh = kuota?.sisa === 0;
 
-  async function prefill() {
-    if (!url.trim()) return;
+  // Grow the description box to fit its content (≤160 chars) so it never scrolls.
+  useEffect(() => {
+    const el = descRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, [deskripsi]);
+
+  function clearUrl() {
+    setUrl("");
+    setPrefilled(false);
+    setLogoUrl(null);
+    setLogoFailed(false);
+    // Wipe everything the URL auto-filled too, so it's a clean start.
+    setNama("");
+    setDeskripsi("");
+    setKategoriSlug("");
+    urlRef.current?.focus();
+  }
+
+  async function prefillFromUrl() {
+    if (!url.trim() || previewing) return;
     setPreviewing(true);
+    setPrefilled(false);
     try {
       const res = await fetch(`/api/preview?url=${encodeURIComponent(url)}`);
       if (!res.ok) return;
       const p = await res.json();
+      // Auto-fill; never overwrite what the user already typed/picked.
       setNama((n) => n || p.nama || "");
       setDeskripsi((d) => d || p.deskripsi || "");
       if (p.kategoriSlug) setKategoriSlug((k) => k || p.kategoriSlug);
+      setLogoUrl(p.logoUrl ?? null);
+      setLogoFailed(false);
+      setPrefilled(true);
     } catch {
-      /* best-effort */
+      /* preview is best-effort */
     } finally {
       setPreviewing(false);
     }
@@ -64,7 +99,9 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? copy.error.gagalProses);
-      window.location.href = `/l/${data.listingId}`;
+      // Keep the user on the board (with a confirmation + highlight) rather than
+      // an unreachable listing page — free listers have no way back to /l/{id}.
+      window.location.href = `/?baru=${data.listingId}#kaki-tiang`;
     } catch (e) {
       setError(e instanceof Error ? e.message : copy.error.gagalProses);
       setSubmitting(false);
@@ -88,51 +125,104 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
           </p>
         ))}
 
-      <Input
-        label={copy.manjat.urlLabel}
-        placeholder={copy.pasangGratis.urlPlaceholder}
-        hint={previewing ? copy.manjat.urlHintMemuat : copy.manjat.urlHint}
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        onBlur={prefill}
-      />
-
-      <details className="rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu" open>
-        <summary className="cursor-pointer text-sm font-medium text-tinta-redup">
-          {copy.manjat.detailRingkas}
-        </summary>
-        <div className="mt-3 flex flex-col gap-3">
-          <Input
-            label={copy.manjat.judulListing}
-            placeholder={copy.pasangGratis.judulPlaceholder}
-            value={nama}
-            onChange={(e) => setNama(e.target.value)}
+      {/* Paste a link. On Enter/blur we fetch the site: the site logo lands on
+          the left, a spinner on the right while it loads. */}
+      <label className="block">
+        <span className="mb-1 block text-sm font-medium text-tinta-redup">
+          {copy.manjat.urlLabel}
+        </span>
+        <div className="relative">
+          <span className="absolute left-3 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center">
+            {logoUrl && !logoFailed ? (
+              // biome-ignore lint/performance/noImgElement: remote site logo, not a static asset
+              <img
+                src={logoUrl}
+                alt=""
+                onError={() => setLogoFailed(true)}
+                className="size-6 rounded-full border border-garis bg-kertas-1 object-contain p-0.5"
+              />
+            ) : (
+              <Globe className="size-5 text-tinta-redup" aria-hidden />
+            )}
+          </span>
+          <input
+            ref={urlRef}
+            inputMode="url"
+            placeholder={copy.pasangGratis.urlPlaceholder}
+            value={url}
+            onChange={(e) => {
+              setUrl(e.target.value);
+              setPrefilled(false);
+              setLogoFailed(false);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                (e.target as HTMLInputElement).blur();
+              }
+            }}
+            onBlur={prefillFromUrl}
+            className={`${fieldClasses} pl-11 pr-11`}
           />
-          <Dropdown
-            label={copy.manjat.kategori}
-            placeholder="—"
-            value={kategoriSlug}
-            onChange={setKategoriSlug}
-            options={kategori.map((k) => ({
-              value: k.slug,
-              label: k.nama,
-              icon: <KategoriIcon slug={k.slug} className="size-4 shrink-0 text-tinta-redup" />,
-            }))}
-          />
-          <label className="block">
-            <span className="mb-1 block text-sm font-medium text-tinta-redup">
-              {copy.manjat.deskripsi}
-            </span>
-            <textarea
-              value={deskripsi}
-              maxLength={160}
-              rows={2}
-              onChange={(e) => setDeskripsi(e.target.value)}
-              className={textareaClasses}
-            />
-          </label>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2">
+            {previewing ? (
+              <Loader2 className="size-5 animate-spin text-tinta-redup" aria-hidden />
+            ) : url.trim() ? (
+              <button
+                type="button"
+                onClick={clearUrl}
+                aria-label={copy.manjat.hapusUrl}
+                className="group/clr flex size-6 items-center justify-center rounded-full hover:bg-kertas-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah"
+              >
+                {prefilled ? (
+                  <>
+                    <Check className="size-5 text-hidup group-hover/clr:hidden" aria-hidden />
+                    <X className="hidden size-5 text-tinta-redup group-hover/clr:block" aria-hidden />
+                  </>
+                ) : (
+                  <X className="size-5 text-tinta-redup" aria-hidden />
+                )}
+              </button>
+            ) : null}
+          </span>
         </div>
-      </details>
+        {previewing && (
+          <span className="mt-1 block text-xs text-merah-teks">{copy.manjat.cekLink}</span>
+        )}
+      </label>
+
+      {/* Prefilled from the URL, but editable — tweak before you go up. */}
+      <Input
+        label={copy.manjat.judulListing}
+        placeholder={copy.pasangGratis.judulPlaceholder}
+        value={nama}
+        onChange={(e) => setNama(e.target.value)}
+      />
+      <Dropdown
+        label={copy.manjat.kategori}
+        placeholder="—"
+        value={kategoriSlug}
+        onChange={setKategoriSlug}
+        options={kategori.map((k) => ({
+          value: k.slug,
+          label: k.nama,
+          icon: <KategoriIcon slug={k.slug} className="size-4 shrink-0 text-tinta-redup" />,
+        }))}
+      />
+      <label className="block">
+        <span className="mb-1 block text-sm font-medium text-tinta-redup">
+          {copy.manjat.deskripsi}
+        </span>
+        <textarea
+          ref={descRef}
+          value={deskripsi}
+          maxLength={160}
+          rows={2}
+          onChange={(e) => setDeskripsi(e.target.value)}
+          style={{ resize: "none", overflow: "hidden" }}
+          className={textareaClasses}
+        />
+      </label>
 
       <Input
         label={copy.manjat.emailOpsional}

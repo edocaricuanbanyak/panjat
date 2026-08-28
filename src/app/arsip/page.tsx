@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { desc, eq } from "drizzle-orm";
-import { LogoTile } from "@/components/LogoTile";
+import { SiteLogo } from "@/components/SiteLogo";
 import { PageShell } from "@/components/PageShell";
 import { copy } from "@/copy";
 import { db } from "@/db";
@@ -21,7 +21,7 @@ export default async function ArsipPage() {
   const [mingguan, rows] = await Promise.all([
     getJuaraMingguanTerbaru(db),
     db
-      .select({ tanggal: juaraHarian.tanggal, id: listing.id, nama: listing.nama })
+      .select({ tanggal: juaraHarian.tanggal, id: listing.id, nama: listing.nama, urlNormal: listing.urlNormal })
       .from(juaraHarian)
       .innerJoin(listing, eq(listing.id, juaraHarian.listingId))
       .orderBy(desc(juaraHarian.tanggal))
@@ -43,21 +43,12 @@ export default async function ArsipPage() {
 
       {juaraMingguan.length > 0 && (
         <section className="mt-6 rounded-2xl border border-emas/50 bg-gradient-to-b from-emas/12 to-kertas-1 p-4 shadow-kartu">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="font-display font-semibold text-tinta">{copy.arsip.mingguanJudul}</h2>
-              <p className="font-mono text-xs text-tinta-redup">
-                {copy.arsip.mingguanPekan(juaraMingguan[0].minggu)}
-              </p>
-            </div>
-            <a
-              href="/api/og/mingguan"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 rounded-lg border border-garis bg-kertas-1 px-3 py-2 text-xs font-medium text-tinta shadow-kartu hover:bg-kertas-2"
-            >
-              {copy.arsip.unduhKartu}
-            </a>
+          <div>
+            <h2 className="font-display font-semibold text-tinta">{copy.arsip.mingguanJudul}</h2>
+            <p className="mt-0.5 font-mono text-xs font-medium text-tinta">
+              {copy.arsip.mingguanPekan(juaraMingguan[0].minggu)}
+            </p>
+            <p className="mt-0.5 text-xs text-tinta-redup">{copy.arsip.mingguanInfo}</p>
           </div>
           <ul className="mt-3 flex flex-col gap-2">
             {juaraMingguan.map((j) => (
@@ -68,7 +59,7 @@ export default async function ArsipPage() {
                 <span className="w-24 shrink-0 font-mono text-[11px] uppercase tracking-wide text-tinta-redup">
                   {copy.arsip.jenis[j.jenis] ?? j.jenis}
                 </span>
-                <LogoTile nama={j.nama} className="size-8 rounded-md text-xs" />
+                <SiteLogo listingId={j.listingId} nama={j.nama} className="size-8 rounded-md text-xs" />
                 <span className="min-w-0 flex-1 truncate font-display font-semibold text-tinta">
                   {j.nama}
                 </span>
@@ -98,7 +89,7 @@ export default async function ArsipPage() {
                 href={`/hari-ini/${r.tanggal}`}
                 className="flex items-center gap-3 py-3 hover:text-merah-teks"
               >
-                <LogoTile nama={r.nama} />
+                <SiteLogo listingId={r.id} nama={r.nama} />
                 <div className="min-w-0">
                   <span className="block truncate font-display font-semibold text-tinta">
                     {r.nama}

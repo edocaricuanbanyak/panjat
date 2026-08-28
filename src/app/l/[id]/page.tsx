@@ -5,7 +5,7 @@ import { LencanaRow } from "@/components/LencanaRow";
 import { KategoriIcon } from "@/components/KategoriIcon";
 import { ManjatButton } from "@/components/ManjatModal";
 import { copy } from "@/copy";
-import { LogoTile } from "@/components/LogoTile";
+import { SiteLogo } from "@/components/SiteLogo";
 import { PageShell } from "@/components/PageShell";
 import { Sparkline } from "@/components/Sparkline";
 import { db } from "@/db";
@@ -48,7 +48,7 @@ export default async function ListingPublikPage({
   return (
     <PageShell>
       <div className="flex items-start gap-4">
-        <LogoTile nama={l.nama} className="size-16 rounded-md text-3xl" />
+        <SiteLogo listingId={l.id} nama={l.nama} className="size-16 rounded-md text-3xl" />
         <div className="min-w-0 flex-1">
           <h1 className="font-display text-3xl font-bold text-tinta" style={{ fontStretch: "125%" }}>
             {l.nama}
@@ -117,7 +117,7 @@ export default async function ListingPublikPage({
             {l.serupa.map((s) => (
               <li key={s.id}>
                 <a href={`/l/${s.id}`} className="flex items-center gap-3 rounded-lg border border-garis bg-kertas-1 p-3 hover:bg-kertas-2">
-                  <LogoTile nama={s.nama} />
+                  <SiteLogo listingId={s.id} nama={s.nama} />
                   <div className="min-w-0">
                     <span className="block truncate font-display font-semibold text-tinta">{s.nama}</span>
                     {s.deskripsi && <span className="block truncate text-xs text-tinta-redup">{s.deskripsi}</span>}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { copy } from "@/copy";
 import { Dropdown } from "./Dropdown";
 import { fieldClasses } from "./Input";
 import { KategoriIcon } from "./KategoriIcon";
@@ -31,13 +32,14 @@ export function HeroManjat({ kategori }: { kategori: Kategori[] }) {
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && go()}
-        placeholder="Tempel link yang mau kamu panjatkan"
+        placeholder={copy.beranda.heroUrlPlaceholder}
+        aria-label={copy.beranda.heroUrlPlaceholder}
         className={`${fieldClasses} sm:flex-1`}
       />
       <div className="flex gap-2 sm:contents">
         <Dropdown
           className="flex-1 sm:w-44 sm:flex-none"
-          placeholder="Kategori"
+          placeholder={copy.beranda.heroKategoriPlaceholder}
           value={kategoriSlug}
           onChange={setKategoriSlug}
           options={kategori.map((k) => ({
@@ -51,7 +53,7 @@ export function HeroManjat({ kategori }: { kategori: Kategori[] }) {
           disabled={!url.trim()}
           className="h-12 shrink-0 rounded-xl bg-merah px-5 font-display font-semibold text-kertas-1 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah active:translate-y-0 disabled:opacity-50 sm:h-11"
         >
-          Mulai Panjat
+          {copy.beranda.heroCta}
         </button>
       </div>
     </div>

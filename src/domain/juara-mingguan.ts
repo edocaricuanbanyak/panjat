@@ -59,6 +59,7 @@ export interface JuaraArsip {
   jenis: JuaraJenis;
   listingId: string;
   nama: string;
+  urlNormal: string;
   metrik: number;
 }
 
@@ -76,6 +77,7 @@ export async function getJuaraMingguanTerbaru(db: Database): Promise<JuaraArsip[
       jenis: juaraMingguan.jenis,
       listingId: juaraMingguan.listingId,
       nama: listing.nama,
+      urlNormal: listing.urlNormal,
       metrik: juaraMingguan.metrik,
     })
     .from(juaraMingguan)
@@ -91,6 +93,38 @@ export interface JuaraKakiTiangArsip {
   deskripsi: string | null;
   sorak: number;
   klik: number;
+}
+
+export interface JuaraTerfavoritArsip {
+  id: string;
+  nama: string;
+  urlNormal: string;
+  deskripsi: string | null;
+  votes: number;
+  klik: number;
+}
+
+/**
+ * Most-favorited climber of the latest archived week (free spectator vote, never
+ * a paid rank) — a labelled showcase on the board, mirroring the Kaki Tiang
+ * champion. Null until a week is archived.
+ */
+export async function getJuaraTerfavoritArsip(db: Database): Promise<JuaraTerfavoritArsip | null> {
+  const [row] = await db
+    .select({
+      id: listing.id,
+      nama: listing.nama,
+      urlNormal: listing.urlNormal,
+      deskripsi: listing.deskripsi,
+      votes: juaraMingguan.metrik,
+      klik: sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian" where "klik_harian"."listing_id" = "listing"."id")`,
+    })
+    .from(juaraMingguan)
+    .innerJoin(listing, eq(listing.id, juaraMingguan.listingId))
+    .where(eq(juaraMingguan.jenis, "terfavorit"))
+    .orderBy(desc(juaraMingguan.minggu))
+    .limit(1);
+  return row ?? null;
 }
 
 /**

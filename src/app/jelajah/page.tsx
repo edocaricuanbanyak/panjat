@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { BoardTabs } from "@/components/BoardTabs";
+import { buttonClasses } from "@/components/Button";
 import { JelajahCard } from "@/components/JelajahCard";
 import { KategoriIcon } from "@/components/KategoriIcon";
 import { PageShell } from "@/components/PageShell";
+import { fieldClasses } from "@/components/Input";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { listCategories, searchListings } from "@/domain/jelajah";
 
@@ -30,15 +33,16 @@ export default async function JelajahPage({
       <BoardTabs active="jelajah" className="mb-5" />
 
       <form action="/jelajah" method="get" className="flex gap-2">
-        <input
-          name="q"
-          defaultValue={query}
-          placeholder="cari AI tools, jasa, game…"
-          className="h-11 flex-1 rounded-lg border border-garis bg-kertas-1 px-3.5 text-base text-tinta shadow-kartu focus-visible:border-merah focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah/25"
-        />
-        <button className="h-11 rounded-lg bg-merah px-5 text-sm font-display font-semibold text-kertas-1 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah">
-          Cari
-        </button>
+        <label className="flex-1">
+          <span className="sr-only">{copy.jelajah.cariLabel}</span>
+          <input
+            name="q"
+            defaultValue={query}
+            placeholder={copy.jelajah.cariPlaceholder}
+            className={fieldClasses}
+          />
+        </label>
+        <button className={buttonClasses("primary", "md")}>{copy.jelajah.cari}</button>
       </form>
 
       {query ? (

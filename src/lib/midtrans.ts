@@ -109,12 +109,18 @@ export const midtransSnapClient: SnapClient = {
     const auth = Buffer.from(`${serverKey}:`).toString("base64");
     const enabled = enabledPaymentsFor(grossAmount);
 
+    // Route settlement notifications to THIS app's webhook per-transaction,
+    // independent of the dashboard's single Notification URL — needed when the
+    // Merchant ID is shared with another site so both keep settling (§17.4).
+    const notifUrl = process.env.MIDTRANS_NOTIFICATION_URL?.trim();
+
     const res = await fetch(`${base}/snap/v1/transactions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Basic ${auth}`,
+        ...(notifUrl ? { "X-Override-Notification": notifUrl } : {}),
       },
       body: JSON.stringify({
         transaction_details: { order_id: orderId, gross_amount: grossAmount },

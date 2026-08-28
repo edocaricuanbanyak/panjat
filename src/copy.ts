@@ -13,8 +13,9 @@ import { formatRupiah } from "@/lib/format";
 export const copy = {
   merek: {
     nama: "Panjat",
+    tagline: "Rebut Peringkat Teratas",
     deskripsiSitus:
-      "Bayar untuk manjat. Pegangan paling kuat duduk paling atas. Tiangnya licin — yang berhenti manjat, merosot.",
+      "Tempel linkmu, panjat papan, dan salip yang di atas. Makin kuat peganganmu, makin tinggi posisimu.",
   },
 
   nav: {
@@ -40,6 +41,9 @@ export const copy = {
     papanKosongPesan: "Tiangnya masih kinclong.",
     caraMainJudul: "Cara main",
     punyaProduk: "Punya produk?",
+    heroUrlPlaceholder: "Tempel link yang mau kamu panjatkan",
+    heroKategoriPlaceholder: "Kategori",
+    heroCta: "Mulai Panjat",
   },
 
   caraMain: [
@@ -54,7 +58,15 @@ export const copy = {
 
   papan: {
     aktivitas: "Aktivitas",
+    aktivitasVote: "baru divote",
+    aktivitasDukung: "baru didukung",
+    aktivitasManjat: "baru manjat",
+    aktivitasNaik: (rank: number) => `naik ke #${rank}`,
+    puncakBerganti: (nama: string) => `Puncak berganti — ${nama} kini #1`,
+    papanDiperbarui: "Papan diperbarui",
     juaraKakiTiang: "Juara Kaki Tiang minggu ini · gratis",
+    juaraTerfavorit: "Pemanjat terfavorit minggu ini",
+    juaraTerfavoritVote: (n: number) => `${n.toLocaleString("id-ID")} vote`,
     salip: (rp: string) => `Salip ${rp}`,
     salipRank: (rank: number, rp: string) => `Salip #${rank} ${rp}`,
     juara: (rank: number) => `Juara ${rank}`,
@@ -73,8 +85,6 @@ export const copy = {
     steps: ["Detail", "Posisi", "Bayar"],
     urlLabel: "URL",
     urlPlaceholder: "panjat.id",
-    urlHint: "Cukup tempel URL saja — sisanya kami isi otomatis.",
-    urlHintMemuat: "Mengambil detail…",
     detailTerisi: "Detail terisi",
     cekLink: "Mengecek link & mengisi detail…",
     hapusUrl: "Hapus & tulis ulang",
@@ -160,6 +170,8 @@ export const copy = {
     dukungan_n: (n: number) => `${n.toLocaleString("id-ID")} dukungan`,
     kosong: "Belum ada yang manjat. Tiangnya masih kinclong.",
     pasangGratisTaut: "Pasang gratis di Kaki Tiang",
+    baruNaik: "Listingmu sudah naik ke Kaki Tiang. Ajak orang buat sorak biar naik!",
+    baruTutup: "Tutup",
   },
 
   momen: {
@@ -176,6 +188,10 @@ export const copy = {
     pilihUkuran: "Pilih ukuran kartu",
     unduh: "Unduh kartu",
     mengunduh: "Menyiapkan…",
+    toggleScreenshot: "Screenshot",
+    toggleLogo: "Logo",
+    rasio: "Rasio",
+    gambar: "Gambar",
   },
 
   privasi: {
@@ -186,7 +202,8 @@ export const copy = {
       ["Berapa lama.", " Klik mentah 13 bulan lalu dihapus (agregat harian permanen). Log notifikasi 6 bulan. Data transaksi mengikuti kewajiban pajak/audit."],
       ["Hakmu.", " Kamu bisa berhenti berlangganan notifikasi kapan saja, dan meminta penghapusan data kontak."],
     ] as const,
-    draf: "Draf — menunggu tinjauan hukum sebelum peluncuran publik.",
+    kontak: "Untuk penghapusan data atau pertanyaan privasi, hubungi halo@panjat.id.",
+    diperbarui: "Terakhir diperbarui 28 Agustus 2026.",
   },
 
   ketentuan: {
@@ -200,12 +217,17 @@ export const copy = {
       ["Moderasi & konten.", " Konten judi/slot, dewasa, pinjol ilegal, dan penipuan ditolak. Kami dapat menahan atau menurunkan listing yang melanggar."],
       ["Kepemilikan URL.", " Pemilik sah sebuah URL berhak mengklaim atau meminta penurunan listing atas URL-nya (verifikasi diperlukan)."],
       ["Tanggung jawab.", " Panjat tidak bertanggung jawab atas konten atau produk pihak sponsor."],
+      ["Kontak.", " Pertanyaan soal ketentuan ini bisa dikirim ke halo@panjat.id."],
     ] as const,
-    draf: "Draf — menunggu tinjauan hukum sebelum peluncuran publik.",
+    diperbarui: "Terakhir diperbarui 28 Agustus 2026.",
   },
 
   jelajah: {
     cariPlaceholder: "cari AI tools, jasa, game…",
+    cari: "Cari",
+    cariLabel: "Cari listing",
+    juaraKategori: "Juara kategori",
+    diPapan: "di papan →",
     semua: "Semua",
     kosong: "Tidak ada listing yang cocok. Coba kata kunci atau kategori lain.",
   },
@@ -259,7 +281,7 @@ export const copy = {
     kosong: "Belum ada juara yang diarsipkan.",
     mingguanJudul: "Juara minggu ini",
     mingguanPekan: (minggu: string) => `Pekan ${minggu}`,
-    unduhKartu: "Unduh kartu Instagram",
+    mingguanInfo: "Diperbarui otomatis tiap pekan, diarsipkan permanen.",
     harianJudul: "Juara harian",
     jenis: {
       papan1: "Juara 1",
@@ -420,6 +442,12 @@ export const copy = {
    * one-click "manjat lagi" and unsubscribe links.
    */
   notif: {
+    unsubBerhenti: "Berhenti berlangganan",
+    unsubTidakValid: "Tautan tidak valid",
+    unsubBerhasil:
+      "Kamu tidak akan menerima notifikasi disalip lagi. Posisimu tetap bisa dilihat di papan kapan saja.",
+    unsubGagal: "Tautan berhenti berlangganan tidak dikenali atau kedaluwarsa.",
+    unsubKePapan: "Ke papan",
     disalipSubjek: "Kamu disalip di Panjat",
     disalip: (d: { toRank: number; tierLabel: string; pegangan: number; manjatLink: string; unsubLink: string }) => {
       const headline = `Kamu merosot ke #${d.toRank}, keluar dari ${d.tierLabel}.`;
@@ -431,5 +459,16 @@ export const copy = {
         wa: `${headline} Manjat lagi: ${d.manjatLink}`,
       };
     },
+  },
+
+  /** System pages — 404 / error boundary / loading. Plain and reassuring. */
+  sistem: {
+    memuat: "Memuat…",
+    takAdaJudul: "Halaman tidak ditemukan",
+    takAdaPesan: "Tautannya mungkin salah atau listingnya sudah tidak tayang.",
+    galatJudul: "Ada yang tersendat",
+    galatPesan: "Maaf, ada gangguan sesaat. Coba lagi sebentar.",
+    cobaLagi: "Coba lagi",
+    kePapan: "Ke papan",
   },
 } as const;

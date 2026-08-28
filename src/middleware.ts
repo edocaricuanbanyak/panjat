@@ -12,11 +12,11 @@ export function middleware(req: NextRequest) {
 
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${scriptExtra}`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://cloud.umami.is${scriptExtra}`,
     "style-src 'self' 'unsafe-inline'", // Tailwind + inline style attributes
     "img-src 'self' data: https:", // OG cards + remote logos
     "font-src 'self' data:",
-    "connect-src 'self'", // SSE board stream
+    "connect-src 'self' https://cloud.umami.is", // SSE board stream + Umami analytics
     "frame-ancestors 'none'", // no clickjacking (papan tak boleh di-iframe)
     "base-uri 'self'",
     "form-action 'self'",

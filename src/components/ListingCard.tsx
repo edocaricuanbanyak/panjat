@@ -73,7 +73,7 @@ export function ListingCard({
           </div>
         )}
         <SiteLogo
-          urlNormal={entry.urlNormal}
+          listingId={entry.id}
           nama={entry.nama}
           className={puncak ? "size-11 rounded-md text-lg" : "size-9 rounded-md text-sm"}
         />

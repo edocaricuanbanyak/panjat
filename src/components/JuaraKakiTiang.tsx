@@ -1,7 +1,7 @@
 import { Star } from "lucide-react";
 import { copy } from "@/copy";
 import type { JuaraKakiTiang as Juara } from "@/domain/sorak";
-import { LogoTile } from "./LogoTile";
+import { SiteLogo } from "./SiteLogo";
 
 /**
  * Weekly Kaki Tiang champion — the most-cheered free (Rp0) listing of the last 7
@@ -18,7 +18,7 @@ export function JuaraKakiTiang({ entry }: { entry: Juara }) {
         {copy.papan.juaraKakiTiang}
       </p>
       <article className="flex items-center gap-4">
-        <LogoTile nama={entry.nama} className="size-11 rounded-md text-lg" />
+        <SiteLogo listingId={entry.id} nama={entry.nama} className="size-11 rounded-md text-lg" />
         <div className="min-w-0 flex-1">
           <a
             href={`/k/${entry.id}?asal=papan`}

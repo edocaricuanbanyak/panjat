@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { copy } from "@/copy";
 import type { Board } from "@/domain/board";
 import { ListingCard } from "./ListingCard";
 
@@ -32,8 +33,8 @@ export function BoardLive({
 
       const msg =
         nextTop && prevTop && nextTop !== prevTop && next.entries[0]
-          ? `Puncak berganti — ${next.entries[0].nama} kini #1`
-          : "Papan diperbarui";
+          ? copy.papan.puncakBerganti(next.entries[0].nama)
+          : copy.papan.papanDiperbarui;
 
       const commit = () => {
         setBoard(next);

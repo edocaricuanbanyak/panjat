@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { buttonClasses } from "@/components/Button";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { sponsorKontak } from "@/db/schema";
 import { verifyUnsub } from "@/lib/notify";
@@ -24,15 +25,13 @@ export default async function UnsubPage({
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-16 text-center">
       <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
-        {kontakId ? "Berhenti berlangganan" : "Tautan tidak valid"}
+        {kontakId ? copy.notif.unsubBerhenti : copy.notif.unsubTidakValid}
       </h1>
       <p className="mt-2 text-sm text-tinta-redup">
-        {kontakId
-          ? "Kamu tidak akan menerima notifikasi disalip lagi. Posisimu tetap bisa dilihat di papan kapan saja."
-          : "Tautan berhenti berlangganan tidak dikenali atau kedaluwarsa."}
+        {kontakId ? copy.notif.unsubBerhasil : copy.notif.unsubGagal}
       </p>
       <a href="/" className={`${buttonClasses("secondary", "md")} mt-6 self-center`}>
-        Ke papan
+        {copy.notif.unsubKePapan}
       </a>
     </main>
   );

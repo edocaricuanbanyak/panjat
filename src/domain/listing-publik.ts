@@ -21,7 +21,7 @@ export interface ListingPublik {
   screenshotUrl: string | null;
   badges: string[];
   riwayat: { jam: Date; rank: number }[];
-  serupa: { id: string; nama: string; deskripsi: string | null }[];
+  serupa: { id: string; nama: string; deskripsi: string | null; urlNormal: string }[];
 }
 
 export async function getListingPublik(db: Database, id: string): Promise<ListingPublik | null> {
@@ -55,7 +55,7 @@ export async function getListingPublik(db: Database, id: string): Promise<Listin
       .limit(14),
     l.kategoriId
       ? db
-          .select({ id: listing.id, nama: listing.nama, deskripsi: listing.deskripsi })
+          .select({ id: listing.id, nama: listing.nama, deskripsi: listing.deskripsi, urlNormal: listing.urlNormal })
           .from(listing)
           .where(and(eq(listing.status, "tayang"), eq(listing.kategoriId, l.kategoriId), ne(listing.id, id)))
           .orderBy(desc(listing.createdAt))

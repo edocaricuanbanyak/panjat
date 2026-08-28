@@ -205,7 +205,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ listing:
       }}
     >
       {/* biome-ignore lint/performance/noImgElement: satori renders to a raster, not the DOM */}
-      <img src={hero?.dataUri} width={P.heroW} height={P.heroH} style={{ objectFit: "cover" }} alt="" />
+      {/* contain, not cover: show the whole screenshot (letterboxed on KERTAS1) so nothing is cropped */}
+      <img src={hero?.dataUri} width={P.heroW} height={P.heroH} style={{ objectFit: "contain" }} alt="" />
     </div>
   );
   // Logo/tile hug their own size (no empty hero box) so portrait cards stay tight.

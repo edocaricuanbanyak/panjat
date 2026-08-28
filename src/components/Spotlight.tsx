@@ -9,11 +9,11 @@ import type { Aktivitas } from "@/lib/aktivitas";
 function label(a: Aktivitas): string {
   switch (a.jenis) {
     case "vote":
-      return "baru divote";
+      return copy.papan.aktivitasVote;
     case "dukung":
-      return "baru didukung";
+      return copy.papan.aktivitasDukung;
     case "naik":
-      return a.rank ? `naik ke #${a.rank}` : "baru manjat";
+      return a.rank ? copy.papan.aktivitasNaik(a.rank) : copy.papan.aktivitasManjat;
   }
 }
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { Heart } from "lucide-react";
-import { useState } from "react";
+import { Heart, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { copy } from "@/copy";
 import type { KakiTiangEntry } from "@/domain/sorak";
-import { LogoTile } from "./LogoTile";
+import { SiteLogo } from "./SiteLogo";
 
 /**
  * Kaki Tiang — the free (Rp0) tier below all paid listings, ordered by Sorak
@@ -16,9 +16,12 @@ import { LogoTile } from "./LogoTile";
 export function KakiTiang({
   entries,
   remaining: initialRemaining,
+  baruId = null,
 }: {
   entries: KakiTiangEntry[];
   remaining: number;
+  /** A just-posted free listing to confirm + highlight (from `/?baru=…`). */
+  baruId?: string | null;
 }) {
   const [remaining, setRemaining] = useState(initialRemaining);
   const [counts, setCounts] = useState<Record<string, number>>(() =>
@@ -26,6 +29,24 @@ export function KakiTiang({
   );
   // How many of my 5 I've poured into each listing (for styling + revert).
   const [mine, setMine] = useState<Record<string, number>>({});
+
+  // Just-posted confirmation: scroll to the new row + flash it (the free flow
+  // keeps you here instead of an unreachable listing page). Banner gives closure
+  // even when the listing was held by screening (not in `entries`).
+  const [showBaru, setShowBaru] = useState(Boolean(baruId));
+  const [flash, setFlash] = useState<string | null>(null);
+  const rowRefs = useRef<Record<string, HTMLElement | null>>({});
+  useEffect(() => {
+    if (!baruId) return;
+    const el = rowRefs.current[baruId];
+    if (!el) return;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    setFlash(baruId);
+    const t = setTimeout(() => setFlash(null), 2000);
+    return () => clearTimeout(t);
+  }, [baruId]);
 
   async function dukung(id: string) {
     if (remaining <= 0) return;
@@ -61,6 +82,20 @@ export function KakiTiang({
       </div>
       <p className="mt-1 text-xs text-tinta-redup">{copy.kakiTiang.ajakan}</p>
 
+      {showBaru && (
+        <div className="mt-3 flex items-center gap-2 rounded-lg border border-merah/40 bg-merah/5 px-3 py-2 text-sm text-tinta">
+          <span className="flex-1">{copy.kakiTiang.baruNaik}</span>
+          <button
+            type="button"
+            onClick={() => setShowBaru(false)}
+            aria-label={copy.kakiTiang.baruTutup}
+            className="shrink-0 rounded-full p-1 text-tinta-redup hover:bg-kertas-2 hover:text-tinta"
+          >
+            <X className="size-4" aria-hidden />
+          </button>
+        </div>
+      )}
+
       {entries.length === 0 ? (
         <p className="mt-3 text-sm text-tinta-redup">{copy.kakiTiang.kosong}</p>
       ) : (
@@ -68,9 +103,14 @@ export function KakiTiang({
           {entries.map((e) => (
             <article
               key={e.id}
-              className="flex items-center gap-3 rounded-lg border border-garis bg-kertas-2 p-3"
+              ref={(el) => {
+                rowRefs.current[e.id] = el;
+              }}
+              className={`flex items-center gap-3 rounded-lg border p-3 ${
+                flash === e.id ? "manjat-slot border-merah bg-merah/5" : "border-garis bg-kertas-2"
+              }`}
             >
-              <LogoTile nama={e.nama} />
+              <SiteLogo listingId={e.id} nama={e.nama} />
               <div className="min-w-0 flex-1">
                 <a
                   href={`/k/${e.id}?asal=papan`}

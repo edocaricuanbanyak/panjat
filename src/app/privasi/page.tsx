@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: copy.privasi.metaTitle };
 // PageShell fetches categories for the site-wide Manjat modal → render per request.
 export const dynamic = "force-dynamic";
 
-// Draft aligned with UU PDP (§18.7). Requires legal review before public launch.
+// Aligned with UU PDP (§18.7).
 export default function PrivasiPage() {
   return (
     <PageShell>
@@ -24,7 +24,8 @@ export default function PrivasiPage() {
             {teks}
           </p>
         ))}
-        <p className="text-xs">{copy.privasi.draf}</p>
+        <p>{copy.privasi.kontak}</p>
+        <p className="mt-1 text-xs">{copy.privasi.diperbarui}</p>
       </div>
     </PageShell>
   );
