@@ -1,7 +1,7 @@
 import type { HariIniEntry } from "@/domain/papan-hari-ini";
 import { formatRupiah } from "@/lib/format";
-import { LogoTile } from "./LogoTile";
 import { RankBadge } from "./RankBadge";
+import { SiteLogo } from "./SiteLogo";
 
 /** Papan Hari Ini standings — same money-ranked shape as the board, 24h window. */
 export function HariIniBoard({ entries }: { entries: HariIniEntry[] }) {
@@ -17,7 +17,7 @@ export function HariIniBoard({ entries }: { entries: HariIniEntry[] }) {
   return (
     <div className="mt-6 flex flex-col gap-3">
       <div className="flex items-center gap-3 rounded-lg border border-merah/40 bg-merah/5 p-4">
-        <LogoTile nama={champ.nama} className="size-14 rounded-md text-2xl" />
+        <SiteLogo urlNormal={champ.urlNormal} nama={champ.nama} className="size-14 rounded-md text-2xl" />
         <div className="min-w-0 flex-1">
           <p className="font-mono text-xs text-merah-teks">Juara Hari Ini</p>
           <a
@@ -47,7 +47,7 @@ export function HariIniBoard({ entries }: { entries: HariIniEntry[] }) {
           <div className="w-8 shrink-0 text-right">
             <RankBadge rank={e.rank} />
           </div>
-          <LogoTile nama={e.nama} />
+          <SiteLogo urlNormal={e.urlNormal} nama={e.nama} />
           <div className="min-w-0 flex-1">
             <a
               href={`/k/${e.id}?asal=papan`}

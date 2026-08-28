@@ -1,6 +1,6 @@
 import type { JelajahCard as Card } from "@/domain/jelajah";
 import { KategoriIcon } from "./KategoriIcon";
-import { LogoTile } from "./LogoTile";
+import { SiteLogo } from "./SiteLogo";
 
 /**
  * Directory card for Jelajah/category surfaces. Always offers a way back to the
@@ -9,7 +9,7 @@ import { LogoTile } from "./LogoTile";
 export function JelajahCard({ card, asal }: { card: Card; asal: "jelajah" | "pencarian" }) {
   return (
     <article className="flex gap-3 rounded-lg border border-garis bg-kertas-1 p-3">
-      <LogoTile nama={card.nama} />
+      <SiteLogo urlNormal={card.urlNormal} nama={card.nama} />
       <div className="min-w-0 flex-1">
         <a
           href={`/k/${card.id}?asal=${asal}`}
