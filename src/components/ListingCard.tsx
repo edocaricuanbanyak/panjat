@@ -46,7 +46,7 @@ export function ListingCard({
         <span
           aria-label={medali.label}
           style={{ clipPath: "polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%)" }}
-          className={`absolute -top-1 left-4 z-20 flex h-9 w-9 items-start justify-center pt-1.5 font-display text-sm font-bold leading-none text-kertas-1 drop-shadow-md ${medali.bg}`}
+          className={`absolute -top-1 left-3 z-20 flex h-10 w-11 items-start justify-center pt-1.5 font-display text-sm font-bold leading-none text-kertas-1 drop-shadow-md sm:left-4 ${medali.bg}`}
         >
           #{entry.rank}
         </span>
