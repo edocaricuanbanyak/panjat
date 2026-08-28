@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, Globe, Loader2, X } from "lucide-react";
+import { Check, Globe, Loader2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
 import { Dropdown } from "@/components/Dropdown";
@@ -162,6 +162,10 @@ export function ManjatWizard({
     setPrefilled(false);
     setLogoUrl(null);
     setLogoFailed(false);
+    // Wipe everything the URL auto-filled too, so it's a clean start.
+    setNama("");
+    setDeskripsi("");
+    setKategoriSlug("");
     urlRef.current?.focus();
   }
   async function prefillFromUrl() {
@@ -333,9 +337,8 @@ export function ManjatWizard({
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          <Button disabled={!canStep1} onClick={() => setStep(2)} className="gap-1.5">
-            {express && <ArrowLeft className="size-4" aria-hidden />}
-            {express ? copy.manjat.kembaliPosisi : copy.manjat.lanjut}
+          <Button disabled={!canStep1} onClick={() => setStep(2)}>
+            {copy.manjat.lanjut}
           </Button>
         </div>
       )}
