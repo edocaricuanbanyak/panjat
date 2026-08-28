@@ -72,7 +72,7 @@ export const copy = {
     kembaliPapan: "← Papan",
     steps: ["Detail", "Posisi", "Bayar"],
     urlLabel: "URL",
-    urlPlaceholder: "nyala.id",
+    urlPlaceholder: "panjat.id",
     urlHint: "Cukup tempel URL saja — sisanya kami isi otomatis.",
     urlHintMemuat: "Mengambil detail…",
     detailTerisi: "Detail terisi",
