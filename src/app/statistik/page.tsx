@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { PageShell } from "@/components/PageShell";
 import { StatTile } from "@/components/StatTile";
-import { UmamiEmbed } from "@/components/UmamiEmbed";
 import { copy } from "@/copy";
 import { db } from "@/db";
 import { getStatistik } from "@/domain/statistik";
@@ -85,8 +84,9 @@ export default async function StatistikPage() {
         />
       </div>
 
-      {/* Trafik web — Umami's own dashboard, embedded (set NEXT_PUBLIC_UMAMI_SHARE_URL). */}
-      <UmamiEmbed url={process.env.NEXT_PUBLIC_UMAMI_SHARE_URL} />
+      {/* Trafik web (embed Umami) di-hide sementara — nyalakan lagi dengan:
+          import { UmamiEmbed } from "@/components/UmamiEmbed";
+          <UmamiEmbed url={process.env.NEXT_PUBLIC_UMAMI_SHARE_URL} /> */}
     </PageShell>
   );
 }
