@@ -116,7 +116,7 @@ export function Dropdown({
           onKeyDown={onKey}
           className={`${fieldClasses} flex cursor-pointer items-center justify-between gap-2 text-left`}
         >
-          <span className={`flex min-w-0 items-center gap-2 truncate ${selected ? "text-tinta" : "text-tinta-redup"}`}>
+          <span className={`flex min-w-0 items-center gap-2 truncate ${selected ? "text-tinta" : "text-tinta-redup/55"}`}>
             {selected?.icon}
             <span className="truncate">{selected ? selected.label : placeholder}</span>
           </span>
