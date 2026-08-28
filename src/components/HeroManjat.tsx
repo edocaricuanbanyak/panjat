@@ -31,7 +31,7 @@ export function HeroManjat({ kategori }: { kategori: Kategori[] }) {
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && go()}
-        placeholder="Tempel URL produkmu — mis. nyala.id"
+        placeholder="Tempel link yang mau kamu panjatkan"
         className={`${fieldClasses} sm:flex-1`}
       />
       <div className="flex gap-2 sm:contents">
