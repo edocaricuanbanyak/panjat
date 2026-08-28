@@ -3,7 +3,7 @@ export function RankBadge({ rank }: { rank: number }) {
   const top = rank <= 3;
   return (
     <span
-      className={`font-mono tabular text-sm font-semibold ${top ? "text-merah-teks" : "text-tinta-redup"}`}
+      className={`font-sans tabular text-sm font-semibold ${top ? "text-merah-teks" : "text-tinta-redup"}`}
     >
       #{rank}
     </span>

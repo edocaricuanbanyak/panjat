@@ -80,7 +80,7 @@ export function VoteFavorit({
                   <span className="w-full truncate font-display text-sm font-semibold text-tinta">
                     {e.nama}
                   </span>
-                  <span className="font-mono tabular text-xs text-tinta-redup">
+                  <span className="font-sans tabular text-xs text-tinta-redup">
                     {copy.favorit.vote_n(e.votes)}
                   </span>
                 </li>

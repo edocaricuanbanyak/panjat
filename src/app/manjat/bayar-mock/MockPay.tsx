@@ -54,7 +54,7 @@ export function MockPay({ orderId, nominal }: { orderId: string; nominal: number
           <p className="mt-1 font-mono text-xs text-tinta-redup">{orderId}</p>
           <div className="mt-4 flex items-baseline justify-between rounded-xl border border-garis bg-kertas-1 px-4 py-3 shadow-kartu">
             <span className="text-sm text-tinta-redup">Total</span>
-            <span className="font-mono tabular text-lg font-semibold text-tinta">
+            <span className="font-sans tabular text-lg font-semibold text-tinta">
               {formatRupiah(nominal)}
             </span>
           </div>

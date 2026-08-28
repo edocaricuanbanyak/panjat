@@ -16,7 +16,7 @@ export function Pagination({ page, totalPages }: { page: number; totalPages: num
       ) : (
         <span className={off}>← Sebelumnya</span>
       )}
-      <span className="font-mono tabular text-tinta-redup">
+      <span className="font-sans tabular text-tinta-redup">
         Halaman {page} / {totalPages}
       </span>
       {page < totalPages ? (

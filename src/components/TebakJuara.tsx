@@ -50,7 +50,7 @@ export function TebakJuara({ status }: { status: GuessStatus }) {
               </option>
             ))}
           </select>
-          <button className="h-11 rounded-md bg-merah px-4 text-sm font-medium text-kertas-1">
+          <button className="h-11 rounded-md bg-merah px-4 text-sm font-display font-semibold text-kertas-1">
             Tebak
           </button>
         </form>

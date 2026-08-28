@@ -72,7 +72,7 @@ export default async function ArsipPage() {
                 <span className="min-w-0 flex-1 truncate font-display font-semibold text-tinta">
                   {j.nama}
                 </span>
-                <span className="shrink-0 font-mono tabular text-xs text-tinta-redup">
+                <span className="shrink-0 font-sans tabular text-xs text-tinta-redup">
                   {j.jenis.startsWith("papan")
                     ? formatRupiah(j.metrik)
                     : j.jenis === "terfavorit"

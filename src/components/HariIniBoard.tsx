@@ -28,7 +28,7 @@ export function HariIniBoard({ entries }: { entries: HariIniEntry[] }) {
           >
             {champ.nama}
           </a>
-          <p className="font-mono tabular text-xs text-tinta-redup">
+          <p className="font-sans tabular text-xs text-tinta-redup">
             {formatRupiah(champ.todayGrip)} hari ini
           </p>
         </div>
@@ -59,7 +59,7 @@ export function HariIniBoard({ entries }: { entries: HariIniEntry[] }) {
             </a>
             {e.kategoriNama && <p className="text-xs text-tinta-redup">{e.kategoriNama}</p>}
           </div>
-          <span className="font-mono tabular text-sm font-semibold text-tinta">
+          <span className="font-sans tabular text-sm font-semibold text-tinta">
             {formatRupiah(e.todayGrip)}
           </span>
         </article>

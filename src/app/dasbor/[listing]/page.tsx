@@ -129,7 +129,7 @@ export default async function DasborListing({
                 <span className="text-tinta-redup">
                   {formatWIB(r.waktu)} · {r.metode ?? "—"}
                 </span>
-                <span className="font-mono tabular font-semibold text-tinta">
+                <span className="font-sans tabular font-semibold text-tinta">
                   {formatRupiah(r.nominal)}
                 </span>
               </li>

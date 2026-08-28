@@ -31,7 +31,7 @@ export function JuaraKakiTiang({ entry }: { entry: Juara }) {
           {entry.deskripsi && (
             <p className="truncate text-sm text-tinta-redup">{entry.deskripsi}</p>
           )}
-          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono tabular text-xs text-tinta-redup">
+          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 font-sans tabular text-xs text-tinta-redup">
             <span className="truncate">{entry.urlNormal.replace(/^https?:\/\//, "").replace(/\/+$/, "")}</span>
             <span aria-hidden>·</span>
             <span className="shrink-0 text-emas">{copy.kakiTiang.dukungan_n(entry.sorak)}</span>

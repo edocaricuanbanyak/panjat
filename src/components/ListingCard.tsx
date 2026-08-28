@@ -82,7 +82,7 @@ export function ListingCard({
         {/* Rank 4+ shows the number inline; podium wears its medal ribbon on the
             card (above), so the row is just logo + text. */}
         {!puncak && (
-          <div className="w-9 shrink-0 text-right font-mono tabular text-base font-semibold text-tinta-redup">
+          <div className="w-9 shrink-0 text-right font-sans tabular text-base font-semibold text-tinta-redup">
             #{entry.rank}
           </div>
         )}
@@ -105,7 +105,7 @@ export function ListingCard({
               {entry.nama}
             </a>
             <span
-              className={`shrink-0 font-mono tabular font-medium text-tinta-redup ${puncak ? "text-sm sm:text-base" : "text-xs sm:text-sm"}`}
+              className={`shrink-0 font-sans tabular font-medium text-tinta-redup ${puncak ? "text-sm sm:text-base" : "text-xs sm:text-sm"}`}
             >
               {formatRupiah(entry.pegangan)}
             </span>
@@ -131,7 +131,7 @@ export function ListingCard({
               </span>
             )}
             <span aria-hidden>·</span>
-            <span className="shrink-0 font-mono tabular">{copy.papan.klik(entry.klikHariIni)}</span>
+            <span className="shrink-0 font-sans tabular">{copy.papan.klik(entry.klikHariIni)}</span>
           </p>
 
           {entry.badges.length > 0 && (

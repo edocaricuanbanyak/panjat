@@ -82,7 +82,7 @@ export function KakiTiang({
                 </a>
                 {e.deskripsi && <p className="truncate text-xs text-tinta-redup">{e.deskripsi}</p>}
               </div>
-              <span className="font-mono tabular text-xs text-tinta-redup">
+              <span className="font-sans tabular text-xs text-tinta-redup">
                 {copy.kakiTiang.dukungan_n(counts[e.id] ?? 0)}
               </span>
               <DukungButton
@@ -152,7 +152,7 @@ function DukungButton({
           aria-hidden
         />
         {copy.kakiTiang.dukung}
-        {mineCount > 0 && <span className="font-mono tabular text-xs">×{mineCount}</span>}
+        {mineCount > 0 && <span className="font-sans tabular text-xs">×{mineCount}</span>}
       </button>
 
       {burst > 0 && (

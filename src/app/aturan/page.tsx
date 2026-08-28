@@ -47,7 +47,7 @@ export default async function AturanPage() {
               {tiers.map(([label, rate]) => (
                 <tr key={label} className="border-t border-garis bg-kertas-1">
                   <td className="px-3 py-2 text-tinta">{label}</td>
-                  <td className="px-3 py-2 text-right font-mono tabular text-tinta">
+                  <td className="px-3 py-2 text-right font-sans tabular text-tinta">
                     {Math.round(rate * 100)}%
                   </td>
                 </tr>

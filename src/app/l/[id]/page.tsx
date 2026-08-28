@@ -74,7 +74,7 @@ export default async function ListingPublikPage({
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <span className="font-mono tabular text-sm text-tinta">
+        <span className="font-sans tabular text-sm text-tinta">
           {l.rank ? `#${l.rank}` : "—"} · pegangan {formatRupiah(l.pegangan)}
         </span>
         <a href={`/k/${l.id}?asal=jelajah`} target="_blank" rel="noopener noreferrer" className={buttonClasses("primary", "sm")}>

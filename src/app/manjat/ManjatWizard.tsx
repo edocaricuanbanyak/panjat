@@ -38,7 +38,7 @@ function BoardRow({
   return (
     <div className={`flex items-center gap-3 px-3 py-2 ${kamu ? "bg-merah/8" : ""}`}>
       <span
-        className={`w-8 shrink-0 font-mono tabular text-sm font-semibold ${
+        className={`w-8 shrink-0 font-sans tabular text-sm font-semibold ${
           kamu ? "text-merah-teks" : "text-tinta-redup"
         }`}
       >
@@ -57,7 +57,7 @@ function BoardRow({
         )}
       </span>
       <span
-        className={`shrink-0 font-mono tabular text-sm ${
+        className={`shrink-0 font-sans tabular text-sm ${
           kamu ? "font-semibold text-tinta" : "text-tinta-redup"
         }`}
       >
@@ -449,7 +449,7 @@ export function ManjatWizard({
                 </p>
               )}
 
-              <p className="text-center font-mono tabular text-xs text-tinta-redup">
+              <p className="text-center font-sans tabular text-xs text-tinta-redup">
                 {copy.manjat.posisiRingkas(
                   formatRupiah(quote.nominal),
                   formatRupiah(quote.rosotPerHari),

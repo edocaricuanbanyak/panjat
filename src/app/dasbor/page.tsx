@@ -50,7 +50,7 @@ export default async function DasborIndex() {
                   </span>
                   <span className="font-mono text-xs text-tinta-redup">{l.status}</span>
                 </span>
-                <span className="font-mono tabular text-base font-semibold text-tinta">
+                <span className="font-sans tabular text-base font-semibold text-tinta">
                   {formatRupiah(l.pegangan)}
                 </span>
               </a>

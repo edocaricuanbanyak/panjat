@@ -87,7 +87,7 @@ export default async function Home({
         </h1>
         <p className="mt-4 max-w-xl text-base text-tinta-redup sm:text-lg">{copy.beranda.heroSub}</p>
         <HeroManjat kategori={kats} />
-        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 font-mono tabular text-xs text-tinta-redup">
+        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 font-sans tabular text-xs text-tinta-redup">
           <span className="inline-flex items-center gap-1.5">
             <span className="blink inline-block size-1.5 rounded-full bg-hidup" aria-hidden />
             <b className="text-tinta">{visitor.online}</b> {copy.beranda.statOnline}
