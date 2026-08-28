@@ -18,7 +18,7 @@ export const copy = {
   },
 
   nav: {
-    sepanjangMasa: "Sepanjang Masa",
+    sepanjangMasa: "Papan Utama",
     hariIni: "Hari Ini",
     jelajah: "Jelajah",
     manjat: "Manjat",

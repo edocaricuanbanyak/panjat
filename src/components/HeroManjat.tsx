@@ -51,7 +51,7 @@ export function HeroManjat({ kategori }: { kategori: Kategori[] }) {
           disabled={!url.trim()}
           className="h-12 shrink-0 rounded-xl bg-merah px-5 font-display font-semibold text-kertas-1 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah active:translate-y-0 disabled:opacity-50 sm:h-11"
         >
-          Manjat →
+          Mulai Panjat
         </button>
       </div>
     </div>
