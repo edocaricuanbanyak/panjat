@@ -90,11 +90,11 @@ export function VoteFavorit({
 
       {voted ? (
         top5.length > 0 ? (
-          <ol className="mt-3 flex gap-2 overflow-x-auto pb-1">
+          <ol className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-5 sm:overflow-visible sm:pb-0">
             {top5.map((e, i) => (
               <li
                 key={e.id}
-                className={`flex w-28 shrink-0 flex-col items-center gap-1.5 rounded-xl border p-3 text-center ${
+                className={`flex w-28 shrink-0 flex-col items-center gap-1.5 rounded-xl border p-3 text-center sm:w-auto ${
                   e.id === myChoice ? "border-tinta bg-kertas-2" : "border-garis"
                 }`}
               >

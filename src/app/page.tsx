@@ -12,7 +12,6 @@ import { ListingCard } from "@/components/ListingCard";
 import { PageShell } from "@/components/PageShell";
 import { Pagination } from "@/components/Pagination";
 import { PasangGratisModal } from "@/components/PasangGratisModal";
-import { Spotlight } from "@/components/Spotlight";
 import { VoteFavorit } from "@/components/VoteFavorit";
 import { copy } from "@/copy";
 import { db } from "@/db";
@@ -21,7 +20,6 @@ import { jelajahAll, listCategories } from "@/domain/jelajah";
 import { getHariIni } from "@/domain/papan-hari-ini";
 import { getJuaraKakiTiangArsip } from "@/domain/juara-mingguan";
 import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
-import { recentAktivitas } from "@/lib/aktivitas";
 import { currentAnon } from "@/lib/anon";
 import { favoritBoard, myFavoritToday } from "@/lib/favorit";
 import { pingVisitor, VID_COOKIE, visitorStats } from "@/lib/presence";
@@ -50,7 +48,6 @@ export default async function Home({
     visitor,
     favorit,
     choice,
-    aktivitas,
     hariIni,
     jelajahItems,
   ] = await Promise.all([
@@ -61,7 +58,6 @@ export default async function Home({
     visitorStats(),
     favoritBoard(db, now, 5),
     myFavoritToday(vid, now),
-    recentAktivitas(20),
     getHariIni(db, now),
     jelajahAll(db),
   ]);
@@ -73,19 +69,16 @@ export default async function Home({
   const voteEntries = entries.map((e) => ({ id: e.id, nama: e.nama, urlNormal: e.urlNormal }));
 
   return (
-    <PageShell
-      manjatKategori={kats}
-      topbar={aktivitas.length > 0 ? <Spotlight items={aktivitas} /> : undefined}
-    >
+    <PageShell manjatKategori={kats}>
       {/* HERO — value + the one action */}
-      <section className="pt-2 pb-8">
+      <section className="pt-1 pb-5">
         <h1
           className="font-display text-4xl font-bold leading-[0.95] text-tinta sm:text-5xl md:text-6xl"
           style={{ fontStretch: "130%" }}
         >
           {copy.beranda.heroJudul}
         </h1>
-        <p className="mt-4 max-w-xl text-base text-tinta-redup sm:text-lg">{copy.beranda.heroSub}</p>
+        <p className="mt-3 max-w-xl text-base text-tinta-redup sm:text-lg">{copy.beranda.heroSub}</p>
         <HeroManjat kategori={kats} />
         {/* Live social proof — the USP. Prominent but on one compact line, so the
             top-3 board stays above the fold. */}
