@@ -4,26 +4,30 @@ import { useEffect, useState } from "react";
 import { LogoTile } from "./LogoTile";
 
 /**
- * The listing's real site logo (its favicon), with a graceful fall back to the
- * neutral letter tile when the site has none / it fails (R2). The favicon is
- * preloaded off-DOM, so the letter tile is the immediate default and the real
- * logo only swaps in once it genuinely loads — no broken-image flash. Loaded
- * from the sponsor's own domain (CSP already allows remote https images).
+ * The listing's real site logo, with a graceful fall back to the neutral letter
+ * tile when the site has none / it fails (R2). Loaded from `/api/logo/[id]`, which
+ * resolves the logo server-side with the same chain the OG card uses (declared
+ * `<link rel=icon>` → common favicon paths → Google favicon service) — so the
+ * board matches the form's preview instead of blindly guessing `/favicon.ico`.
+ * The image is preloaded off-DOM, so the letter tile is the immediate default and
+ * the real logo only swaps in once it genuinely loads — no broken-image flash.
  */
 export function SiteLogo({
+  listingId,
   urlNormal,
   nama,
   className,
 }: {
-  urlNormal: string;
+  listingId?: string;
+  urlNormal?: string;
   nama: string;
   className?: string;
 }) {
   const host = urlNormal
-    .replace(/^https?:\/\//, "")
+    ?.replace(/^https?:\/\//, "")
     .replace(/\/+$/, "")
     .split("/")[0];
-  const src = host ? `https://${host}/favicon.ico` : null;
+  const src = listingId ? `/api/logo/${listingId}` : host ? `https://${host}/favicon.ico` : null;
   const [ok, setOk] = useState(false);
 
   useEffect(() => {

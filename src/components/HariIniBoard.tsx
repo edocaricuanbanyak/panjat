@@ -12,42 +12,15 @@ export function HariIniBoard({ entries }: { entries: HariIniEntry[] }) {
       </p>
     );
   }
-  const [champ, ...rest] = entries;
 
   return (
     <div className="mt-6 flex flex-col gap-3">
-      <div className="flex items-center gap-3 rounded-lg border border-merah/40 bg-merah/5 p-4">
-        <SiteLogo urlNormal={champ.urlNormal} nama={champ.nama} className="size-14 rounded-md text-2xl" />
-        <div className="min-w-0 flex-1">
-          <p className="font-mono text-xs text-merah-teks">Juara Hari Ini</p>
-          <a
-            href={`/k/${champ.id}?asal=papan`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block truncate font-display text-lg font-semibold text-tinta hover:text-merah-teks"
-          >
-            {champ.nama}
-          </a>
-          <p className="font-sans tabular text-xs text-tinta-redup">
-            {formatRupiah(champ.todayGrip)} hari ini
-          </p>
-        </div>
-        <a
-          href={`/api/og/${champ.id}?story=1`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shrink-0 font-mono text-xs text-tinta-redup hover:text-tinta"
-        >
-          kartu juara →
-        </a>
-      </div>
-
-      {rest.map((e) => (
+      {entries.map((e) => (
         <article key={e.id} className="flex items-center gap-4 rounded-lg border border-garis bg-kertas-1 p-3">
           <div className="w-8 shrink-0 text-right">
             <RankBadge rank={e.rank} />
           </div>
-          <SiteLogo urlNormal={e.urlNormal} nama={e.nama} />
+          <SiteLogo listingId={e.id} nama={e.nama} />
           <div className="min-w-0 flex-1">
             <a
               href={`/k/${e.id}?asal=papan`}

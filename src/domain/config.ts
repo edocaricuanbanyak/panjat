@@ -34,6 +34,30 @@ export async function loadManjatConfig(db: DbOrTx): Promise<ManjatConfig> {
   };
 }
 
+export interface OgConfig {
+  /** Show the site's own screenshot as the share-card hero. */
+  tampilkanScreenshot: boolean;
+  /** Fall back to the site logo (favicon) when there's no screenshot. */
+  tampilkanLogo: boolean;
+}
+
+/**
+ * Share-card hero toggles. Defaults to `true` when a key is absent so a DB
+ * seeded before these keys existed still renders the product hero.
+ */
+export async function loadOgConfig(db: DbOrTx): Promise<OgConfig> {
+  const rows = await db
+    .select({ key: konfigurasi.key, value: konfigurasi.value })
+    .from(konfigurasi)
+    .where(inArray(konfigurasi.key, ["og_tampilkan_screenshot", "og_tampilkan_logo"]));
+  const byKey = new Map(rows.map((r) => [r.key, r.value]));
+  const flag = (k: string) => byKey.get(k) !== false; // default true
+  return {
+    tampilkanScreenshot: flag("og_tampilkan_screenshot"),
+    tampilkanLogo: flag("og_tampilkan_logo"),
+  };
+}
+
 export async function loadRosotConfig(db: DbOrTx): Promise<RosotConfig> {
   const rows = await db
     .select({ key: konfigurasi.key, value: konfigurasi.value })
