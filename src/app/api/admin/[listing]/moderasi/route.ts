@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { approveListing, rejectListing, turunkanListing } from "@/domain/moderasi";
-import { currentAdmin } from "@/lib/admin";
+import { adminHome, adminLogin, currentAdmin } from "@/lib/admin";
 
 export const runtime = "nodejs";
 
 /** POST /api/admin/{listing}/moderasi (form: aksi=approve|reject) — human decision. */
 export async function POST(req: Request, ctx: { params: Promise<{ listing: string }> }) {
+  const host = req.headers.get("host");
   if (!(await currentAdmin())) {
-    return NextResponse.redirect(new URL("/admin/masuk", req.url), { status: 303 });
+    return NextResponse.redirect(new URL(adminLogin(host), req.url), { status: 303 });
   }
   const { listing: listingId } = await ctx.params;
   const form = await req.formData();
@@ -18,5 +19,5 @@ export async function POST(req: Request, ctx: { params: Promise<{ listing: strin
   else if (aksi === "reject") await rejectListing(db, listingId);
   else if (aksi === "turunkan") await turunkanListing(db, listingId);
 
-  return NextResponse.redirect(new URL("/admin", req.url), { status: 303 });
+  return NextResponse.redirect(new URL(adminHome(host), req.url), { status: 303 });
 }

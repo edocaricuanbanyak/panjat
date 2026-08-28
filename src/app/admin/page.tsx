@@ -1,4 +1,5 @@
 import { CheckCircle2 } from "lucide-react";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { LogoTile } from "@/components/LogoTile";
 import { PageShell } from "@/components/PageShell";
@@ -7,7 +8,7 @@ import { db } from "@/db";
 import { getModerationQueue } from "@/domain/admin";
 import { getLaporanTerbuka } from "@/domain/laporan";
 import { formatRupiah } from "@/lib/format";
-import { currentAdmin } from "@/lib/admin";
+import { adminLogin, currentAdmin } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false } };
@@ -22,7 +23,7 @@ const neutralBtn =
   `h-9 rounded-lg border border-garis px-3.5 text-sm text-tinta-redup transition hover:bg-kertas-2 ${focusRing}`;
 
 export default async function AdminPage() {
-  if (!(await currentAdmin())) redirect("/admin/masuk");
+  if (!(await currentAdmin())) redirect(adminLogin((await headers()).get("host")));
   const [queue, laporan] = await Promise.all([getModerationQueue(db), getLaporanTerbuka(db)]);
 
   return (

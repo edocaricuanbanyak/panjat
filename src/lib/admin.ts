@@ -66,3 +66,19 @@ export async function currentAdmin(): Promise<boolean> {
   const store = await cookies();
   return verifyAdmin(store.get(ADMIN_COOKIE)?.value);
 }
+
+/**
+ * Admin lives at the clean root of the adm.* subdomain (adm.panjat.id → dashboard,
+ * /masuk → login) but at the /admin path on localhost/preview. Redirects choose the
+ * base from the request host so both work; the middleware rewrites /→/admin,
+ * /masuk→/admin/masuk on the subdomain.
+ */
+export function onAdminSubdomain(host: string | null | undefined): boolean {
+  return !!host && host.startsWith("adm.");
+}
+export function adminHome(host: string | null | undefined): string {
+  return onAdminSubdomain(host) ? "/" : "/admin";
+}
+export function adminLogin(host: string | null | undefined): string {
+  return onAdminSubdomain(host) ? "/masuk" : "/admin/masuk";
+}

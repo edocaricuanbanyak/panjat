@@ -27,8 +27,36 @@ export function middleware(req: NextRequest) {
   const reqHeaders = new Headers(req.headers);
   reqHeaders.set("x-nonce", nonce);
   reqHeaders.set("content-security-policy", csp);
+  const nextOpts = { request: { headers: reqHeaders } };
 
-  const res = NextResponse.next({ request: { headers: reqHeaders } });
+  // Host routing: admin is served from the adm.* subdomain (clean root), and the
+  // old /admin path is hidden (404) on the public production domain.
+  const host = req.headers.get("host") ?? "";
+  const { pathname } = req.nextUrl;
+  let res: NextResponse;
+
+  if (host.startsWith("adm.")) {
+    // adm.panjat.id → /admin, /masuk → /admin/masuk. /api and /_next pass through
+    // (so /api/admin actions + framework assets work); everything else 404s under
+    // /admin, which also keeps the public app off the admin host.
+    if (pathname.startsWith("/api") || pathname.startsWith("/_next")) {
+      res = NextResponse.next(nextOpts);
+    } else {
+      const url = req.nextUrl.clone();
+      url.pathname = pathname === "/" ? "/admin" : `/admin${pathname}`;
+      res = NextResponse.rewrite(url, nextOpts);
+    }
+  } else if (
+    (host === "www.panjat.id" || host === "panjat.id") &&
+    (pathname === "/admin" || pathname.startsWith("/admin/") || pathname.startsWith("/api/admin"))
+  ) {
+    // Admin lives only on adm.panjat.id — hide it on the public domain.
+    const url = req.nextUrl.clone();
+    url.pathname = "/_admin-hidden-404";
+    res = NextResponse.rewrite(url, nextOpts);
+  } else {
+    res = NextResponse.next(nextOpts);
+  }
 
   // Provision a visitor id for public presence counting (online + total). Not
   // security-sensitive and never touches money/ranking — just a stable counter id.
