@@ -228,6 +228,7 @@ export const copy = {
     cariLabel: "Cari listing",
     juaraKategori: "Juara kategori",
     diPapan: "di papan →",
+    lihatDetail: "Lihat detail →",
     semua: "Semua",
     kosong: "Tidak ada listing yang cocok. Coba kata kunci atau kategori lain.",
   },

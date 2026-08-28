@@ -1,10 +1,12 @@
+import { copy } from "@/copy";
 import type { JelajahCard as Card } from "@/domain/jelajah";
 import { KategoriIcon } from "./KategoriIcon";
 import { SiteLogo } from "./SiteLogo";
 
 /**
- * Directory card for Jelajah/category surfaces. Always offers a way back to the
- * board ("di papan") — Jelajah feeds the board, never replaces it (R22).
+ * Directory card for Jelajah/search surfaces. The name links out to the site
+ * (via the counted /k/ redirect); "Lihat detail" opens the listing's public
+ * page (/l/[id]) with its stats, chart, and Salip action.
  */
 export function JelajahCard({ card, asal }: { card: Card; asal: "jelajah" | "pencarian" }) {
   return (
@@ -30,8 +32,8 @@ export function JelajahCard({ card, asal }: { card: Card; asal: "jelajah" | "pen
             </a>
           )}
           <span>{card.klikTotal} klik</span>
-          <a href={`/?f=${card.id}`} className="hover:text-tinta">
-            di papan →
+          <a href={`/l/${card.id}`} className="hover:text-tinta">
+            {copy.jelajah.lihatDetail}
           </a>
         </div>
       </div>
