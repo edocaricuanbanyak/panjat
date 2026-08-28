@@ -97,6 +97,7 @@ export function ManjatWizard({
   const [loadingQuote, setLoadingQuote] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function refreshQuote(payload: { nominal: number }) {
@@ -462,8 +463,39 @@ export function ManjatWizard({
             </div>
           )}
 
+          {/* Consent — required before the payment can be started. */}
+          <label className="flex items-start gap-2 text-xs text-tinta-redup">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              className="mt-0.5 size-4 shrink-0 accent-merah"
+            />
+            <span>
+              {copy.manjat.consentSetuju}{" "}
+              <a
+                href="/ketentuan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-merah-teks hover:underline"
+              >
+                {copy.manjat.consentKetentuan}
+              </a>{" "}
+              &amp;{" "}
+              <a
+                href="/aturan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-merah-teks hover:underline"
+              >
+                {copy.manjat.consentAturan}
+              </a>
+              {copy.manjat.consentRosot}
+            </span>
+          </label>
+
           {/* Single CTA — pay goes straight to the payment gateway. */}
-          <Button className="w-full" disabled={!quote || submitting} onClick={onPay}>
+          <Button className="w-full" disabled={!quote || submitting || !consent} onClick={onPay}>
             {submitting
               ? copy.manjat.memproses
               : copy.manjat.bayar(quote ? formatRupiah(quote.nominal) : undefined)}
