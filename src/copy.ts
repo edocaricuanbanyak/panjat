@@ -108,8 +108,8 @@ export const copy = {
     salipTambah: (extra: string, rank: number) => `Tambah ${extra} → salip #${rank}`,
     jadiPuncak: "🚩 Kamu jadi #1 — puncak!",
     papanPratinjau: "Posisimu di papan",
-    posisiRingkas: (bayar: string, rosot: string, estimasiHari: number | null) =>
-      `Bayar ${bayar} · merosot ~${rosot}/hari · ` +
+    posisiRingkas: (rosot: string, estimasiHari: number | null) =>
+      `Merosot ~${rosot}/hari · ` +
       (estimasiHari === null ? "stabil (kaki tiang)" : `bertahan ~${estimasiHari} hari`),
     akanBayar: "Kamu akan bayar",
     bayar: (rp?: string) => (rp ? `Bayar ${rp}` : "Bayar"),

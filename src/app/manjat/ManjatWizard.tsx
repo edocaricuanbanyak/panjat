@@ -406,11 +406,13 @@ export function ManjatWizard({
             )}
           </div>
 
-          {/* Live board — you slot in among real competitors as you set the amount. */}
+          {/* Live board — you slot in among real competitors as you set the amount.
+              The board is the single result surface: standings + decay footer, with
+              a light salip hint below. */}
           {quote ? (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               <div className="divide-y divide-garis/50 overflow-hidden rounded-xl border border-garis bg-kertas-1">
-                <p className="px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide text-tinta-redup">
+                <p className="px-3 py-1.5 text-[11px] font-medium uppercase tracking-wide text-tinta-redup">
                   {copy.manjat.papanPratinjau}
                 </p>
                 {quote.atas.map((n) => (
@@ -423,39 +425,32 @@ export function ManjatWizard({
                 {quote.bawah.map((n) => (
                   <BoardRow key={`b${n.rank}`} rank={n.rank} nama={n.nama} rp={n.pegangan} />
                 ))}
+                {/* Decay/estimate folded into the board footer, muted. */}
+                <p className="bg-kertas px-3 py-1.5 font-sans tabular text-[11px] text-tinta-redup">
+                  {copy.manjat.posisiRingkas(
+                    formatRupiah(quote.rosotPerHari),
+                    quote.estimasiHari,
+                  )}
+                </p>
               </div>
 
+              {/* Salip — a light, centred hint (tap to bump), not a heavy box. */}
               {quote.salipAtas ? (
                 <button
                   type="button"
                   onClick={() =>
                     setNominalInput(String(quote.nominal + (quote.salipAtas?.extra ?? 0)))
                   }
-                  className="flex items-center justify-between gap-2 rounded-xl border border-merah/40 bg-merah/8 px-3 py-2 text-left text-sm text-merah-teks transition ease-panjat hover:bg-merah/12 active:scale-[0.99]"
+                  className="mx-auto inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-sm font-medium text-merah-teks transition hover:underline"
                 >
-                  <span className="font-medium">
-                    {copy.manjat.salipTambah(
-                      formatRupiah(quote.salipAtas.extra),
-                      quote.salipAtas.rank,
-                    )}
-                  </span>
-                  <span className="shrink-0 truncate font-mono text-xs opacity-80">
-                    {quote.salipAtas.nama}
+                  {copy.manjat.salipTambah(formatRupiah(quote.salipAtas.extra), quote.salipAtas.rank)}
+                  <span className="max-w-[9rem] truncate text-xs text-tinta-redup">
+                    · {quote.salipAtas.nama}
                   </span>
                 </button>
               ) : (
-                <p className="rounded-xl border border-emas/40 bg-emas/10 px-3 py-2 text-sm font-medium text-tinta">
-                  {copy.manjat.jadiPuncak}
-                </p>
+                <p className="text-center text-sm font-medium text-tinta">{copy.manjat.jadiPuncak}</p>
               )}
-
-              <p className="text-center font-sans tabular text-xs text-tinta-redup">
-                {copy.manjat.posisiRingkas(
-                  formatRupiah(quote.nominal),
-                  formatRupiah(quote.rosotPerHari),
-                  quote.estimasiHari,
-                )}
-              </p>
             </div>
           ) : (
             <div className="rounded-xl border border-dashed border-garis bg-kertas-1 px-4 py-6 text-center text-sm text-tinta-redup">
