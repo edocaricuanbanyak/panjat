@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, Loader2 } from "lucide-react";
+import { ArrowLeft, Globe, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import { Dropdown } from "@/components/Dropdown";
@@ -210,13 +210,26 @@ export function ManjatWizard({
 
       {step === 1 && (
         <div className="mt-6 flex flex-col gap-4">
-          {/* The one thing to do on this step: paste a link. On Enter/blur we
-              fetch the site and fill the rest — with a visible spinner → check. */}
+          {/* Paste a link. On Enter/blur we fetch the site: the site logo lands on
+              the left, a spinner on the right while it loads. */}
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-tinta-redup">
               {copy.manjat.urlLabel}
             </span>
             <div className="relative">
+              <span className="absolute left-2.5 top-1/2 flex -translate-y-1/2 items-center">
+                {logoUrl && !logoFailed ? (
+                  // biome-ignore lint/performance/noImgElement: remote site logo, not a static asset
+                  <img
+                    src={logoUrl}
+                    alt=""
+                    onError={() => setLogoFailed(true)}
+                    className="size-6 rounded border border-garis bg-kertas-1 object-contain"
+                  />
+                ) : (
+                  <Globe className="size-5 text-tinta-redup" aria-hidden />
+                )}
+              </span>
               <input
                 inputMode="url"
                 placeholder={copy.manjat.urlPlaceholder}
@@ -224,6 +237,7 @@ export function ManjatWizard({
                 onChange={(e) => {
                   setUrl(e.target.value);
                   setPrefilled(false);
+                  setLogoFailed(false);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -232,14 +246,12 @@ export function ManjatWizard({
                   }
                 }}
                 onBlur={prefillFromUrl}
-                className={`${fieldClasses} pr-11`}
+                className={`${fieldClasses} pl-11 pr-10`}
               />
               <span className="absolute right-3.5 top-1/2 -translate-y-1/2">
-                {previewing ? (
+                {previewing && (
                   <Loader2 className="size-5 animate-spin text-tinta-redup" aria-hidden />
-                ) : prefilled ? (
-                  <Check className="size-5 text-hidup" aria-hidden />
-                ) : null}
+                )}
               </span>
             </div>
             <span
@@ -248,30 +260,6 @@ export function ManjatWizard({
               {previewing ? copy.manjat.cekLink : copy.manjat.urlHint}
             </span>
           </label>
-
-          {/* Logo + "detail terisi" confirmation — slides in once the fetch lands. */}
-          {prefilled && (
-            <div
-              key={host}
-              className="detail-in flex items-center gap-3 rounded-xl border border-hidup/30 bg-hidup/8 p-2.5"
-            >
-              {logoUrl && !logoFailed ? (
-                // biome-ignore lint/performance/noImgElement: remote site logo, not a static asset
-                <img
-                  src={logoUrl}
-                  alt=""
-                  onError={() => setLogoFailed(true)}
-                  className="size-10 shrink-0 rounded-lg border border-garis bg-kertas-1 object-contain"
-                />
-              ) : (
-                <LogoTile nama={nama || host} className="size-10 shrink-0 rounded-lg text-base" />
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-tinta">{nama || host}</p>
-                <p className="truncate font-mono text-xs text-tinta-redup">{host}</p>
-              </div>
-            </div>
-          )}
 
           {/* Prefilled from the URL, but editable — tweak before you go up. */}
           <Input

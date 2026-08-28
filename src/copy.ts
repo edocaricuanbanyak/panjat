@@ -146,7 +146,7 @@ export const copy = {
   kakiTiang: {
     judul: "Kaki Tiang",
     sisaDukungan: (n: number) => `${n} dukungan tersisa hari ini`,
-    ajakan: "Listing gratis. Beri dukungan untuk yang bagus — yang paling didukung naik di sini.",
+    ajakan: "Listing gratis. Beri dukungan untuk yang bagus — yang paling didukung naik ke tiang.",
     dukung: "Dukung",
     dukungan_n: (n: number) => `${n.toLocaleString("id-ID")} dukungan`,
     kosong: "Belum ada yang manjat. Tiangnya masih kinclong.",
