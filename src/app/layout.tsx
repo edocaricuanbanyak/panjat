@@ -1,19 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Anybody, Instrument_Sans, Martian_Mono } from "next/font/google";
+import { Martian_Mono, Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { copy } from "@/copy";
 import "./globals.css";
 
-// Display: variable width axis is a second data encoding (§9.6.3).
-const anybody = Anybody({
-  variable: "--font-anybody",
+// Headings.
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-  axes: ["wdth"],
+  weight: ["400", "500", "600", "700", "800"],
 });
-const instrumentSans = Instrument_Sans({
-  variable: "--font-instrument-sans",
+// Body / content / caption.
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
 });
+// Numbers / tabular data.
 const martianMono = Martian_Mono({
   variable: "--font-martian-mono",
   subsets: ["latin"],
@@ -43,7 +45,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="id"
-      className={`${anybody.variable} ${instrumentSans.variable} ${martianMono.variable} h-full antialiased`}
+      className={`${poppins.variable} ${jakarta.variable} ${martianMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-kertas text-tinta">
         <PostHogProvider>{children}</PostHogProvider>

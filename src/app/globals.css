@@ -28,9 +28,9 @@
   --color-perunggu: #b06a34;
 
   /* Fonts (bound in layout via next/font CSS variables) */
-  --font-display: var(--font-anybody);
-  --font-sans: var(--font-instrument-sans);
-  --font-mono: var(--font-martian-mono);
+  --font-display: var(--font-poppins); /* headings */
+  --font-sans: var(--font-jakarta); /* body / content / caption */
+  --font-mono: var(--font-martian-mono); /* numbers / tabular */
 
   /* Radius (§9.5) */
   --radius-sm: 6px;
