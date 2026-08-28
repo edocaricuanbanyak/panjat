@@ -148,6 +148,15 @@ export function ManjatWizard({
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoFailed, setLogoFailed] = useState(false);
   const urlRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLTextAreaElement>(null);
+  // Grow the description box to fit its content (≤160 chars) so it never scrolls.
+  useEffect(() => {
+    const el = descRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, [deskripsi, step]);
   function clearUrl() {
     setUrl("");
     setPrefilled(false);
@@ -305,10 +314,12 @@ export function ManjatWizard({
               {copy.manjat.deskripsi}
             </span>
             <textarea
+              ref={descRef}
               value={deskripsi}
               maxLength={160}
               rows={2}
               onChange={(e) => setDeskripsi(e.target.value)}
+              style={{ resize: "none", overflow: "hidden" }}
               className={textareaClasses}
             />
           </label>
