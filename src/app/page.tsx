@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { Suspense } from "react";
 import { BoardLive } from "@/components/BoardLive";
 import { CaraMain } from "@/components/CaraMain";
 import { EmptyState } from "@/components/EmptyState";
@@ -13,6 +14,7 @@ import { ListingCard } from "@/components/ListingCard";
 import { PageShell } from "@/components/PageShell";
 import { Pagination } from "@/components/Pagination";
 import { PasangGratisModal } from "@/components/PasangGratisModal";
+import { HomeSkeleton } from "@/components/Skeleton";
 import { VoteFavorit } from "@/components/VoteFavorit";
 import { copy } from "@/copy";
 import { db } from "@/db";
@@ -30,7 +32,25 @@ export const dynamic = "force-dynamic";
 
 const PER_PAGE = 20;
 
-export default async function Home({
+// The board + its 10 parallel queries are the slow part; the sticky header/ticker
+// (from PageShell) paint first, then the body streams in behind a skeleton. A
+// route-level loading.tsx can't be used here — at src/app/ it's the root boundary
+// that wraps every route and turns notFound() into a soft-404 (removed earlier).
+export default function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ hal?: string; baru?: string }>;
+}) {
+  return (
+    <PageShell>
+      <Suspense fallback={<HomeSkeleton />}>
+        <HomeBody searchParams={searchParams} />
+      </Suspense>
+    </PageShell>
+  );
+}
+
+async function HomeBody({
   searchParams,
 }: {
   searchParams: Promise<{ hal?: string; baru?: string }>;
@@ -73,7 +93,7 @@ export default async function Home({
   const voteEntries = entries.map((e) => ({ id: e.id, nama: e.nama, urlNormal: e.urlNormal }));
 
   return (
-    <PageShell manjatKategori={kats}>
+    <>
       {/* HERO — value + the one action */}
       <section className="pt-1 pb-5">
         <h1
@@ -165,6 +185,6 @@ export default async function Home({
         </h2>
         <CaraMain />
       </section>
-    </PageShell>
+    </>
   );
 }

@@ -228,6 +228,23 @@ body {
   animation: manjat-slot 260ms var(--ease-panjat);
 }
 
+/* Skeleton placeholder — a sunken-paper block that softly pulses while a page
+   streams in. The reduced-motion rule below neutralizes the pulse (via the
+   global `*` animation override), leaving a static block. */
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+.skeleton {
+  background-color: var(--color-kertas-2);
+  animation: skeleton-pulse 1.5s var(--ease-panjat) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
