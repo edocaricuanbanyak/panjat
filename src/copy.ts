@@ -404,6 +404,7 @@ export const copy = {
     jenisLapor: "Laporkan konten bermasalah",
     jenisKlaim: "Klaim: saya pemilik URL ini",
     pesan: "Pesan",
+    pesanPlaceholder: "Ceritakan singkat masalahnya atau bukti kepemilikan URL…",
     kontak: "Kontak kamu (untuk verifikasi klaim)",
     kontakPlaceholder: "email atau WA",
     kirim: "Kirim",
