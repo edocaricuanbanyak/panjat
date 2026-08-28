@@ -5,7 +5,8 @@ import { readFileSync, writeFileSync } from "node:fs";
 import sharp from "sharp";
 
 const svg = readFileSync(new URL("../src/app/icon.svg", import.meta.url));
-const sizes = [16, 32, 48];
+// Sizes Google Search favicon prefers (square, multiples of 48) + small tab sizes.
+const sizes = [16, 32, 48, 96, 192];
 
 const pngs = await Promise.all(
   sizes.map((s) => sharp(svg, { density: 512 }).resize(s, s).png().toBuffer()),
