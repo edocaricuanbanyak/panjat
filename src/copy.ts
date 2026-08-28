@@ -35,7 +35,7 @@ export const copy = {
       "Pegangan paling kuat duduk paling atas. Tiangnya licin — yang berhenti manjat, merosot.",
     statOnline: "online",
     statPengunjung: "pengunjung",
-    statPeserta: "peserta manjat",
+    statPeserta: "pemanjat",
     papanKosongJudul: "Belum ada yang manjat.",
     papanKosongPesan: "Tiangnya masih kinclong.",
     caraMainJudul: "Cara main",
