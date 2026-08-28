@@ -493,7 +493,9 @@ export function ManjatWizard({
           <Button className="w-full" disabled={!quote || submitting || !consent} onClick={onPay}>
             {submitting
               ? copy.manjat.memproses
-              : copy.manjat.bayar(quote ? formatRupiah(quote.nominal) : undefined)}
+              : nominalDinaikkan && quote
+                ? copy.manjat.bayarMinimal(formatRupiah(quote.nominal))
+                : copy.manjat.bayar(quote ? formatRupiah(quote.nominal) : undefined)}
           </Button>
         </div>
       )}

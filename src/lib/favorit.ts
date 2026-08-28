@@ -59,6 +59,7 @@ export async function myFavoritToday(vid: string | undefined, now = new Date()):
 export interface FavoritEntry {
   id: string;
   nama: string;
+  urlNormal: string;
   votes: number;
 }
 
@@ -76,13 +77,16 @@ export async function favoritBoard(db: Database, now = new Date(), limit = 10): 
       votes.set(raw[i], Number(raw[i + 1]));
     }
     const rows = await db
-      .select({ id: listing.id, nama: listing.nama })
+      .select({ id: listing.id, nama: listing.nama, urlNormal: listing.urlNormal })
       .from(listing)
       .where(inArray(listing.id, ids));
-    const nameById = new Map(rows.map((row) => [row.id, row.nama]));
+    const byId = new Map(rows.map((row) => [row.id, row]));
     return ids
-      .filter((id) => nameById.has(id) && (votes.get(id) ?? 0) > 0)
-      .map((id) => ({ id, nama: nameById.get(id) as string, votes: votes.get(id) ?? 0 }));
+      .filter((id) => byId.has(id) && (votes.get(id) ?? 0) > 0)
+      .map((id) => {
+        const row = byId.get(id) as { nama: string; urlNormal: string };
+        return { id, nama: row.nama, urlNormal: row.urlNormal, votes: votes.get(id) ?? 0 };
+      });
   } catch {
     return [];
   }

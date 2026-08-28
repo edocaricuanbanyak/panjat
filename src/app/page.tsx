@@ -70,7 +70,7 @@ export default async function Home({
   const page = Math.min(Math.max(1, Number((await searchParams).hal) || 1), totalPages);
   const pageEntries = entries.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  const voteEntries = entries.map((e) => ({ id: e.id, nama: e.nama }));
+  const voteEntries = entries.map((e) => ({ id: e.id, nama: e.nama, urlNormal: e.urlNormal }));
 
   return (
     <PageShell
