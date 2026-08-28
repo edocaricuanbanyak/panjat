@@ -30,7 +30,7 @@ export const copy = {
   },
 
   beranda: {
-    heroJudul: "Panjat terusss.",
+    heroJudul: "Panjat. Salip. Jadi #1.",
     heroSub:
       "Pegangan paling kuat duduk paling atas. Tiangnya licin — yang berhenti manjat, merosot.",
     statOnline: "online",
