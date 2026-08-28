@@ -37,13 +37,16 @@ export function Modal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 kaca-overlay sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center kaca-overlay sm:items-center sm:p-4"
       onClick={onClose}
     >
+      {/* Native-style bottom sheet on mobile (slides up, rounded top, drag
+          handle); a centered card on sm+. */}
       <div
-        className="w-full max-w-md rounded-xl border border-garis/80 bg-kertas p-5 shadow-naik"
+        className="sheet-in flex max-h-[92vh] w-full flex-col overflow-y-auto rounded-t-2xl border border-garis/80 bg-kertas p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-naik sm:max-h-[86vh] sm:max-w-md sm:rounded-2xl sm:pb-5"
         onClick={(e) => e.stopPropagation()}
       >
+        <div className="mx-auto mb-3 h-1.5 w-10 shrink-0 rounded-full bg-garis sm:hidden" aria-hidden />
         {title && (
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-display text-xl font-bold text-tinta" style={{ fontStretch: "120%" }}>

@@ -177,6 +177,25 @@ body {
   animation: dukung-plus 720ms var(--ease-panjat) forwards;
 }
 
+/* Modal / bottom sheet entrance — slides up from the bottom (native sheet feel
+   on mobile; a gentle rise on desktop). */
+@keyframes sheet-up {
+  0% { opacity: 0; transform: translateY(100%); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.sheet-in {
+  animation: sheet-up 300ms var(--ease-panjat);
+}
+@media (min-width: 640px) {
+  @keyframes sheet-rise {
+    0% { opacity: 0; transform: translateY(16px) scale(0.98); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .sheet-in {
+    animation: sheet-rise 200ms var(--ease-panjat);
+  }
+}
+
 /* Detail auto-fill confirmation — slides in when the URL preview lands. */
 @keyframes detail-in {
   0% { opacity: 0; transform: translateY(-6px); }
