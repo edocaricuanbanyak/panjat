@@ -76,7 +76,7 @@ export const copy = {
     urlHintMemuat: "Mengambil detail…",
     detailTerisi: "Detail terisi",
     cekLink: "Mengecek link & mengisi detail…",
-    detailRingkas: "Detail terisi otomatis — ketuk untuk ubah",
+    detailRingkas: "Judul, kategori & deskripsi — ketuk untuk ubah",
     posisiPrimer: "Kamu akan bayar",
     judulListing: "Judul",
     judulPlaceholder: "Nyala Analytics",

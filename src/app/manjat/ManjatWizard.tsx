@@ -266,9 +266,6 @@ export function ManjatWizard({
                 <p className="truncate text-sm font-medium text-tinta">{nama || host}</p>
                 <p className="truncate font-mono text-xs text-tinta-redup">{host}</p>
               </div>
-              <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-hidup">
-                <Check className="size-3.5" aria-hidden /> {copy.manjat.detailTerisi}
-              </span>
             </div>
           )}
 
