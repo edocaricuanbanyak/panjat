@@ -32,7 +32,9 @@ export function MomenPuncakReveal({
   const actions = (
     <>
       <p className="text-xs text-tinta-redup">{copy.momen.bagikanAjak}</p>
-      <ShareButton url="/" text={copy.momen.share(rank)} />
+      {/* Share the buyer's own listing (rich per-listing OG card via /api/og/[id]),
+          not the generic board root — the whole point is "ini produkku, aku di #N". */}
+      <ShareButton url={`/l/${listingId}`} text={copy.momen.share(rank)} />
       <a href="/" className={buttonClasses("secondary", "md")}>
         {copy.momen.lihatPapan}
       </a>
