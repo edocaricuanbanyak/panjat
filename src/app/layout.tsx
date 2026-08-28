@@ -3,6 +3,7 @@ import { Martian_Mono, Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import Script from "next/script";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { copy } from "@/copy";
+import { BASE_URL } from "@/lib/site";
 import "./globals.css";
 
 // Headings.
@@ -23,6 +24,7 @@ const martianMono = Martian_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
   title: `${copy.merek.nama} — ${copy.merek.tagline}`,
   description: copy.merek.deskripsiSitus,
   applicationName: copy.merek.nama,
@@ -30,6 +32,20 @@ export const metadata: Metadata = {
     capable: true,
     title: copy.merek.nama,
     statusBarStyle: "default",
+  },
+  // og:image / twitter:image are auto-added by src/app/opengraph-image.tsx.
+  openGraph: {
+    type: "website",
+    siteName: copy.merek.nama,
+    title: `${copy.merek.nama} — ${copy.merek.tagline}`,
+    description: copy.merek.deskripsiSitus,
+    url: "/",
+    locale: "id_ID",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${copy.merek.nama} — ${copy.merek.tagline}`,
+    description: copy.merek.deskripsiSitus,
   },
 };
 
