@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import { Dropdown } from "@/components/Dropdown";
-import { Input, textareaClasses } from "@/components/Input";
+import { fieldClasses, Input, textareaClasses } from "@/components/Input";
 import { LogoTile } from "@/components/LogoTile";
 import { copy } from "@/copy";
 import type { Quote } from "@/domain/manjat";
@@ -144,9 +144,13 @@ export function ManjatWizard({
   }
 
   const [previewing, setPreviewing] = useState(false);
+  const [prefilled, setPrefilled] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoFailed, setLogoFailed] = useState(false);
   async function prefillFromUrl() {
-    if (!url.trim()) return;
+    if (!url.trim() || previewing) return;
     setPreviewing(true);
+    setPrefilled(false);
     try {
       const res = await fetch(`/api/preview?url=${encodeURIComponent(url)}`);
       if (!res.ok) return;
@@ -155,6 +159,9 @@ export function ManjatWizard({
       setNama((n) => n || p.nama || "");
       setDeskripsi((d) => d || p.deskripsi || "");
       if (p.kategoriSlug) setKategoriSlug((k) => k || p.kategoriSlug);
+      setLogoUrl(p.logoUrl ?? null);
+      setLogoFailed(false);
+      setPrefilled(true);
     } catch {
       /* preview is best-effort; the pay flow never waits on it */
     } finally {
@@ -199,16 +206,71 @@ export function ManjatWizard({
 
       {step === 1 && (
         <div className="mt-6 flex flex-col gap-4">
-          {/* The one thing to do on this step: paste a link. Everything else is
-              auto-filled and tucked away. */}
-          <Input
-            label={copy.manjat.urlLabel}
-            placeholder={copy.manjat.urlPlaceholder}
-            hint={previewing ? copy.manjat.urlHintMemuat : copy.manjat.urlHint}
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            onBlur={prefillFromUrl}
-          />
+          {/* The one thing to do on this step: paste a link. On Enter/blur we
+              fetch the site and fill the rest — with a visible spinner → check. */}
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-tinta-redup">
+              {copy.manjat.urlLabel}
+            </span>
+            <div className="relative">
+              <input
+                inputMode="url"
+                placeholder={copy.manjat.urlPlaceholder}
+                value={url}
+                onChange={(e) => {
+                  setUrl(e.target.value);
+                  setPrefilled(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    (e.target as HTMLInputElement).blur();
+                  }
+                }}
+                onBlur={prefillFromUrl}
+                className={`${fieldClasses} pr-11`}
+              />
+              <span className="absolute right-3.5 top-1/2 -translate-y-1/2">
+                {previewing ? (
+                  <Loader2 className="size-5 animate-spin text-tinta-redup" aria-hidden />
+                ) : prefilled ? (
+                  <Check className="size-5 text-hidup" aria-hidden />
+                ) : null}
+              </span>
+            </div>
+            <span
+              className={`mt-1 block text-xs ${previewing ? "text-merah-teks" : "text-tinta-redup"}`}
+            >
+              {previewing ? copy.manjat.cekLink : copy.manjat.urlHint}
+            </span>
+          </label>
+
+          {/* Logo + "detail terisi" confirmation — slides in once the fetch lands. */}
+          {prefilled && (
+            <div
+              key={host}
+              className="detail-in flex items-center gap-3 rounded-xl border border-hidup/30 bg-hidup/8 p-2.5"
+            >
+              {logoUrl && !logoFailed ? (
+                // biome-ignore lint/performance/noImgElement: remote site logo, not a static asset
+                <img
+                  src={logoUrl}
+                  alt=""
+                  onError={() => setLogoFailed(true)}
+                  className="size-10 shrink-0 rounded-lg border border-garis bg-kertas-1 object-contain"
+                />
+              ) : (
+                <LogoTile nama={nama || host} className="size-10 shrink-0 rounded-lg text-base" />
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-tinta">{nama || host}</p>
+                <p className="truncate font-mono text-xs text-tinta-redup">{host}</p>
+              </div>
+              <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-hidup">
+                <Check className="size-3.5" aria-hidden /> {copy.manjat.detailTerisi}
+              </span>
+            </div>
+          )}
 
           {/* Auto-filled from the URL — collapsed by default; open only to edit. */}
           <details className="rounded-xl border border-garis bg-kertas-1 p-3">

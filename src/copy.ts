@@ -74,6 +74,8 @@ export const copy = {
     urlPlaceholder: "nyala.id",
     urlHint: "Cukup tempel URL saja — sisanya kami isi otomatis.",
     urlHintMemuat: "Mengambil detail…",
+    detailTerisi: "Detail terisi",
+    cekLink: "Mengecek link & mengisi detail…",
     detailRingkas: "Detail terisi otomatis — ketuk untuk ubah",
     posisiPrimer: "Kamu akan bayar",
     judulListing: "Judul",
