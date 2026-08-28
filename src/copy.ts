@@ -85,6 +85,7 @@ export const copy = {
     emailHint: "Isi kalau mau akses dasbor & notifikasi. Tanpa akun.",
     lanjut: "Lanjut",
     kembali: "Kembali",
+    kembaliPosisi: "Kembali ke posisi",
     detail: "Detail",
     ubahDetail: "ubah detail",
     manjatPrefix: "Manjat:",

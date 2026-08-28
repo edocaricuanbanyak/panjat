@@ -5,14 +5,12 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import { Dropdown } from "@/components/Dropdown";
 import { Input, textareaClasses } from "@/components/Input";
-import { Steps } from "@/components/Steps";
+import { LogoTile } from "@/components/LogoTile";
 import { copy } from "@/copy";
 import type { Quote } from "@/domain/manjat";
 import { formatRupiah } from "@/lib/format";
 
 type Kategori = { slug: string; nama: string };
-
-const STEP_LABELS: string[] = [...copy.manjat.steps];
 
 async function postManjat(payload: unknown) {
   const res = await fetch("/api/manjat", {
@@ -98,10 +96,8 @@ export function ManjatWizard({
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loadingQuote, setLoadingQuote] = useState(false);
 
-  const [confirmBig, setConfirmBig] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [shotFailed, setShotFailed] = useState(false);
 
   async function refreshQuote(payload: { nominal: number }) {
     setError(null);
@@ -176,8 +172,6 @@ export function ManjatWizard({
   // Only the URL is required; the rest is auto-filled and editable.
   const canStep1 = url.trim() !== "";
   const host = url.trim().replace(/^https?:\/\//, "").replace(/\/+$/, "");
-  const onPayOrConfirm = () => (bigAmount ? setStep(3) : onPay());
-  const bigAmount = (quote?.nominal ?? 0) > 200_000;
 
   return (
     <div className="w-full">
@@ -196,10 +190,6 @@ export function ManjatWizard({
           </h1>
         </>
       )}
-
-      <div className={inModal ? "" : "mt-4"}>
-        <Steps current={step} labels={STEP_LABELS} />
-      </div>
 
       {error && (
         <p className="mt-4 rounded-xl border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">
@@ -261,55 +251,31 @@ export function ManjatWizard({
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          <Button disabled={!canStep1} onClick={() => setStep(2)}>
-            {copy.manjat.lanjut}
+          <Button disabled={!canStep1} onClick={() => setStep(2)} className="gap-1.5">
+            {express && <ArrowLeft className="size-4" aria-hidden />}
+            {express ? copy.manjat.kembaliPosisi : copy.manjat.lanjut}
           </Button>
         </div>
       )}
 
       {step === 2 && (
         <div className="mt-6 flex flex-col gap-4">
-          {/* Site confirmation as a mini browser window — a real (recognisable)
-              page preview, kept compact. Whole card doubles as "ganti detail". */}
+          {/* Site confirmation — logo + URL of the listing you're putting up,
+              with a quick way back to the detail form. */}
           {url.trim() && (
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="block w-full overflow-hidden rounded-xl border border-garis bg-kertas-1 text-left"
+              className="flex w-full items-center gap-3 rounded-xl border border-garis bg-kertas-1 p-2.5 text-left"
             >
-              {/* browser chrome: traffic lights + address + edit */}
-              <div className="flex items-center gap-2 border-b border-garis bg-kertas-2 px-3 py-2">
-                <span className="flex shrink-0 gap-1" aria-hidden>
-                  <span className="size-2 rounded-full bg-garis" />
-                  <span className="size-2 rounded-full bg-garis" />
-                  <span className="size-2 rounded-full bg-garis" />
-                </span>
-                <span className="min-w-0 flex-1 truncate rounded-md bg-kertas-1 px-2 py-0.5 font-mono text-xs text-tinta-redup">
-                  {host}
-                </span>
-                <span className="shrink-0 text-xs font-medium text-merah-teks">
-                  {copy.manjat.ubahDetail}
-                </span>
+              <LogoTile nama={nama || host} className="size-10 shrink-0 rounded-lg text-base" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-tinta">{nama || host}</p>
+                <p className="truncate font-mono text-xs text-tinta-redup">{host}</p>
               </div>
-              {/* the page itself */}
-              {!shotFailed ? (
-                // biome-ignore lint/performance/noImgElement: on-demand capture, not a static asset
-                <img
-                  src={`/api/preview-shot?url=${encodeURIComponent(url)}`}
-                  alt={copy.manjat.pratinjauAlt(nama || url)}
-                  width={1200}
-                  height={800}
-                  onError={() => setShotFailed(true)}
-                  className="h-28 w-full bg-kertas-1 object-cover object-top"
-                />
-              ) : (
-                <div className="flex h-20 w-full items-center gap-3 px-4">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-kertas-2 font-display text-lg font-bold text-tinta-redup">
-                    {(nama || url).slice(0, 1).toUpperCase()}
-                  </div>
-                  <p className="truncate text-sm font-medium text-tinta">{nama || host}</p>
-                </div>
-              )}
+              <span className="shrink-0 text-xs font-medium text-merah-teks">
+                {copy.manjat.ubahDetail}
+              </span>
             </button>
           )}
 
@@ -391,81 +357,12 @@ export function ManjatWizard({
             </div>
           )}
 
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => setStep(1)} className="gap-1.5">
-              <ArrowLeft className="size-4" aria-hidden />
-              {express ? copy.manjat.detail : copy.manjat.kembali}
-            </Button>
-            {express ? (
-              <Button
-                className="flex-1"
-                disabled={!quote || submitting}
-                onClick={onPayOrConfirm}
-              >
-                {submitting
-                  ? copy.manjat.memproses
-                  : copy.manjat.bayar(quote ? formatRupiah(quote.nominal) : undefined)}
-              </Button>
-            ) : (
-              <Button className="flex-1" disabled={!quote} onClick={() => setStep(3)}>
-                {copy.manjat.lanjut}
-              </Button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {step === 3 && quote && (
-        <div className="mt-6 flex flex-col gap-4">
-          <dl className="rounded-xl border border-garis bg-kertas-1 p-4 text-sm">
-            <div className="flex justify-between py-1">
-              <dt className="text-tinta-redup">{copy.manjat.ringkasListing}</dt>
-              <dd className="text-tinta">{nama || url}</dd>
-            </div>
-            <div className="flex justify-between py-1">
-              <dt className="text-tinta-redup">{copy.manjat.ringkasTarget}</dt>
-              <dd className="font-mono tabular text-tinta">#{quote.rank}</dd>
-            </div>
-            <div className="flex justify-between py-1">
-              <dt className="text-tinta-redup">{copy.manjat.ringkasEstimasi}</dt>
-              <dd className="font-mono tabular text-tinta">
-                {quote.estimasiHari === null
-                  ? copy.manjat.stabil
-                  : copy.manjat.bertahanHari(quote.estimasiHari)}
-              </dd>
-            </div>
-            <div className="mt-1 flex items-baseline justify-between border-t border-garis pt-2">
-              <dt className="font-medium text-tinta">{copy.manjat.ringkasTotal}</dt>
-              <dd className="font-mono tabular text-xl font-bold text-tinta">
-                {formatRupiah(quote.nominal)}
-              </dd>
-            </div>
-          </dl>
-
-          {bigAmount && (
-            <label className="flex items-start gap-2 text-sm text-tinta-redup">
-              <input
-                type="checkbox"
-                checked={confirmBig}
-                onChange={(e) => setConfirmBig(e.target.checked)}
-                className="mt-0.5"
-              />
-              {copy.manjat.yakinBayar(formatRupiah(quote.nominal))}
-            </label>
-          )}
-
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => setStep(2)}>
-              {copy.manjat.kembali}
-            </Button>
-            <Button
-              className="flex-1"
-              disabled={submitting || (bigAmount && !confirmBig)}
-              onClick={onPay}
-            >
-              {submitting ? copy.manjat.memproses : copy.manjat.bayarQris(formatRupiah(quote.nominal))}
-            </Button>
-          </div>
+          {/* Single CTA — pay goes straight to the payment gateway. */}
+          <Button className="w-full" disabled={!quote || submitting} onClick={onPay}>
+            {submitting
+              ? copy.manjat.memproses
+              : copy.manjat.bayar(quote ? formatRupiah(quote.nominal) : undefined)}
+          </Button>
         </div>
       )}
     </div>

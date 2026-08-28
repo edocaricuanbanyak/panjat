@@ -58,7 +58,7 @@ export function ListingCard({
 
       {/* Above-center floating action, revealed on hover (pointer devices). */}
       <div className="pointer-events-none absolute -top-3 left-1/2 z-20 hidden -translate-x-1/2 opacity-0 transition-all ease-panjat group-hover:pointer-events-auto group-hover:-top-3.5 group-hover:opacity-100 md:block">
-        <ManjatButton url={entry.urlNormal} nominal={salipCost} size="sm" className="h-7 px-2.5 text-xs">
+        <ManjatButton nominal={salipCost} size="sm" className="h-7 px-2.5 text-xs">
           {copy.papan.salipRank(entry.rank, formatRupiah(salipCost))}
         </ManjatButton>
       </div>
@@ -131,7 +131,7 @@ export function ListingCard({
               {formatRupiah(entry.pegangan)}
             </span>
             <span className="relative z-10">
-              <ManjatButton url={entry.urlNormal} nominal={salipCost} size="sm" className="h-9 w-full">
+              <ManjatButton nominal={salipCost} size="sm" className="h-9 w-full">
                 {copy.papan.salip(formatRupiah(salipCost))}
               </ManjatButton>
             </span>
@@ -146,7 +146,7 @@ export function ListingCard({
           {formatRupiah(entry.pegangan)}
         </span>
         <span className="relative z-10 md:hidden">
-          <ManjatButton url={entry.urlNormal} nominal={salipCost} size="sm" variant="secondary" className="h-7 px-2.5 text-xs">
+          <ManjatButton nominal={salipCost} size="sm" variant="secondary" className="h-7 px-2.5 text-xs">
             {copy.papan.salipSingkat}
           </ManjatButton>
         </span>

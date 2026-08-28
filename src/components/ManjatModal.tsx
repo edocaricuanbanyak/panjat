@@ -92,8 +92,9 @@ export function ManjatButton({
   children: React.ReactNode;
 }) {
   const { open } = useManjat();
-  // Consistent behaviour: a known URL (Salip a card, hero) jumps straight to the
-  // position+pay step; no URL (new Manjat) starts at step 1 to paste one.
+  // A known URL (hero) jumps straight to the position+pay step. Salip passes only
+  // a nominal (no URL) so it starts at step 1 — you enter YOUR listing, then land
+  // above the picked rank at that nominal.
   return (
     <button
       onClick={() => open({ url, nominal, express: Boolean(url) })}
