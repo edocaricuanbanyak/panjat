@@ -1,4 +1,3 @@
-import { Crown } from "lucide-react";
 import { copy } from "@/copy";
 import type { BoardEntry } from "@/domain/board";
 import { formatRupiah } from "@/lib/format";
@@ -42,15 +41,15 @@ export function ListingCard({
     <article
       className={`group relative flex flex-col gap-1.5 rounded-xl px-3 transition-all ease-panjat hover:z-10 sm:flex-row sm:items-center sm:gap-4 sm:px-4 ${puncak ? "py-3.5" : "py-3"}`}
     >
-      {/* Medal ribbon banner across the card's top — top-3 only (the "pita"). */}
+      {/* Medal ribbon (pita) on the card's top-left — top-3 only. */}
       {medali && (
-        <div
+        <span
           aria-label={medali.label}
-          className={`absolute -top-3 left-4 z-20 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-display text-xs font-bold uppercase tracking-wide text-kertas-1 shadow-naik ring-2 ring-kertas ${medali.bg}`}
+          style={{ clipPath: "polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%)" }}
+          className={`absolute -top-1 left-4 z-20 flex h-9 w-9 items-start justify-center pt-1.5 font-display text-sm font-bold leading-none text-kertas-1 drop-shadow-md ${medali.bg}`}
         >
-          {entry.rank === 1 && <Crown className="size-3.5" strokeWidth={2.5} aria-hidden />}
-          {copy.papan.juara(entry.rank)}
-        </div>
+          #{entry.rank}
+        </span>
       )}
 
       {/* Above-center floating action, revealed on hover (pointer devices). */}
