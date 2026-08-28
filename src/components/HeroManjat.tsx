@@ -36,7 +36,7 @@ export function HeroManjat({ kategori }: { kategori: Kategori[] }) {
       />
       <div className="flex gap-2 sm:contents">
         <Dropdown
-          className="flex-1 sm:w-44"
+          className="flex-1 sm:w-44 sm:flex-none"
           placeholder="Kategori"
           value={kategoriSlug}
           onChange={setKategoriSlug}
