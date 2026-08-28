@@ -271,6 +271,9 @@ export const copy = {
     online: "Online sekarang",
     onlineSub: "lagi lihat papan",
     onlineMetode: "Pengunjung anon aktif beberapa menit terakhir.",
+    trafikJudul: "Trafik web",
+    trafikSub: "Tampilan halaman & pengunjung dari Umami (analitik tanpa cookie).",
+    trafikBuka: "Buka dashboard Umami →",
   },
 
   arsip: {

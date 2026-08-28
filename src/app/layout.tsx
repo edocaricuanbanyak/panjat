@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Martian_Mono, Plus_Jakarta_Sans, Poppins } from "next/font/google";
+import Script from "next/script";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { copy } from "@/copy";
 import "./globals.css";
@@ -49,6 +50,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-kertas text-tinta">
         <PostHogProvider>{children}</PostHogProvider>
+        {/* Umami — privacy-friendly (cookieless) analytics, site-wide so every
+            page is tracked (not just /statistik). next/script auto-applies the
+            CSP nonce; cloud.umami.is is allowlisted in script-src + connect-src
+            (middleware.ts). Switch to strategy="beforeInteractive" to emit into
+            <head> if physical head placement is ever required. */}
+        <Script
+          src="https://cloud.umami.is/script.js"
+          data-website-id={
+            process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? "c70429e3-b6c0-4f83-91d1-5239f110278d"
+          }
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

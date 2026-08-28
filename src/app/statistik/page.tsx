@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import Script from "next/script";
 import { PageShell } from "@/components/PageShell";
 import { StatTile } from "@/components/StatTile";
+import { UmamiEmbed } from "@/components/UmamiEmbed";
 import { copy } from "@/copy";
 import { db } from "@/db";
 import { getStatistik } from "@/domain/statistik";
@@ -85,14 +85,8 @@ export default async function StatistikPage() {
         />
       </div>
 
-      {/* Umami — privacy-friendly (cookieless) analytics, this page only.
-          next/script auto-applies the CSP nonce; cloud.umami.is is allowlisted
-          in script-src + connect-src (middleware.ts). */}
-      <Script
-        src="https://cloud.umami.is/script.js"
-        data-website-id="c70429e3-b6c0-4f83-91d1-5239f110278d"
-        strategy="afterInteractive"
-      />
+      {/* Trafik web — Umami's own dashboard, embedded (set NEXT_PUBLIC_UMAMI_SHARE_URL). */}
+      <UmamiEmbed url={process.env.NEXT_PUBLIC_UMAMI_SHARE_URL} />
     </PageShell>
   );
 }

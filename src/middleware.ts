@@ -17,6 +17,7 @@ export function middleware(req: NextRequest) {
     "img-src 'self' data: https:", // OG cards + remote logos
     "font-src 'self' data:",
     "connect-src 'self' https://cloud.umami.is", // SSE board stream + Umami analytics
+    "frame-src https://cloud.umami.is", // Umami share dashboard embed on /statistik
     "frame-ancestors 'none'", // no clickjacking (papan tak boleh di-iframe)
     "base-uri 'self'",
     "form-action 'self'",
