@@ -3,7 +3,7 @@ import { copy } from "@/copy";
 import type { BoardEntry } from "@/domain/board";
 import { formatRupiah } from "@/lib/format";
 import { LencanaRow } from "./LencanaRow";
-import { LogoTile } from "./LogoTile";
+import { SiteLogo } from "./SiteLogo";
 import { ManjatButton } from "./ManjatModal";
 
 // Top-3 podium medals: gold crown, silver, bronze (ribbon-style corner badge).
@@ -88,7 +88,8 @@ export function ListingCard({
         >
           #{entry.rank}
         </div>
-        <LogoTile
+        <SiteLogo
+          urlNormal={entry.urlNormal}
           nama={entry.nama}
           className={puncak ? "size-11 rounded-md text-lg" : "size-9 rounded-md text-sm"}
         />
@@ -104,7 +105,7 @@ export function ListingCard({
           {entry.nama}
         </a>
         {entry.deskripsi && (
-          <p className={`truncate text-tinta-redup ${puncak ? "text-sm" : "text-xs sm:text-sm"}`}>
+          <p className={`line-clamp-2 text-tinta-redup ${puncak ? "text-sm" : "text-xs sm:text-sm"}`}>
             {entry.deskripsi}
           </p>
         )}

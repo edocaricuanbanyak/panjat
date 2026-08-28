@@ -3,7 +3,8 @@
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
-import { fieldClasses, Input } from "@/components/Input";
+import { Dropdown } from "@/components/Dropdown";
+import { fieldClasses, Input, textareaClasses } from "@/components/Input";
 import { LogoTile } from "@/components/LogoTile";
 import { copy } from "@/copy";
 import type { Quote } from "@/domain/manjat";
@@ -178,6 +179,10 @@ export function ManjatWizard({
   // Only the URL is required; the rest is auto-filled and editable.
   const canStep1 = url.trim() !== "";
   const host = url.trim().replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  // The server clamps below-minimum amounts up; surface that instead of silently
+  // showing a different position than the number you typed.
+  const typedNominal = Number(nominalInput) || 0;
+  const nominalDinaikkan = quote != null && typedNominal > 0 && quote.nominal > typedNominal;
 
   return (
     <div className="w-full">
@@ -268,6 +273,33 @@ export function ManjatWizard({
             </div>
           )}
 
+          {/* Prefilled from the URL, but editable — tweak before you go up. */}
+          <Input
+            label={copy.manjat.judulListing}
+            placeholder={copy.manjat.judulPlaceholder}
+            value={nama}
+            onChange={(e) => setNama(e.target.value)}
+          />
+          <Dropdown
+            label={copy.manjat.kategori}
+            placeholder="—"
+            value={kategoriSlug}
+            onChange={setKategoriSlug}
+            options={kategori.map((k) => ({ value: k.slug, label: k.nama }))}
+          />
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-tinta-redup">
+              {copy.manjat.deskripsi}
+            </span>
+            <textarea
+              value={deskripsi}
+              maxLength={160}
+              rows={2}
+              onChange={(e) => setDeskripsi(e.target.value)}
+              className={textareaClasses}
+            />
+          </label>
+
           <Input
             label={copy.manjat.emailOpsional}
             type="email"
@@ -330,10 +362,20 @@ export function ManjatWizard({
                 placeholder={copy.manjat.nominalPlaceholder}
                 value={nominalInput ? Number(nominalInput).toLocaleString("id-ID") : ""}
                 onChange={(e) => setNominalInput(e.target.value.replace(/\D/g, ""))}
-                className="h-14 w-full rounded-xl border border-garis bg-kertas-1 pl-12 pr-4 font-mono text-2xl font-bold text-tinta shadow-kartu focus-visible:border-merah focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merah/25"
+                className={`h-14 w-full rounded-xl border bg-kertas-1 pl-12 pr-4 font-mono text-2xl font-bold text-tinta shadow-kartu focus-visible:outline-none focus-visible:ring-2 ${
+                  nominalDinaikkan
+                    ? "border-galat focus-visible:border-galat focus-visible:ring-galat/25"
+                    : "border-garis focus-visible:border-merah focus-visible:ring-merah/25"
+                }`}
               />
             </div>
-            <p className="mt-1.5 text-xs text-tinta-redup">{copy.manjat.nominalNaik}</p>
+            {nominalDinaikkan && quote ? (
+              <p className="mt-1.5 text-xs font-medium text-galat">
+                {copy.manjat.nominalDinaikkan(formatRupiah(quote.nominal))}
+              </p>
+            ) : (
+              <p className="mt-1.5 text-xs text-tinta-redup">{copy.manjat.nominalNaik}</p>
+            )}
           </div>
 
           {/* Live board — you slot in among real competitors as you set the amount. */}
