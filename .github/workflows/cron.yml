@@ -1,0 +1,47 @@
+name: Cron
+
+# Free replacement for Vercel Cron (Hobby plan can't run sub-daily crons).
+# GitHub-hosted scheduler hits /api/cron/* on the production site with CRON_SECRET.
+# Schedules are UTC and mirror vercel.json. Note: GitHub's scheduler is best-effort
+# and can lag/skip under load — rosot is idempotent per hour and reconcile catches
+# drift, so this is fine for a free launch (upgrade to Vercel Pro for exact timing).
+
+on:
+  schedule:
+    - cron: "0 * * * *" # rosot (hourly)
+    - cron: "5 * * * *" # jaga-posisi
+    - cron: "30 * * * *" # moderasi
+    - cron: "15 * * * *" # screenshot
+    - cron: "0 17 * * *" # tebak (00:00 WIB)
+    - cron: "0 18 * * *" # lencana (01:00 WIB)
+    - cron: "0 19 * * *" # reconcile (02:00 WIB)
+    - cron: "5 17 * * 0" # juara-mingguan (Mon 00:05 WIB)
+  workflow_dispatch:
+    inputs:
+      path:
+        description: "cron path to trigger manually (e.g. rosot, reconcile)"
+        required: true
+        default: reconcile
+
+jobs:
+  hit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger cron endpoint
+        env:
+          BASE: https://panjat.id # works once the domain is live on Vercel
+          SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          case "${{ github.event.schedule }}" in
+            "0 * * * *")   P=rosot ;;
+            "5 * * * *")   P=jaga-posisi ;;
+            "30 * * * *")  P=moderasi ;;
+            "15 * * * *")  P=screenshot ;;
+            "0 17 * * *")  P=tebak ;;
+            "0 18 * * *")  P=lencana ;;
+            "0 19 * * *")  P=reconcile ;;
+            "5 17 * * 0")  P=juara-mingguan ;;
+            *)             P="${{ github.event.inputs.path }}" ;;
+          esac
+          echo "→ GET $BASE/api/cron/$P"
+          curl -fsS --max-time 300 -H "Authorization: Bearer $SECRET" "$BASE/api/cron/$P"
