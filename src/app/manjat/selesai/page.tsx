@@ -2,7 +2,6 @@ import { buttonClasses } from "@/components/Button";
 import { copy } from "@/copy";
 import { db } from "@/db";
 import { getMomen } from "@/domain/momen";
-import { formatRupiah } from "@/lib/format";
 import { MomenPuncakReveal } from "./MomenPuncakReveal";
 
 export const dynamic = "force-dynamic";
@@ -36,9 +35,9 @@ export default async function SelesaiPage({
         rank={momen.rank}
         heading={heading}
         nama={momen.nama}
-        pegangan={formatRupiah(momen.pegangan)}
-        overtaken={momen.overtaken}
         listingId={momen.listingId}
+        order={order}
+        hasScreenshot={momen.hasScreenshot}
       />
     </main>
   );

@@ -4,7 +4,7 @@
  */
 import { eq } from "drizzle-orm";
 import type { Database } from "@/db";
-import { transaksi } from "@/db/schema";
+import { listing, transaksi } from "@/db/schema";
 import { getBoard } from "./board";
 
 export interface Momen {
@@ -16,6 +16,8 @@ export interface Momen {
   overtaken: number;
   /** Reached the very top? */
   puncak: boolean;
+  /** Whether a site screenshot already exists (else the share card triggers one). */
+  hasScreenshot: boolean;
 }
 
 export async function getMomen(db: Database, orderId: string): Promise<Momen | null> {
@@ -35,6 +37,11 @@ export async function getMomenForListing(
   const { entries } = await getBoard(db);
   const e = entries.find((x) => x.id === listingId);
   if (!e) return null;
+  const [shot] = await db
+    .select({ screenshotUrl: listing.screenshotUrl })
+    .from(listing)
+    .where(eq(listing.id, listingId))
+    .limit(1);
   return {
     listingId: e.id,
     nama: e.nama,
@@ -42,5 +49,6 @@ export async function getMomenForListing(
     pegangan: e.pegangan,
     overtaken: entries.length - e.rank,
     puncak: e.rank === 1,
+    hasScreenshot: Boolean(shot?.screenshotUrl),
   };
 }

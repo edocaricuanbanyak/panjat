@@ -1,8 +1,8 @@
 "use client";
 
-import { Check, Search, Trophy } from "lucide-react";
+import { Check, ChevronDown, Search, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { copy } from "@/copy";
 import type { FavoritEntry } from "@/lib/favorit";
 import { Button } from "./Button";
@@ -14,7 +14,8 @@ type PickEntry = { id: string; nama: string; urlNormal: string };
 /**
  * "Pemanjat terfavorit" — a free spectator vote alongside the paid board (never
  * money/ranking). One vote per WIB day, accumulated weekly. Before voting: a
- * searchable picker (with each site's logo). After voting: the week's top-5.
+ * click-to-open, searchable combobox (each row shows the site's logo). After
+ * voting: the week's top-5.
  */
 export function VoteFavorit({
   entries,
@@ -28,16 +29,28 @@ export function VoteFavorit({
   const router = useRouter();
   const [pick, setPick] = useState("");
   const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
   const voted = myChoice !== null;
+
+  const picked = useMemo(() => entries.find((e) => e.id === pick), [entries, pick]);
 
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    const list = needle
-      ? entries.filter((e) => e.nama.toLowerCase().includes(needle))
-      : entries;
+    const list = needle ? entries.filter((e) => e.nama.toLowerCase().includes(needle)) : entries;
     return list.slice(0, 40);
   }, [entries, q]);
+
+  // Close the dropdown on outside click.
+  useEffect(() => {
+    if (!open) return;
+    function onDown(e: MouseEvent) {
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [open]);
 
   async function vote() {
     if (!pick || saving) return;
@@ -103,45 +116,76 @@ export function VoteFavorit({
         <>
           <p className="mt-1 text-sm text-tinta-redup">{copy.favorit.ajakan}</p>
 
-          {/* Searchable picker with each listing's logo. */}
-          <div className="relative mt-3">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-tinta-redup"
-              aria-hidden
-            />
+          {/* Click-to-open, searchable combobox. */}
+          <div ref={boxRef} className="relative mt-3">
+            {picked ? (
+              <SiteLogo
+                urlNormal={picked.urlNormal}
+                nama={picked.nama}
+                className="pointer-events-none absolute left-2.5 top-1/2 size-5 -translate-y-1/2 rounded text-[10px]"
+              />
+            ) : (
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-tinta-redup"
+                aria-hidden
+              />
+            )}
             <input
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={(e) => {
+                setQ(e.target.value);
+                setPick("");
+                setOpen(true);
+              }}
+              onFocus={() => setOpen(true)}
               placeholder={copy.favorit.cari}
-              className={`${fieldClasses} h-10 pl-9`}
+              aria-expanded={open}
+              role="combobox"
+              aria-controls="favorit-list"
+              className={`${fieldClasses} h-10 pl-9 pr-8`}
             />
-          </div>
+            <ChevronDown
+              className={`pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-tinta-redup transition ${
+                open ? "rotate-180" : ""
+              }`}
+              aria-hidden
+            />
 
-          <ul className="mt-2 max-h-44 divide-y divide-garis/50 overflow-y-auto rounded-xl border border-garis bg-kertas-1">
-            {results.length === 0 ? (
-              <li className="px-3 py-3 text-sm text-tinta-redup">{copy.favorit.takAda}</li>
-            ) : (
-              results.map((e) => {
-                const on = pick === e.id;
-                return (
-                  <li key={e.id}>
-                    <button
-                      type="button"
-                      onClick={() => setPick(e.id)}
-                      aria-pressed={on}
-                      className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition ${
-                        on ? "bg-merah/8" : "hover:bg-kertas-2"
-                      }`}
-                    >
-                      <SiteLogo urlNormal={e.urlNormal} nama={e.nama} className="size-7 rounded-md text-xs" />
-                      <span className="min-w-0 flex-1 truncate text-tinta">{e.nama}</span>
-                      {on && <Check className="size-4 shrink-0 text-merah-teks" aria-hidden />}
-                    </button>
-                  </li>
-                );
-              })
+            {open && (
+              <ul
+                id="favorit-list"
+                className="absolute z-20 mt-1 max-h-56 w-full divide-y divide-garis/50 overflow-y-auto rounded-xl border border-garis bg-kertas-1 shadow-kartu"
+              >
+                {results.length === 0 ? (
+                  <li className="px-3 py-3 text-sm text-tinta-redup">{copy.favorit.takAda}</li>
+                ) : (
+                  results.map((e) => {
+                    const on = pick === e.id;
+                    return (
+                      <li key={e.id}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPick(e.id);
+                            setQ(e.nama);
+                            setOpen(false);
+                          }}
+                          aria-pressed={on}
+                          className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition ${
+                            on ? "bg-merah/8" : "hover:bg-kertas-2"
+                          }`}
+                        >
+                          <SiteLogo urlNormal={e.urlNormal} nama={e.nama} className="size-7 rounded-md text-xs" />
+                          <span className="min-w-0 flex-1 truncate text-tinta">{e.nama}</span>
+                          {on && <Check className="size-4 shrink-0 text-merah-teks" aria-hidden />}
+                        </button>
+                      </li>
+                    );
+                  })
+                )}
+              </ul>
             )}
-          </ul>
+          </div>
 
           <Button onClick={vote} disabled={!pick || saving} className="mt-2 w-full">
             {saving ? "…" : copy.favorit.vote}

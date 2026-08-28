@@ -7,24 +7,25 @@ import { Confetti } from "@/components/Confetti";
 import { copy } from "@/copy";
 
 /**
- * Momen Puncak (MI-1) — "ini produk sesungguhnya" (§9.2). A ~1.2s staggered
- * entrance: rank pops, name and stats rise, a flag waves once, the share card
- * arrives. transform/opacity only; reduced-motion collapses to instant.
+ * Momen Puncak (MI-1) — "ini produk sesungguhnya" (§9.2). A staggered entrance:
+ * confetti, the rank pops, the heading rises, then the product-forward share card
+ * arrives (the card carries name + stat, so nothing is repeated here). transform/
+ * opacity only; reduced-motion collapses to instant.
  */
 export function MomenPuncakReveal({
   rank,
   heading,
   nama,
-  pegangan,
-  overtaken,
   listingId,
+  order,
+  hasScreenshot,
 }: {
   rank: number;
   heading: string;
   nama: string;
-  pegangan: string;
-  overtaken: number;
   listingId: string;
+  order?: string;
+  hasScreenshot: boolean;
 }) {
   return (
     <>
@@ -55,19 +56,16 @@ export function MomenPuncakReveal({
       >
         {heading}
       </h1>
-      <p className="reveal mt-1 text-sm text-tinta-redup" style={{ animationDelay: "0.6s" }}>
-        {copy.momen.ringkas(nama, pegangan)}
-        {overtaken > 0 && <> · {copy.momen.menyalip(overtaken)}</>}
-      </p>
 
-      <div className="reveal mt-6 w-full" style={{ animationDelay: "0.85s" }}>
-        <ShareCard listingId={listingId} nama={nama} />
+      <div className="reveal mt-6 w-full" style={{ animationDelay: "0.7s" }}>
+        <ShareCard listingId={listingId} nama={nama} order={order} hasScreenshot={hasScreenshot} />
       </div>
 
       <div
         className="reveal mt-6 flex w-full max-w-xs flex-col gap-2"
-        style={{ animationDelay: "1.05s" }}
+        style={{ animationDelay: "0.9s" }}
       >
+        <p className="text-xs text-tinta-redup">{copy.momen.bagikanAjak}</p>
         <ShareButton url="/" text={copy.momen.share(rank)} />
         <a href="/" className={buttonClasses("secondary", "md")}>
           {copy.momen.lihatPapan}
