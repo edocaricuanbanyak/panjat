@@ -1,42 +1,21 @@
 "use client";
 
-import { Download } from "lucide-react";
 import { useState } from "react";
 import { copy } from "@/copy";
 
 const RATIOS = [
-  { key: "9x16", label: "Story" },
+  { key: "9x16", label: "9:16" },
   { key: "1x1", label: "1:1" },
   { key: "4x3", label: "4:3" },
-  { key: "16x9", label: "16:9" },
 ] as const;
 
 /**
- * Personalised share card with an aspect-ratio picker + live preview + download.
- * The image is rendered server-side by /api/og/[listing] at the chosen ratio.
+ * Personalised share card with an aspect-ratio picker + live preview. The image
+ * is rendered server-side by /api/og/[listing] at the chosen ratio.
  */
 export function ShareCard({ listingId, nama }: { listingId: string; nama: string }) {
   const [ratio, setRatio] = useState<string>("9x16");
-  const [busy, setBusy] = useState(false);
   const src = `/api/og/${listingId}?ratio=${ratio}`;
-
-  async function download() {
-    setBusy(true);
-    try {
-      const res = await fetch(src);
-      const blob = await res.blob();
-      const href = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = href;
-      a.download = `panjat-${ratio}.png`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(href);
-    } finally {
-      setBusy(false);
-    }
-  }
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
@@ -70,16 +49,6 @@ export function ShareCard({ listingId, nama }: { listingId: string; nama: string
           );
         })}
       </div>
-
-      <button
-        type="button"
-        onClick={download}
-        disabled={busy}
-        className="inline-flex items-center gap-2 text-sm font-medium text-merah-teks hover:underline disabled:opacity-50"
-      >
-        <Download className="size-4" aria-hidden />
-        {busy ? copy.momen.mengunduh : copy.momen.unduh}
-      </button>
     </div>
   );
 }
