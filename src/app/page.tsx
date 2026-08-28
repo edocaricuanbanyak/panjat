@@ -87,19 +87,29 @@ export default async function Home({
         </h1>
         <p className="mt-4 max-w-xl text-base text-tinta-redup sm:text-lg">{copy.beranda.heroSub}</p>
         <HeroManjat kategori={kats} />
-        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 font-sans tabular text-xs text-tinta-redup">
-          <span className="inline-flex items-center gap-1.5">
+        {/* Live social proof — the USP. Prominent but on one compact line, so the
+            top-3 board stays above the fold. */}
+        <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5">
+          <div className="inline-flex items-center gap-1.5">
             <span className="blink inline-block size-1.5 rounded-full bg-hidup" aria-hidden />
-            <b className="text-tinta">{visitor.online}</b> {copy.beranda.statOnline}
-          </span>
-          <span>
-            <b className="text-tinta">{visitor.total.toLocaleString("id-ID")}</b>{" "}
-            {copy.beranda.statPengunjung}
-          </span>
-          <span>
-            <b className="text-tinta">{entries.length}</b> {copy.beranda.statPeserta}
-          </span>
-        </div>
+            <dd className="font-display text-lg font-bold leading-none text-hidup tabular">
+              {visitor.online.toLocaleString("id-ID")}
+            </dd>
+            <dt className="text-xs text-tinta-redup">{copy.beranda.statOnline}</dt>
+          </div>
+          <div className="inline-flex items-center gap-1.5">
+            <dd className="font-display text-lg font-bold leading-none text-tinta tabular">
+              {visitor.total.toLocaleString("id-ID")}
+            </dd>
+            <dt className="text-xs text-tinta-redup">{copy.beranda.statPengunjung}</dt>
+          </div>
+          <div className="inline-flex items-center gap-1.5">
+            <dd className="font-display text-lg font-bold leading-none text-tinta tabular">
+              {entries.length.toLocaleString("id-ID")}
+            </dd>
+            <dt className="text-xs text-tinta-redup">{copy.beranda.statPeserta}</dt>
+          </div>
+        </dl>
       </section>
 
       {/* PAPAN — three in-place tabs (no page navigation) */}

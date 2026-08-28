@@ -4,7 +4,7 @@
  * accumulate into a weekly leaderboard. Tallies live in Redis, names resolved
  * from Postgres. Fail-open: a down Redis just yields an empty favourite board.
  */
-import { inArray } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import type { Database } from "@/db";
 import { listing } from "@/db/schema";
 import { redis } from "./redis";
@@ -63,8 +63,8 @@ export interface FavoritEntry {
   votes: number;
 }
 
-/** This week's accumulated favourites, ranked. */
-export async function favoritBoard(db: Database, now = new Date(), limit = 10): Promise<FavoritEntry[]> {
+/** This week's votes, ranked (only listings that actually received votes). */
+async function votedFavorit(db: Database, now: Date, limit: number): Promise<FavoritEntry[]> {
   const r = redis();
   if (!r) return [];
   try {
@@ -90,4 +90,32 @@ export async function favoritBoard(db: Database, now = new Date(), limit = 10): 
   } catch {
     return [];
   }
+}
+
+/**
+ * The favourite board: this week's voted listings, then padded with the top
+ * climbers (0 votes) so the papan always shows a full `limit` — an empty-looking
+ * board reads as a dead feature.
+ */
+export async function favoritBoard(db: Database, now = new Date(), limit = 10): Promise<FavoritEntry[]> {
+  const voted = await votedFavorit(db, now, limit);
+  if (voted.length >= limit) return voted;
+
+  const haveIds = new Set(voted.map((v) => v.id));
+  const fillers = await db
+    .select({ id: listing.id, nama: listing.nama, urlNormal: listing.urlNormal })
+    .from(listing)
+    .where(eq(listing.status, "tayang"))
+    .orderBy(desc(listing.peganganCached))
+    .limit(limit + haveIds.size);
+
+  const out = [...voted];
+  for (const f of fillers) {
+    if (out.length >= limit) break;
+    if (!haveIds.has(f.id)) {
+      out.push({ id: f.id, nama: f.nama, urlNormal: f.urlNormal, votes: 0 });
+      haveIds.add(f.id);
+    }
+  }
+  return out;
 }
