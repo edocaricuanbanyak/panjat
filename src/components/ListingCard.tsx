@@ -45,8 +45,8 @@ export function ListingCard({
       {medali && (
         <span
           aria-label={medali.label}
-          style={{ clipPath: "polygon(0 0, 100% 0, 100% 66%, 50% 100%, 0 66%)" }}
-          className={`absolute -top-2.5 left-3 z-20 flex h-7 w-11 items-start justify-center pt-1 font-display text-xs font-bold leading-none text-kertas-1 drop-shadow-md sm:left-4 ${medali.bg}`}
+          style={{ clipPath: "polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%)" }}
+          className={`absolute -top-2.5 left-3 z-20 flex h-8 w-11 items-center justify-center rounded-t-md pb-1.5 font-display text-xs font-bold leading-none text-kertas-1 drop-shadow-md sm:left-4 ${medali.bg}`}
         >
           #{entry.rank}
         </span>
@@ -105,7 +105,7 @@ export function ListingCard({
               {entry.nama}
             </a>
             <span
-              className={`shrink-0 font-mono tabular font-semibold ${puncak ? "text-base text-merah-teks sm:text-lg" : "text-sm text-tinta sm:text-base"}`}
+              className={`shrink-0 font-mono tabular font-medium text-tinta-redup ${puncak ? "text-sm sm:text-base" : "text-xs sm:text-sm"}`}
             >
               {formatRupiah(entry.pegangan)}
             </span>
