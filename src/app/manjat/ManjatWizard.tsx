@@ -96,6 +96,17 @@ export function ManjatWizard({
   const [nominalInput, setNominalInput] = useState(initialNominal > 0 ? String(initialNominal) : "");
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loadingQuote, setLoadingQuote] = useState(false);
+  const nominalRef = useRef<HTMLInputElement>(null);
+
+  // Focus the Rp field only AFTER the sheet finishes opening, so it doesn't fight
+  // the entrance animation (300ms sheet-up / 260ms manjat-slot). Reduced-motion
+  // collapses the animation, so focus immediately.
+  useEffect(() => {
+    if (step !== 2) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const t = setTimeout(() => nominalRef.current?.focus(), reduce ? 0 : 360);
+    return () => clearTimeout(t);
+  }, [step]);
 
   const [submitting, setSubmitting] = useState(false);
   const [consent, setConsent] = useState(false);
@@ -388,8 +399,8 @@ export function ManjatWizard({
                 Rp
               </span>
               <input
+                ref={nominalRef}
                 inputMode="numeric"
-                autoFocus
                 placeholder={copy.manjat.nominalPlaceholder}
                 value={nominalInput ? Number(nominalInput).toLocaleString("id-ID") : ""}
                 onChange={(e) => setNominalInput(e.target.value.replace(/\D/g, ""))}
