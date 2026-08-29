@@ -21,7 +21,7 @@ const entry = (over: Partial<BoardEntry> = {}): BoardEntry => ({
   kategoriNama: "SaaS",
   kategoriSlug: "saas",
   pegangan: 98_808,
-  klikHariIni: 412,
+  klikTotal: 412,
   rosotPerHari: 24_702,
   screenshotUrl: null,
   badges: ["Pernah di Puncak", "Comeback"],
@@ -92,7 +92,7 @@ export default function KitchenSink() {
         <div className="flex w-full flex-col gap-3">
           <ListingCard entry={entry()} max={98_808} density="puncak" />
           <ListingCard
-            entry={entry({ rank: 7, nama: "Rakit Hosting", pegangan: 24_867, kategoriNama: "Jasa", klikHariIni: 33, rosotPerHari: 2984 })}
+            entry={entry({ rank: 7, nama: "Rakit Hosting", pegangan: 24_867, kategoriNama: "Jasa", klikTotal: 33, rosotPerHari: 2984 })}
             max={98_808}
           />
         </div>

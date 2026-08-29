@@ -1,11 +1,12 @@
 /**
  * Board read model (R1) — the paid `tayang` listings, ranked by grip, enriched
- * with category, today's click count, and the current decay rate so the UI can
- * make rosot visible (§9.1). Pure ranking is reused from ranking.ts.
+ * with category, total click count (all-time, consistent with Jelajah/Kategori),
+ * and the current decay rate so the UI can make rosot visible (§9.1). Pure ranking
+ * is reused from ranking.ts.
  */
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, sql } from "drizzle-orm";
 import type { Database } from "@/db";
-import { kategori, klikHarian, listing } from "@/db/schema";
+import { kategori, listing } from "@/db/schema";
 import { loadRosotConfig } from "./config";
 import { badgesFor } from "./lencana";
 import { computeRanks } from "./ranking";
@@ -20,7 +21,7 @@ export interface BoardEntry {
   kategoriNama: string | null;
   kategoriSlug: string | null;
   pegangan: number;
-  klikHariIni: number;
+  klikTotal: number;
   rosotPerHari: number;
   screenshotUrl: string | null;
   badges: string[];
@@ -33,7 +34,9 @@ export interface Board {
 }
 
 export async function getBoard(db: Database): Promise<Board> {
-  const today = new Date().toISOString().slice(0, 10); // UTC date
+  // All-time clicks to this listing's /k/ redirect — the same expression Jelajah
+  // uses, so the "klik" number matches on every touchpoint.
+  const klikTotalExpr = sql<number>`(select coalesce(sum(jumlah_valid), 0)::int from klik_harian where klik_harian.listing_id = ${listing.id})`;
 
   const [rows, cfg] = await Promise.all([
     db
@@ -47,14 +50,10 @@ export async function getBoard(db: Database): Promise<Board> {
         screenshotUrl: listing.screenshotUrl,
         kategoriNama: kategori.nama,
         kategoriSlug: kategori.slug,
-        klikHariIni: klikHarian.jumlahValid,
+        klikTotal: klikTotalExpr,
       })
       .from(listing)
       .leftJoin(kategori, eq(kategori.id, listing.kategoriId))
-      .leftJoin(
-        klikHarian,
-        and(eq(klikHarian.listingId, listing.id), eq(klikHarian.tanggal, today)),
-      )
       // Paid board only: grip-0 (Kaki Tiang / free) listings live in their own
       // tier, never on the paid leaderboard.
       .where(and(eq(listing.status, "tayang"), gt(listing.peganganCached, 0))),
@@ -72,7 +71,7 @@ export async function getBoard(db: Database): Promise<Board> {
     kategoriNama: r.kategoriNama,
     kategoriSlug: r.kategoriSlug,
     pegangan: r.peganganCached,
-    klikHariIni: r.klikHariIni ?? 0,
+    klikTotal: r.klikTotal ?? 0,
     rosotPerHari: Math.round(r.peganganCached * dailyRateForRank(rank, r.peganganCached, cfg)),
     screenshotUrl: r.screenshotUrl,
     badges: badges.get(r.id) ?? [],

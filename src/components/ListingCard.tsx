@@ -118,7 +118,7 @@ export function ListingCard({
               </span>
             )}
             <span aria-hidden>·</span>
-            <span className="shrink-0 font-sans tabular">{copy.papan.klik(entry.klikHariIni)}</span>
+            <span className="shrink-0 font-sans tabular">{copy.papan.klik(entry.klikTotal)}</span>
           </p>
 
           {entry.badges.length > 0 && (
@@ -127,10 +127,16 @@ export function ListingCard({
             </div>
           )}
 
-          {/* Mobile & tablet: full-width red Salip CTA (desktop uses the hover button). */}
+          {/* Mobile & tablet: full-width Salip CTA (desktop uses the hover button).
+              Summit stays primary red; rank 4+ gets an outline (secondary) button. */}
           <div className="relative z-10 mt-2 lg:hidden">
-            <ManjatButton nominal={salipCost} size="sm" className="h-9 w-full">
-              {copy.papan.salip(formatRupiah(salipCost))}
+            <ManjatButton
+              nominal={salipCost}
+              size="sm"
+              variant={puncak ? "primary" : "secondary"}
+              className="h-9 w-full"
+            >
+              {copy.papan.salipRank(entry.rank, formatRupiah(salipCost))}
             </ManjatButton>
           </div>
         </div>
