@@ -65,6 +65,7 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
   return (
     <html
       lang="id"
@@ -84,6 +85,24 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }
           strategy="afterInteractive"
         />
+        {/* Google Analytics 4 — site-wide, only when a Measurement ID is configured.
+            next/script applies the CSP nonce; googletagmanager/google-analytics are
+            allowlisted in middleware.ts. Data flows to GA now; the /statistik embed
+            (Looker Studio or GA Data API) is a later step. */}
+        {gaId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${gaId}');`}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );
