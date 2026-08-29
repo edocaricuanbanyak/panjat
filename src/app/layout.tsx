@@ -65,13 +65,25 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   return (
     <html
       lang="id"
       className={`${poppins.variable} ${jakarta.variable} ${martianMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-kertas text-tinta">
+        {/* GTM <noscript> fallback — immediately after <body> per Google's guide. */}
+        {gtmId && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+              title="Google Tag Manager"
+            />
+          </noscript>
+        )}
         <PostHogProvider>{children}</PostHogProvider>
         {/* Umami — privacy-friendly (cookieless) analytics, site-wide so every
             page is tracked (not just /statistik). next/script auto-applies the
@@ -85,23 +97,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }
           strategy="afterInteractive"
         />
-        {/* Google Analytics 4 — site-wide, only when a Measurement ID is configured.
-            next/script applies the CSP nonce; googletagmanager/google-analytics are
-            allowlisted in middleware.ts. Data flows to GA now; the /statistik embed
-            (Looker Studio or GA Data API) is a later step. */}
-        {gaId && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-              strategy="afterInteractive"
-            />
-            <Script id="ga4-init" strategy="afterInteractive">
-              {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${gaId}');`}
-            </Script>
-          </>
+        {/* Google Tag Manager — the single container that loads GA4 (and any other
+            tags) site-wide. Configure the GA4 tag (G-QTS41C8LWG) INSIDE GTM, not here,
+            so nothing double-counts. next/script applies the CSP nonce; strict-dynamic
+            lets GTM load its own injected tags. googletagmanager/google-analytics are
+            allowlisted in middleware.ts (script/connect/frame-src). */}
+        {gtmId && (
+          <Script id="gtm" strategy="afterInteractive">
+            {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');`}
+          </Script>
         )}
       </body>
     </html>
