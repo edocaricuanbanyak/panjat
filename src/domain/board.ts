@@ -3,7 +3,7 @@
  * with category, today's click count, and the current decay rate so the UI can
  * make rosot visible (§9.1). Pure ranking is reused from ranking.ts.
  */
-import { and, eq } from "drizzle-orm";
+import { and, eq, gt } from "drizzle-orm";
 import type { Database } from "@/db";
 import { kategori, klikHarian, listing } from "@/db/schema";
 import { loadRosotConfig } from "./config";
@@ -55,7 +55,9 @@ export async function getBoard(db: Database): Promise<Board> {
         klikHarian,
         and(eq(klikHarian.listingId, listing.id), eq(klikHarian.tanggal, today)),
       )
-      .where(eq(listing.status, "tayang")),
+      // Paid board only: grip-0 (Kaki Tiang / free) listings live in their own
+      // tier, never on the paid leaderboard.
+      .where(and(eq(listing.status, "tayang"), gt(listing.peganganCached, 0))),
     loadRosotConfig(db),
   ]);
 
