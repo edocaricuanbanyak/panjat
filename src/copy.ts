@@ -170,7 +170,7 @@ export const copy = {
     dukungan_n: (n: number) => `${n.toLocaleString("id-ID")} dukungan`,
     kosong: "Belum ada yang nunggu, kamu gak ada pesaing",
     pasangGratisTaut: "Pasang gratis di Kaki Tiang",
-    baruNaik: "Listingmu sudah naik ke Kaki Tiang. Ajak orang buat sorak biar naik!",
+    baruNaik: "Listingmu sudah naik ke Kaki Tiang. Ajak orang buat dukung biar naik!",
     baruTutup: "Tutup",
   },
 
