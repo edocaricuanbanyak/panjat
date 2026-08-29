@@ -245,6 +245,27 @@ body {
   animation: skeleton-pulse 1.5s var(--ease-panjat) infinite;
 }
 
+/* Reorder motion (board + Kaki Tiang): the View Transitions API slides rows to
+   their new rank; brand the timing with our easing. */
+::view-transition-group(*) {
+  animation-duration: 380ms;
+  animation-timing-function: var(--ease-panjat);
+}
+
+/* Kaki Tiang "nyalip" lift — a soft merah/heart glow on the row that just climbed
+   after a dukung (colour/shadow only, so it never fights the VT slide). */
+@keyframes kt-lift {
+  0% {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-merah) 45%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+.kt-lift {
+  animation: kt-lift 600ms var(--ease-panjat);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

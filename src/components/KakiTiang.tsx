@@ -1,10 +1,22 @@
 "use client";
 
 import { Heart, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { copy } from "@/copy";
 import type { KakiTiangEntry } from "@/domain/sorak";
 import { SiteLogo } from "./SiteLogo";
+
+/** Sort by live support desc; ties keep the server order (origIndex) as the stable
+ *  tiebreak (server orders desc(sorak), desc(createdAt)). */
+function sortBySupport(
+  entries: KakiTiangEntry[],
+  counts: Record<string, number>,
+  origIndex: Record<string, number>,
+): KakiTiangEntry[] {
+  return [...entries].sort(
+    (a, b) => (counts[b.id] ?? 0) - (counts[a.id] ?? 0) || origIndex[a.id] - origIndex[b.id],
+  );
+}
 
 /**
  * Kaki Tiang — the free (Rp0) tier below all paid listings, ordered by Sorak
@@ -29,6 +41,18 @@ export function KakiTiang({
   );
   // How many of my 5 I've poured into each listing (for styling + revert).
   const [mine, setMine] = useState<Record<string, number>>({});
+  // The row that just climbed on a dukung — gets a soft "lift" glow for a beat.
+  const [lifted, setLifted] = useState<string | null>(null);
+
+  // Stable tiebreak (server order) + the live-support ordering used for display.
+  const origIndex = useMemo(
+    () => Object.fromEntries(entries.map((e, i) => [e.id, i])) as Record<string, number>,
+    [entries],
+  );
+  const ordered = useMemo(
+    () => sortBySupport(entries, counts, origIndex),
+    [entries, counts, origIndex],
+  );
 
   // Just-posted confirmation: scroll to the new row + flash it (the free flow
   // keeps you here instead of an unreachable listing page). Banner gives closure
@@ -48,13 +72,46 @@ export function KakiTiang({
     return () => clearTimeout(t);
   }, [baruId]);
 
+  const reduceMotion = () =>
+    typeof window !== "undefined" &&
+    !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  // Slide rows to their new order via the View Transitions API (like the board);
+  // falls back to an instant commit when unsupported or reduced-motion.
+  const viewTransition = (commit: () => void): Promise<unknown> => {
+    const start = (
+      document as unknown as {
+        startViewTransition?: (cb: () => void) => { finished?: Promise<unknown> };
+      }
+    ).startViewTransition;
+    if (!reduceMotion() && typeof start === "function") {
+      return start.call(document, commit).finished ?? Promise.resolve();
+    }
+    commit();
+    return Promise.resolve();
+  };
+
   async function dukung(id: string) {
     if (remaining <= 0) return;
+
+    // Will this dukung make the row overtake the one above it? (for the lift cue)
+    const nextCounts = { ...counts, [id]: (counts[id] ?? 0) + 1 };
+    const oldIdx = ordered.findIndex((e) => e.id === id);
+    const newIdx = sortBySupport(entries, nextCounts, origIndex).findIndex((e) => e.id === id);
+    const climbed = newIdx < oldIdx;
+
     // Optimistic: bump this listing + spend one from the daily allowance. You may
-    // stack all 5 on a single listing.
-    setCounts((c) => ({ ...c, [id]: (c[id] ?? 0) + 1 }));
-    setRemaining((r) => r - 1);
-    setMine((m) => ({ ...m, [id]: (m[id] ?? 0) + 1 }));
+    // stack all 5 on a single listing. The reorder animates; the climber lifts.
+    viewTransition(() => {
+      setCounts((c) => ({ ...c, [id]: (c[id] ?? 0) + 1 }));
+      setRemaining((r) => r - 1);
+      setMine((m) => ({ ...m, [id]: (m[id] ?? 0) + 1 }));
+    }).then(() => {
+      if (climbed && !reduceMotion()) {
+        setLifted(id);
+        window.setTimeout(() => setLifted((l) => (l === id ? null : l)), 700);
+      }
+    });
+
     try {
       const body = new FormData();
       body.set("listingId", id);
@@ -65,10 +122,12 @@ export function KakiTiang({
       });
       if (!res.ok) throw new Error("gagal");
     } catch {
-      // Revert on failure (daily cap hit, rate-limited, offline…).
-      setCounts((c) => ({ ...c, [id]: Math.max(0, (c[id] ?? 1) - 1) }));
-      setRemaining((r) => r + 1);
-      setMine((m) => ({ ...m, [id]: Math.max(0, (m[id] ?? 1) - 1) }));
+      // Revert on failure (daily cap hit, rate-limited, offline…) — slide back too.
+      viewTransition(() => {
+        setCounts((c) => ({ ...c, [id]: Math.max(0, (c[id] ?? 1) - 1) }));
+        setRemaining((r) => r + 1);
+        setMine((m) => ({ ...m, [id]: Math.max(0, (m[id] ?? 1) - 1) }));
+      });
     }
   }
 
@@ -100,13 +159,16 @@ export function KakiTiang({
         <p className="mt-3 text-sm text-tinta-redup">{copy.kakiTiang.kosong}</p>
       ) : (
         <div className="mt-3 flex flex-col gap-2">
-          {entries.map((e) => (
+          {ordered.map((e) => (
             <article
               key={e.id}
               ref={(el) => {
                 rowRefs.current[e.id] = el;
               }}
+              style={{ viewTransitionName: `vt-kt-${e.id}` } as React.CSSProperties}
               className={`flex items-center gap-3 rounded-lg border p-3 ${
+                lifted === e.id ? "kt-lift " : ""
+              }${
                 flash === e.id ? "manjat-slot border-merah bg-merah/5" : "border-garis bg-kertas-2"
               }`}
             >
