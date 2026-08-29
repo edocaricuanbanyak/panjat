@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { ShareButton } from "./ShareButton";
 import { ShareCard } from "./ShareCard";
 import { buttonClasses } from "@/components/Button";
@@ -29,12 +30,20 @@ export function MomenPuncakReveal({
   order?: string;
   hasScreenshot: boolean;
 }) {
+  const [shareImg, setShareImg] = useState<string | null>(null);
+
   const actions = (
     <>
       <p className="text-xs text-tinta-redup">{copy.momen.bagikanAjak}</p>
-      {/* Share the buyer's own listing (rich per-listing OG card via /api/og/[id]),
-          not the generic board root — the whole point is "ini produkku, aku di #N". */}
-      <ShareButton url={`/l/${listingId}`} text={copy.momen.share(rank)} />
+      {/* Desktop: save the chosen OG image. Mobile: Web Share the buyer's own listing
+          (rich per-listing OG card via /api/og/[id]) — "ini produkku, aku di #N". */}
+      <ShareButton
+        url={`/l/${listingId}`}
+        text={copy.momen.share(rank)}
+        imageUrl={shareImg}
+        nama={nama}
+        rank={rank}
+      />
       <a href="/" className={buttonClasses("secondary", "md")}>
         {copy.momen.lihatPapan}
       </a>
@@ -88,6 +97,7 @@ export function MomenPuncakReveal({
             total={total}
             order={order}
             hasScreenshot={hasScreenshot}
+            onImageChange={setShareImg}
           />
         </div>
 

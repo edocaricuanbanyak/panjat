@@ -26,6 +26,7 @@ export function ShareCard({
   total,
   order,
   hasScreenshot,
+  onImageChange,
 }: {
   listingId: string;
   nama: string;
@@ -33,6 +34,8 @@ export function ShareCard({
   total: number;
   order?: string;
   hasScreenshot: boolean;
+  /** Reports the currently-previewed OG image URL so the share action can save it. */
+  onImageChange?: (src: string) => void;
 }) {
   const [ratio, setRatio] = useState<string>("9x16");
   // Default to the logo: it resolves instantly, so the first paint is smooth. The
@@ -76,6 +79,11 @@ export function ShareCard({
   useEffect(() => {
     setLayers((prev) => (prev[prev.length - 1] === src ? prev : [...prev, src].slice(-2)));
   }, [src]);
+
+  // Surface the chosen image URL so the "Bagikan" action can download exactly this.
+  useEffect(() => {
+    onImageChange?.(src);
+  }, [src, onImageChange]);
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
