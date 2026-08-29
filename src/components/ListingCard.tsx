@@ -40,29 +40,29 @@ export function ListingCard({
 
   return (
     <article
-      className={`group relative flex flex-col gap-1.5 rounded-xl px-3 transition-all ease-panjat hover:z-10 sm:flex-row sm:items-center sm:gap-4 sm:px-4 ${puncak ? "py-3.5" : "py-3"}`}
+      className={`group relative flex flex-col gap-1.5 rounded-xl px-3 transition-all ease-panjat hover:z-10 lg:flex-row lg:items-center lg:gap-4 lg:px-4 ${puncak ? "py-3.5" : "py-3"}`}
     >
       {/* Medal ribbon (pita) on the card's top-left — top-3 only. */}
       {medali && (
         <span
           aria-label={medali.label}
           style={{ clipPath: "polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%)" }}
-          className={`absolute -top-2.5 left-3 z-20 flex h-8 w-11 items-center justify-center rounded-t-md pb-1.5 font-display text-xs font-bold leading-none text-kertas-1 drop-shadow-md sm:left-4 ${medali.bg}`}
+          className={`absolute -top-2.5 left-3 z-20 flex h-8 w-11 items-center justify-center rounded-t-md pb-1.5 font-display text-xs font-bold leading-none text-kertas-1 drop-shadow-md lg:left-4 ${medali.bg}`}
         >
           #{entry.rank}
         </span>
       )}
 
-      {/* Above-center floating action, revealed on hover (pointer devices). */}
-      <div className="pointer-events-none absolute -top-3 left-1/2 z-20 hidden -translate-x-1/2 opacity-0 transition-all ease-panjat group-hover:pointer-events-auto group-hover:-top-3.5 group-hover:opacity-100 md:block">
+      {/* Above-center floating action, revealed on hover (desktop pointer devices). */}
+      <div className="pointer-events-none absolute -top-3 left-1/2 z-20 hidden -translate-x-1/2 opacity-0 transition-all ease-panjat group-hover:pointer-events-auto group-hover:-top-3.5 group-hover:opacity-100 lg:block">
         <ManjatButton nominal={salipCost} size="sm" className="h-7 px-2.5 text-xs">
           {copy.papan.salipRank(entry.rank, formatRupiah(salipCost))}
         </ManjatButton>
       </div>
 
-      {/* Rank + logo + the listing block. On sm+ the wrapper dissolves (contents)
-          into the editorial row. */}
-      <div className="flex min-w-0 items-center gap-3 sm:contents">
+      {/* Rank + logo + the listing block. Only on lg+ (desktop) the wrapper dissolves
+          (contents) into the editorial row; tablet & mobile keep the stacked card. */}
+      <div className="flex min-w-0 items-center gap-3 lg:contents">
         {/* Rank 4+ shows the number inline; the podium wears its medal as a badge
             on the logo, freeing the whole row width for a one-line title. */}
         {/* Rank 4+ shows the number inline; podium wears its medal ribbon on the
@@ -91,7 +91,7 @@ export function ListingCard({
               {entry.nama}
             </a>
             <span
-              className={`shrink-0 font-sans tabular font-medium text-tinta-redup ${puncak ? "text-sm sm:text-base" : "text-xs sm:text-sm"}`}
+              className={`shrink-0 font-sans tabular font-medium text-tinta-redup ${puncak ? "text-sm lg:text-base" : "text-xs lg:text-sm"}`}
             >
               {formatRupiah(entry.pegangan)}
             </span>
@@ -101,7 +101,7 @@ export function ListingCard({
           {entry.deskripsi && (
             <p
               className={`mt-0.5 text-tinta-redup ${
-                puncak ? "line-clamp-2 text-sm" : "line-clamp-1 text-xs sm:text-sm"
+                puncak ? "line-clamp-2 text-sm" : "line-clamp-1 text-xs lg:text-sm"
               }`}
             >
               {entry.deskripsi}
@@ -111,7 +111,7 @@ export function ListingCard({
           <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
             <span className="truncate font-mono text-tinta-redup">{host}</span>
             {entry.kategoriNama && (
-              <span className="hidden shrink-0 items-center gap-1 sm:flex">
+              <span className="hidden shrink-0 items-center gap-1 lg:flex">
                 <span aria-hidden>·</span>
                 <KategoriIcon slug={entry.kategoriSlug} className="size-3.5 text-tinta-redup" />
                 {entry.kategoriNama}
@@ -127,20 +127,13 @@ export function ListingCard({
             </div>
           )}
 
-          {/* Mobile: full-width red Salip CTA. */}
-          <div className="relative z-10 mt-2 sm:hidden">
+          {/* Mobile & tablet: full-width red Salip CTA (desktop uses the hover button). */}
+          <div className="relative z-10 mt-2 lg:hidden">
             <ManjatButton nominal={salipCost} size="sm" className="h-9 w-full">
               {copy.papan.salip(formatRupiah(salipCost))}
             </ManjatButton>
           </div>
         </div>
-      </div>
-
-      {/* Tablet (sm–md) inline Salip; desktop uses the hover button above. */}
-      <div className="relative z-10 hidden shrink-0 items-center sm:flex md:hidden">
-        <ManjatButton nominal={salipCost} size="sm" variant="secondary" className="h-7 px-2.5 text-xs">
-          {copy.papan.salipSingkat}
-        </ManjatButton>
       </div>
     </article>
   );
