@@ -27,12 +27,57 @@ const URL_SHORTENER = /\b(bit\.ly|tinyurl\.com|s\.id|cutt\.ly|ow\.ly|t\.co|goo\.
 // Needs nuance (legal vs illegal) — escalate, don't auto-reject.
 const PINJOL = /\b(pinjol|pinjaman online|dana cepat|pinjaman cepat|rentenir|gadai cepat)\b/i;
 
+// Known hard-banned domains whose name/description may look innocent, so the
+// keyword regexes above miss them (e.g. an adult site listed as "Video App").
+// Matched on host, incl. subdomains. Not exhaustive — a safety net, not the
+// only defense (§R8).
+const DOMAIN_TERLARANG: Record<string, "dewasa" | "judi" | "bajakan"> = {
+  // Dewasa
+  "xnxx.com": "dewasa",
+  "xvideos.com": "dewasa",
+  "pornhub.com": "dewasa",
+  "xhamster.com": "dewasa",
+  "redtube.com": "dewasa",
+  "youporn.com": "dewasa",
+  "spankbang.com": "dewasa",
+  "onlyfans.com": "dewasa",
+  "brazzers.com": "dewasa",
+  // Judi
+  "sbobet.com": "judi",
+  "dafabet.com": "judi",
+  "1xbet.com": "judi",
+  "bet365.com": "judi",
+  "stake.com": "judi",
+  // Bajakan
+  "thepiratebay.org": "bajakan",
+  "1337x.to": "bajakan",
+  "fmovies.to": "bajakan",
+  "lk21.org": "bajakan",
+  "indoxxi.net": "bajakan",
+  "rebahin.com": "bajakan",
+};
+
+/** Registrable host from a normalized url ("host/path" → "host"). */
+function hostDari(urlNormal: string): string {
+  return urlNormal.split("/")[0].replace(/^w{2,}\./, "").toLowerCase();
+}
+
+function domainTerlarang(urlNormal: string): "dewasa" | "judi" | "bajakan" | null {
+  const host = hostDari(urlNormal);
+  for (const [dom, kat] of Object.entries(DOMAIN_TERLARANG)) {
+    if (host === dom || host.endsWith(`.${dom}`)) return kat;
+  }
+  return null;
+}
+
 /**
  * Deterministic layer-1 screen over name + description + url. Runs with the AI
  * offline. Hard bans → tolak; ambiguous (pinjol) → ragu → human/AI queue.
  */
 export function lapis1(nama: string, deskripsi: string | null, url: string): Lapis1Result {
   const text = `${nama} ${deskripsi ?? ""} ${url}`;
+  const kat = domainTerlarang(url);
+  if (kat) return { verdict: "tolak", alasan: `Domain terlarang (${kat})`, kategori: kat };
   if (JUDI.test(text)) return { verdict: "tolak", alasan: "Terindikasi judi/slot", kategori: "judi" };
   if (DEWASA.test(text)) return { verdict: "tolak", alasan: "Konten dewasa", kategori: "dewasa" };
   if (CHAT_LINK.test(text)) return { verdict: "tolak", alasan: "Tautan grup chat", kategori: "chat_link" };

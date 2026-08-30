@@ -8,7 +8,9 @@ const TRACKING_PARAMS = [/^utm_/i, /^fbclid$/i, /^igsh$/i, /^gclid$/i];
 /** Host aliases that mean the same place. */
 function canonicalHost(host: string): string {
   let h = host.toLowerCase();
-  if (h.startsWith("www.")) h = h.slice(4);
+  // Strip a leading run of w's: www., and typo variants like wwww. / ww. that
+  // would otherwise create a duplicate listing for the same site.
+  h = h.replace(/^w{2,}\./, "");
   if (h === "twitter.com" || h === "mobile.twitter.com") h = "x.com";
   return h;
 }

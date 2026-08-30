@@ -7,6 +7,13 @@ describe("normalizeUrl", () => {
     expect(normalizeUrl("nyala.id")).toBe("nyala.id");
   });
 
+  it("collapses www-typo variants to the same host (no duplicate listings)", () => {
+    expect(normalizeUrl("wwww.psikorealis.id")).toBe("psikorealis.id");
+    expect(normalizeUrl("https://wwww.psikorealis.id/p/tes")).toBe("psikorealis.id/p/tes");
+    // A normal subdomain that merely starts with letters is untouched.
+    expect(normalizeUrl("web.example.com")).toBe("web.example.com");
+  });
+
   it("drops tracking params but keeps real ones (sorted)", () => {
     expect(normalizeUrl("https://nyala.id/?utm_source=x&ref=1&fbclid=y&igsh=z")).toBe(
       "nyala.id?ref=1",

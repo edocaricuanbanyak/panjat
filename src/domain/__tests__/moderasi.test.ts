@@ -20,6 +20,16 @@ describe("lapis1 — deterministic moderation", () => {
     expect(lapis1("Pinjaman Online Cepat", "cair 5 menit", "danacepat.id").verdict).toBe("ragu");
   });
 
+  it("rejects known banned domains even with an innocent name", () => {
+    expect(lapis1("Video Streaming App", "nonton seru", "xnxx.com").verdict).toBe("tolak");
+    expect(lapis1("Video Streaming App", "nonton seru", "xnxx.com").kategori).toBe("dewasa");
+    expect(lapis1("Situs Prediksi", "analisa angka", "sbobet.com").kategori).toBe("judi");
+    expect(lapis1("Nonton Film", "gratis", "lk21.org").kategori).toBe("bajakan");
+    // Subdomains and www-typo variants of a banned host are caught too.
+    expect(lapis1("App", null, "m.xnxx.com").verdict).toBe("tolak");
+    expect(lapis1("App", null, "wwww.pornhub.com/x").verdict).toBe("tolak");
+  });
+
   it("passes ordinary products", () => {
     expect(lapis1("Nyala Analytics", "analitik web ramah privasi", "nyala.id").verdict).toBe("lolos");
     expect(lapis1("Warungku POS", "kasir UMKM", "warungku.app").verdict).toBe("lolos");

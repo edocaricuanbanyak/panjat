@@ -34,6 +34,9 @@ export const KONFIGURASI: { key: string; value: unknown }[] = [
   // §18.5 fraud gate: a NEW listing reaching this grip goes to manual review
   // before going public. 0 = disabled (new listings auto-list at any amount).
   { key: "ambang_tinjau_manual", value: 0 },
+  // Max FREE listings per host — stops one advertiser flooding Kaki Tiang with
+  // many paths of the same domain. Paid listings are never capped.
+  { key: "maks_gratis_per_domain", value: 1 },
   { key: "jam_hitung_ulang", value: 1 },
   { key: "bobot_spotlight", value: "pegangan" },
   // Share-card (OG) hero toggles — show the site's own screenshot / logo.

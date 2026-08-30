@@ -58,6 +58,21 @@ export async function loadModerasiConfig(db: DbOrTx): Promise<ModerasiConfig> {
   return { ambangTinjauManual: typeof val === "number" ? val : 0 };
 }
 
+/**
+ * Max FREE (grip-0) listings allowed per host, to stop one advertiser flooding
+ * the Kaki Tiang tier with many paths of the same domain (R2 spirit). Paid
+ * listings are never capped. Defaults to 1 when the key is absent.
+ */
+export async function loadMaksGratisPerDomain(db: DbOrTx): Promise<number> {
+  const [row] = await db
+    .select({ value: konfigurasi.value })
+    .from(konfigurasi)
+    .where(eq(konfigurasi.key, "maks_gratis_per_domain"))
+    .limit(1);
+  const val = row?.value;
+  return typeof val === "number" && val > 0 ? val : 1;
+}
+
 export interface OgConfig {
   /** Show the site's own screenshot as the share-card hero. */
   tampilkanScreenshot: boolean;

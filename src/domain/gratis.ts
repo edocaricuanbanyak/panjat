@@ -3,9 +3,10 @@
  * below all paid listings. No payment, no ledger row (grip stays 0). Still
  * moderated: layer-1 screening runs on creation, same as a paid settlement.
  */
-import { and, count, eq, gte, inArray } from "drizzle-orm";
+import { and, count, eq, gte, inArray, like, or } from "drizzle-orm";
 import type { Database, DbOrTx } from "@/db";
 import { listing, sponsorKontak } from "@/db/schema";
+import { loadMaksGratisPerDomain } from "./config";
 import { screenListing } from "./moderasi";
 import { normalizeUrl } from "./url";
 
@@ -67,6 +68,25 @@ export async function createGratis(db: Database, input: GratisInput): Promise<{ 
       .where(eq(listing.urlNormal, urlNormal))
       .limit(1);
     if (existing) throw new GratisError("URL ini sudah terdaftar.");
+
+    // One advertiser may not flood the free tier with many paths of one host.
+    const host = urlNormal.split("/")[0];
+    const maksPerDomain = await loadMaksGratisPerDomain(tx);
+    const [{ n: gratisDomain }] = await tx
+      .select({ n: count() })
+      .from(listing)
+      .where(
+        and(
+          eq(listing.peganganCached, 0),
+          inArray(listing.status, ["tayang", "ditahan"]),
+          or(eq(listing.urlNormal, host), like(listing.urlNormal, `${host}/%`)),
+        ),
+      );
+    if (Number(gratisDomain) >= maksPerDomain) {
+      throw new GratisError(
+        `Domain ini sudah punya listing gratis (batas ${maksPerDomain} per domain). Untuk listing tambahan, naik tiang berbayar.`,
+      );
+    }
 
     const email = input.email?.trim() || null;
     let kontakId: string;
