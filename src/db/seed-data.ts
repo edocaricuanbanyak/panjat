@@ -33,6 +33,9 @@ export const KONFIGURASI: { key: string; value: unknown }[] = [
   // total paid, capped at lantai_maks (kept ≪ summit so #1 stays contestable).
   { key: "lantai_rasio", value: 0.1 },
   { key: "lantai_maks", value: 10000 },
+  // Grace: decay is paused for this many hours after the latest payment
+  // (top-up resets it). 0 = disabled.
+  { key: "masa_tenang_jam", value: 48 },
   { key: "minimum_naik", value: 5000 },
   { key: "minimum_manjat_lagi", value: 1000 },
   // §18.5 fraud gate: a NEW listing reaching this grip goes to manual review

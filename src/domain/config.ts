@@ -101,7 +101,7 @@ export async function loadRosotConfig(db: DbOrTx): Promise<RosotConfig> {
   const rows = await db
     .select({ key: konfigurasi.key, value: konfigurasi.value })
     .from(konfigurasi)
-    .where(inArray(konfigurasi.key, [...KEYS, "lantai_rasio", "lantai_maks"]));
+    .where(inArray(konfigurasi.key, [...KEYS, "lantai_rasio", "lantai_maks", "masa_tenang_jam"]));
 
   const byKey = new Map(rows.map((r) => [r.key, r.value]));
   for (const k of KEYS) {
@@ -116,6 +116,7 @@ export async function loadRosotConfig(db: DbOrTx): Promise<RosotConfig> {
   // rasio 0 + maks = kakiTiang → per-listing floor collapses to the Kaki Tiang floor.
   const lantaiRasioRaw = byKey.get("lantai_rasio");
   const lantaiMaksRaw = byKey.get("lantai_maks");
+  const masaTenangRaw = byKey.get("masa_tenang_jam");
 
   return {
     lajuRosot: {
@@ -134,5 +135,6 @@ export async function loadRosotConfig(db: DbOrTx): Promise<RosotConfig> {
     kakiTiang,
     lantaiRasio: typeof lantaiRasioRaw === "number" ? lantaiRasioRaw : 0,
     lantaiMaks: typeof lantaiMaksRaw === "number" ? lantaiMaksRaw : kakiTiang,
+    masaTenangJam: typeof masaTenangRaw === "number" ? masaTenangRaw : 0,
   };
 }

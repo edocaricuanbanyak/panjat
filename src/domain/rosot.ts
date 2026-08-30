@@ -22,6 +22,23 @@ export interface RosotConfig {
   lantaiRasio: number;
   /** Hard cap on the protected floor — must stay ≪ summit so #1 stays contestable. */
   lantaiMaks: number;
+  /** Grace window (hours) after the latest payment during which decay is paused. */
+  masaTenangJam: number;
+}
+
+/**
+ * Within the post-payment grace window? Decay is paused for `masaTenangJam`
+ * hours after the listing's LATEST payment (top-up resets it). Returns false
+ * when grace is disabled (≤ 0) or the listing has never been paid.
+ */
+export function dalamMasaTenang(
+  bayarTerakhir: Date | null | undefined,
+  masaTenangJam: number,
+  now: Date,
+): boolean {
+  if (masaTenangJam <= 0 || !bayarTerakhir) return false;
+  const berlaluJam = (now.getTime() - bayarTerakhir.getTime()) / 3_600_000;
+  return berlaluJam < masaTenangJam;
 }
 
 /**

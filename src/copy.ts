@@ -73,6 +73,10 @@ export const copy = {
     juara: (rank: number) => `Juara ${rank}`,
     salipSingkat: "Salip",
     klik: (n: number) => `${n.toLocaleString("id-ID")} klik`,
+    // Card rosot status (revealed on hover) — two states + the at-floor case.
+    rosotTerjaga: "masih terjaga",
+    rosotAktif: (rp: string) => `merosot ~${rp}/hari`,
+    rosotLantai: "di lantai · tak merosot",
     kunjungiSitus: "Kunjungi situs",
     salipDiPapan: "Salip di papan",
     pagination: (hal: number, total: number) => `Halaman ${hal} / ${total}`,

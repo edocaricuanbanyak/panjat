@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { RosotConfig } from "../rosot";
 import {
   dailyRateForRank,
+  dalamMasaTenang,
   decayGripOneHour,
   estimateDaysToThreshold,
   hourlyFactor,
@@ -15,6 +16,7 @@ const cfg: RosotConfig = {
   kakiTiang: 1000,
   lantaiRasio: 0.1,
   lantaiMaks: 10000,
+  masaTenangJam: 48,
 };
 
 describe("dailyRateForRank", () => {
@@ -42,6 +44,23 @@ describe("dailyRateForRank", () => {
     expect(dailyRateForRank(1, 9_999, cfg, 10_000)).toBe(0);
     // Above the floor it still decays at the tier rate.
     expect(dailyRateForRank(1, 10_001, cfg, 10_000)).toBe(0.25);
+  });
+});
+
+describe("dalamMasaTenang", () => {
+  const now = new Date("2027-01-03T00:00:00Z");
+  it("is true within the window since the latest payment, false after", () => {
+    expect(dalamMasaTenang(new Date("2027-01-02T02:00:00Z"), 48, now)).toBe(true); // 22j lalu
+    expect(dalamMasaTenang(new Date("2027-01-01T01:00:00Z"), 48, now)).toBe(true); // 47j lalu
+    expect(dalamMasaTenang(new Date("2026-12-31T23:00:00Z"), 48, now)).toBe(false); // 49j lalu
+  });
+  it("ends grace at exactly the boundary (strict <)", () => {
+    expect(dalamMasaTenang(new Date("2027-01-01T00:00:00Z"), 48, now)).toBe(false); // tepat 48j
+  });
+  it("is disabled when hours <= 0 or no payment yet", () => {
+    expect(dalamMasaTenang(new Date("2027-01-02T23:00:00Z"), 0, now)).toBe(false);
+    expect(dalamMasaTenang(null, 48, now)).toBe(false);
+    expect(dalamMasaTenang(undefined, 48, now)).toBe(false);
   });
 });
 

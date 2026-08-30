@@ -11,7 +11,7 @@ import { BOARD_LOCK_KEY } from "./constants";
 import { appendLedger } from "./ledger";
 import { detectDrops, type Drop } from "./notifikasi";
 import { computeRanks } from "./ranking";
-import { dailyRateForRank, decayGripOneHour, listingFloor } from "./rosot";
+import { dailyRateForRank, dalamMasaTenang, decayGripOneHour, listingFloor } from "./rosot";
 
 export interface RosotRunResult {
   ref: string;
@@ -63,16 +63,22 @@ export async function applyHourlyRosot(db: Database, now: Date): Promise<RosotRu
     // floor. Deterministic & auditable; never AI (§ kontrak produk).
     const ids = rows.map((r) => r.id);
     const bayarByListing = new Map<string, number>();
+    // Latest payment time per listing → post-payment grace window (top-up resets).
+    const bayarTerakhirByListing = new Map<string, Date>();
     if (ids.length > 0) {
       const bayarRows = await tx
         .select({
           listingId: peganganLedger.listingId,
           total: sql<number>`coalesce(sum(${peganganLedger.nominalSigned}), 0)::bigint`,
+          terakhir: sql<string>`max(${peganganLedger.createdAt})`,
         })
         .from(peganganLedger)
         .where(and(eq(peganganLedger.jenis, "bayar"), inArray(peganganLedger.listingId, ids)))
         .groupBy(peganganLedger.listingId);
-      for (const b of bayarRows) bayarByListing.set(b.listingId, Number(b.total));
+      for (const b of bayarRows) {
+        bayarByListing.set(b.listingId, Number(b.total));
+        if (b.terakhir) bayarTerakhirByListing.set(b.listingId, new Date(b.terakhir));
+      }
     }
 
     // Pre-decay ranks decide each listing's rate ("posisi saat jam berjalan").
@@ -83,8 +89,10 @@ export async function applyHourlyRosot(db: Database, now: Date): Promise<RosotRu
 
     for (const { rank, listing: l } of preRanked) {
       const floor = listingFloor(bayarByListing.get(l.id) ?? 0, cfg);
-      const rate = dailyRateForRank(rank, l.peganganCached, cfg, floor);
-      const newGrip = decayGripOneHour(l.peganganCached, rate, floor);
+      // Grace: freshly (re)paid listings don't decay for masaTenangJam hours.
+      const inGrace = dalamMasaTenang(bayarTerakhirByListing.get(l.id), cfg.masaTenangJam, now);
+      const rate = inGrace ? 0 : dailyRateForRank(rank, l.peganganCached, cfg, floor);
+      const newGrip = inGrace ? l.peganganCached : decayGripOneHour(l.peganganCached, rate, floor);
       const delta = newGrip - l.peganganCached; // ≤ 0
 
       if (delta !== 0) {

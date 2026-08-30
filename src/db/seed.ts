@@ -90,7 +90,8 @@ async function main() {
       KONFIGURASI.map((k) => ({ key: k.key, value: k.value, updatedBy: "seed" })),
     );
 
-    for (const item of LISTINGS) {
+    for (let i = 0; i < LISTINGS.length; i++) {
+      const item = LISTINGS[i];
       const kategoriId = katBySlug.get(item.kategori);
       if (!kategoriId) throw new Error(`Unknown kategori slug: ${item.kategori}`);
 
@@ -117,12 +118,17 @@ async function main() {
         })
         .returning({ id: listing.id });
 
-      // Grip recorded as an append-only ledger event (Prinsip 1).
+      // Grip recorded as an append-only ledger event (Prinsip 1). Backdate the
+      // payment so the seeded board shows a realistic mix of grace states: the
+      // first two listings are "just paid" (masih terjaga), the rest are older
+      // (sudah merosot). Dev-only cosmetic — production has real timestamps.
+      const jamMundur = i < 2 ? 1 : 24 * 5; // 1h ago vs 5 days ago
       await tx.insert(peganganLedger).values({
         listingId: row.id,
         jenis: "bayar",
         nominalSigned: item.pegangan,
         ref: "seed",
+        createdAt: sql`now() - (${jamMundur} || ' hours')::interval`,
       });
     }
 

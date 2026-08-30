@@ -119,6 +119,19 @@ export function ListingCard({
             )}
             <span aria-hidden>·</span>
             <span className="shrink-0 font-sans tabular">{copy.papan.klik(entry.klikTotal)}</span>
+            {/* Rosot status — always visible on touch, revealed on hover on desktop. */}
+            <span
+              className={`shrink-0 opacity-100 transition-opacity ease-panjat lg:opacity-0 lg:group-hover:opacity-100 ${
+                entry.masihTerjaga ? "text-hidup" : "text-tinta-redup"
+              }`}
+            >
+              <span aria-hidden> · </span>
+              {entry.masihTerjaga
+                ? copy.papan.rosotTerjaga
+                : entry.rosotPerHari > 0
+                  ? copy.papan.rosotAktif(formatRupiah(entry.rosotPerHari))
+                  : copy.papan.rosotLantai}
+            </span>
           </p>
 
           {entry.badges.length > 0 && (
