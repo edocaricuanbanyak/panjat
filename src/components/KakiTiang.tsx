@@ -121,6 +121,8 @@ export function KakiTiang({
         body,
       });
       if (!res.ok) throw new Error("gagal");
+      // Nudge the activity ticker to refetch now (server already pushed the event).
+      window.dispatchEvent(new CustomEvent("panjat:aktivitas"));
     } catch {
       // Revert on failure (daily cap hit, rate-limited, offline…) — slide back too.
       viewTransition(() => {

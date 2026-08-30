@@ -30,7 +30,7 @@ export async function PageShell({
     <ManjatProvider kategori={kats}>
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-2 sm:px-5 sm:pt-4">
         <div className="sticky top-0 z-30 -mx-4 border-b border-garis/70 bg-kertas px-4 pt-[env(safe-area-inset-top)] sm:-mx-5 sm:px-5">
-          {aktivitas.length > 0 && <Spotlight items={aktivitas} />}
+          <Spotlight initialItems={aktivitas} />
           <SiteHeader />
         </div>
         <div className="flex-1 pt-4">{children}</div>

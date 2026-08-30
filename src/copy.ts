@@ -62,6 +62,7 @@ export const copy = {
     aktivitasDukung: "baru didukung",
     aktivitasManjat: "baru manjat",
     aktivitasNaik: (rank: number) => `naik ke #${rank}`,
+    aktivitasKali: (n: number) => ` ${n}x`,
     puncakBerganti: (nama: string) => `Puncak berganti — ${nama} kini #1`,
     papanDiperbarui: "Papan diperbarui",
     juaraKakiTiang: "Juara Kaki Tiang minggu ini · gratis",
