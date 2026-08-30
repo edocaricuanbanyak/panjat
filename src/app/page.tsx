@@ -158,6 +158,16 @@ async function HomeBody({
               </div>
             )}
             <Pagination page={page} totalPages={totalPages} />
+
+            {/* KAKI TIANG (gratis) — lives under the main board only, not the
+                Jelajah / Hari Ini tabs. */}
+            <div className="mt-12">
+              <KakiTiang entries={kakiTiang} remaining={sisaSorak} baruId={sp.baru ?? null} />
+              <div className="mt-3 text-xs text-tinta-redup">
+                {copy.beranda.punyaProduk}{" "}
+                <PasangGratisModal kategori={kats} className="text-merah-teks hover:underline" />.
+              </div>
+            </div>
           </>
         }
         hariIni={
@@ -168,15 +178,6 @@ async function HomeBody({
         }
         jelajah={<JelajahPanel items={jelajahItems} categories={kats} />}
       />
-
-      {/* KAKI TIANG (gratis) */}
-      <div className="mt-12">
-        <KakiTiang entries={kakiTiang} remaining={sisaSorak} baruId={sp.baru ?? null} />
-        <div className="mt-3 text-xs text-tinta-redup">
-          {copy.beranda.punyaProduk}{" "}
-          <PasangGratisModal kategori={kats} className="text-merah-teks hover:underline" />.
-        </div>
-      </div>
 
       {/* CARA MAIN */}
       <section className="mt-14">

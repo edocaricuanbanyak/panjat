@@ -20,15 +20,19 @@ export function JelajahPanel({ items, categories }: { items: Card[]; categories:
 
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return items.filter((it) => {
-      if (cat && it.kategoriSlug !== cat) return false;
-      if (!needle) return true;
-      return (
-        it.nama.toLowerCase().includes(needle) ||
-        (it.deskripsi ?? "").toLowerCase().includes(needle) ||
-        (it.kategoriNama ?? "").toLowerCase().includes(needle)
-      );
-    });
+    return items
+      .filter((it) => {
+        if (cat && it.kategoriSlug !== cat) return false;
+        if (!needle) return true;
+        return (
+          it.nama.toLowerCase().includes(needle) ||
+          (it.deskripsi ?? "").toLowerCase().includes(needle) ||
+          (it.kategoriNama ?? "").toLowerCase().includes(needle)
+        );
+      })
+      // Every Jelajah filter is ordered by most clicks (visitor-chosen order,
+      // never by money — R22). Clicks are counted at the server redirect.
+      .sort((a, b) => b.klikTotal - a.klikTotal);
   }, [items, q, cat]);
 
   const chip = (on: boolean) =>

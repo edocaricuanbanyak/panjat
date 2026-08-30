@@ -4,7 +4,7 @@
  * and no relevance moves the board. Postgres full-text is enough at this scale
  * (§17.3 — no Elasticsearch/Algolia).
  */
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gt, sql } from "drizzle-orm";
 import type { Database } from "@/db";
 import { kategori, klikHarian, listing, sorak } from "@/db/schema";
 
@@ -54,7 +54,9 @@ export interface JelajahCard {
 const klikTotalExpr = sql<number>`(select coalesce(sum(jumlah_valid), 0)::int from klik_harian where klik_harian.listing_id = ${listing.id})`;
 
 /** Full-text search over name + description + category, ranked by text relevance. */
-/** All live listings as directory cards — for the client Jelajah tab to filter. */
+/** All live listings as directory cards — for the client Jelajah tab to filter.
+ *  Free Kaki Tiang listings (pegangan Rp0) are excluded; they live in their own
+ *  section on the main board, not in Jelajah. */
 export async function jelajahAll(db: Database): Promise<JelajahCard[]> {
   return db
     .select({
@@ -68,7 +70,7 @@ export async function jelajahAll(db: Database): Promise<JelajahCard[]> {
     })
     .from(listing)
     .leftJoin(kategori, eq(kategori.id, listing.kategoriId))
-    .where(eq(listing.status, "tayang"))
+    .where(and(eq(listing.status, "tayang"), gt(listing.peganganCached, 0)))
     .orderBy(desc(listing.createdAt))
     .limit(200);
 }
@@ -92,7 +94,7 @@ export async function searchListings(db: Database, q: string): Promise<JelajahCa
     })
     .from(listing)
     .leftJoin(kategori, eq(kategori.id, listing.kategoriId))
-    .where(and(eq(listing.status, "tayang"), sql`${doc} @@ ${tsq}`))
+    .where(and(eq(listing.status, "tayang"), gt(listing.peganganCached, 0), sql`${doc} @@ ${tsq}`))
     .orderBy(sql`ts_rank(${doc}, ${tsq}) desc`)
     .limit(30);
 }
