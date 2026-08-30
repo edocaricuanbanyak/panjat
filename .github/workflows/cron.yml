@@ -8,13 +8,14 @@ name: Cron
 
 on:
   schedule:
-    - cron: "0 * * * *" # rosot (hourly)
+    # rosot + reconcile dipindah ke cron-job.org (always-on, tanpa limit GitHub).
+    # - cron: "0 * * * *" # rosot (hourly) — HANDLED by cron-job.org
     - cron: "5 * * * *" # jaga-posisi
     - cron: "30 * * * *" # moderasi
     - cron: "15 * * * *" # screenshot
     - cron: "0 17 * * *" # tebak (00:00 WIB)
     - cron: "0 18 * * *" # lencana (01:00 WIB)
-    - cron: "0 19 * * *" # reconcile (02:00 WIB)
+    # - cron: "0 19 * * *" # reconcile (02:00 WIB) — HANDLED by cron-job.org
     - cron: "5 17 * * 0" # juara-mingguan (Mon 00:05 WIB)
   workflow_dispatch:
     inputs:
