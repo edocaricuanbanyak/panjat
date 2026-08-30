@@ -34,6 +34,30 @@ export async function loadManjatConfig(db: DbOrTx): Promise<ManjatConfig> {
   };
 }
 
+export interface ModerasiConfig {
+  /**
+   * A NEW listing whose grip reaches this many rupiah is sent to the manual
+   * queue before going public (§18.5 fraud gate — big money straight to the
+   * summit is the scam pattern). 0 disables it: new listings auto-list at any
+   * amount. Layer-1 (deterministic) and the hourly AI pass still run regardless.
+   */
+  ambangTinjauManual: number;
+}
+
+/**
+ * Defaults to 0 (disabled) when the key is absent, so a DB seeded before this
+ * key existed — or a prod DB not yet re-seeded — auto-lists instead of crashing.
+ */
+export async function loadModerasiConfig(db: DbOrTx): Promise<ModerasiConfig> {
+  const [row] = await db
+    .select({ value: konfigurasi.value })
+    .from(konfigurasi)
+    .where(eq(konfigurasi.key, "ambang_tinjau_manual"))
+    .limit(1);
+  const val = row?.value;
+  return { ambangTinjauManual: typeof val === "number" ? val : 0 };
+}
+
 export interface OgConfig {
   /** Show the site's own screenshot as the share-card hero. */
   tampilkanScreenshot: boolean;

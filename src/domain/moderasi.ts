@@ -7,6 +7,8 @@ import { and, eq } from "drizzle-orm";
 import type { Database, DbOrTx } from "@/db";
 import { listing, moderasiLog } from "@/db/schema";
 import { appendLedger, gripFromLedger } from "./ledger";
+import { loadModerasiConfig } from "./config";
+import { formatRupiah } from "@/lib/format";
 import type { AiModerator } from "@/lib/anthropic";
 
 export type Verdict = "lolos" | "tolak" | "ragu";
@@ -93,14 +95,17 @@ export async function screenListing(
     return "tolak";
   }
 
-  const bigNew = input.baru && input.grip >= 100_000;
+  const { ambangTinjauManual } = await loadModerasiConfig(tx);
+  const bigNew = input.baru && ambangTinjauManual > 0 && input.grip >= ambangTinjauManual;
   if (res.verdict === "ragu" || bigNew) {
     await tx.update(listing).set({ status: "ditahan" }).where(eq(listing.id, input.listingId));
     await logModerasi(tx, {
       listingId: input.listingId,
       aktor: "sistem",
       keputusan: "tahan",
-      alasan: bigNew ? "Listing baru ≥Rp100.000 — antrean manual" : `${res.alasan} (lapis 1)`,
+      alasan: bigNew
+        ? `Listing baru ≥${formatRupiah(ambangTinjauManual)} — antrean manual`
+        : `${res.alasan} (lapis 1)`,
       sebelum: "tayang",
       sesudah: "ditahan",
     });

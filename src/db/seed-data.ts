@@ -31,6 +31,9 @@ export const KONFIGURASI: { key: string; value: unknown }[] = [
   { key: "kaki_tiang", value: 1000 },
   { key: "minimum_naik", value: 5000 },
   { key: "minimum_manjat_lagi", value: 1000 },
+  // §18.5 fraud gate: a NEW listing reaching this grip goes to manual review
+  // before going public. 0 = disabled (new listings auto-list at any amount).
+  { key: "ambang_tinjau_manual", value: 0 },
   { key: "jam_hitung_ulang", value: 1 },
   { key: "bobot_spotlight", value: "pegangan" },
   // Share-card (OG) hero toggles — show the site's own screenshot / logo.
