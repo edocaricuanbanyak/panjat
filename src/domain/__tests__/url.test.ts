@@ -31,4 +31,12 @@ describe("normalizeUrl", () => {
     expect(() => normalizeUrl("data:text/html,x")).toThrow();
     expect(() => normalizeUrl("ftp://example.com")).toThrow();
   });
+
+  it("rejects panjat.id and its subdomains (no self-listing)", () => {
+    expect(() => normalizeUrl("panjat.id")).toThrow();
+    expect(() => normalizeUrl("https://www.panjat.id/manjat")).toThrow();
+    expect(() => normalizeUrl("adm.panjat.id")).toThrow();
+    // A look-alike host that merely ends in "panjat.id" text is still fine.
+    expect(normalizeUrl("bukanpanjat.id")).toBe("bukanpanjat.id");
+  });
 });

@@ -12,6 +12,8 @@
     "db:seed": "tsx src/db/seed.ts",
     "db:seed:prod": "tsx src/db/seed-prod.ts",
     "db:reconcile": "tsx src/jobs/reconcile.ts",
+    "turunkan": "tsx src/jobs/turunkan.ts",
+    "ditahan": "tsx src/jobs/ditahan.ts",
     "rosot:run": "tsx src/jobs/rosot.ts",
     "manjat:sim": "tsx src/jobs/manjat-sim.ts",
     "klik:sim": "tsx src/jobs/klik-sim.ts",

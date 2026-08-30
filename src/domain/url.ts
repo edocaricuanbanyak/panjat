@@ -21,7 +21,7 @@ function canonicalHost(host: string): string {
  * dev-Twitter platform); full IG/TikTok handle disambiguation ships with the
  * preview slice.
  */
-export function normalizeUrl(input: string): string {
+export function normalizeUrl(input: string, opts: { allowSelf?: boolean } = {}): string {
   const raw = input.trim();
   if (!raw) throw new Error("URL kosong");
 
@@ -49,6 +49,14 @@ export function normalizeUrl(input: string): string {
   }
 
   const host = canonicalHost(u.hostname);
+
+  // Panjat never lists itself — self-promo on its own board reads as fake stock
+  // and discourages real makers from paying/overtaking. Reject panjat.id and any
+  // subdomain (matches the site host used in middleware). The takedown job passes
+  // allowSelf so it can still resolve an already-created self-listing to remove it.
+  if (!opts.allowSelf && (host === "panjat.id" || host.endsWith(".panjat.id"))) {
+    throw new Error("panjat.id tidak bisa dipasang di papannya sendiri");
+  }
 
   // Drop tracking params, keep the rest sorted for stability.
   const params = [...u.searchParams.entries()]
