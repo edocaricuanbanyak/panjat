@@ -323,6 +323,9 @@ export const copy = {
     refundSisa: " untuk pegangan yang sudah kamu bayar — kecuali kalau listing-mu ditolak moderasi; kalau itu terjadi, dana kembali penuh.",
     rosotServer: (rp: string) =>
       `Rosot dihitung otomatis di server tiap jam. Pegangan berhenti merosot begitu menyentuh ${rp} (Kaki Tiang), dan listing-mu tidak akan pernah dihapus hanya karena merosot.`,
+    lantaiTebal: "Yang sudah kamu bayar dilindungi.",
+    lantaiSisa: (persen: string, maks: string) =>
+      ` Peganganmu tidak akan melorot di bawah ${persen} dari total yang kamu bayar (maksimal ${maks}). Jadi sekali bayar, kamu tidak akan jatuh ke dasar — tapi puncak tetap harus diperjuangkan.`,
   },
 
   pasangGratis: {

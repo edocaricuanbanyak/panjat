@@ -70,6 +70,13 @@ export default async function AturanPage() {
           {copy.aturan.refundSisa}
         </p>
         <p>{copy.aturan.rosotServer(formatRupiah(cfg.kakiTiang))}</p>
+        <p>
+          <span className="text-tinta">{copy.aturan.lantaiTebal}</span>
+          {copy.aturan.lantaiSisa(
+            `${Math.round(cfg.lantaiRasio * 100)}%`,
+            formatRupiah(cfg.lantaiMaks),
+          )}
+        </p>
       </section>
     </PageShell>
   );

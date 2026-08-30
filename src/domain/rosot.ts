@@ -16,16 +16,38 @@ export interface RosotConfig {
   };
   /** Upper rank bound of each tier. */
   ambang: { top1: number; top3: number; top10: number; top30: number };
-  /** Grip floor (Kaki Tiang); at or below this, decay rate is 0. */
+  /** Absolute grip floor (Kaki Tiang); at or below this, decay rate is 0. */
   kakiTiang: number;
+  /** Fraction of a listing's total paid protected from decay (e.g. 0.10 = 10%). */
+  lantaiRasio: number;
+  /** Hard cap on the protected floor — must stay ≪ summit so #1 stays contestable. */
+  lantaiMaks: number;
 }
 
 /**
- * Daily decay rate for a listing at a given rank and grip.
- * Grip at/below the floor never decays (§6.1: "Pegangan ≤ Rp1.000 → 0%").
+ * Per-listing decay floor: what a sponsor paid is protected from rosot, but
+ * capped so a big payer can never lock the summit (§1.5 D1). Floor rises with
+ * total paid up to `lantaiMaks`, and never below the absolute Kaki Tiang floor.
+ *   floor = max(kakiTiang, min(lantaiMaks, round(lantaiRasio × totalBayar)))
+ * A free/unpaid listing (totalBayar 0) floors at kakiTiang, unchanged.
  */
-export function dailyRateForRank(rank: number, grip: number, cfg: RosotConfig): number {
-  if (grip <= cfg.kakiTiang) return 0;
+export function listingFloor(totalBayar: number, cfg: RosotConfig): number {
+  const proporsional = Math.min(cfg.lantaiMaks, Math.round(cfg.lantaiRasio * totalBayar));
+  return Math.max(cfg.kakiTiang, proporsional);
+}
+
+/**
+ * Daily decay rate for a listing at a given rank and grip. Grip at/below its
+ * floor never decays (§6.1). `floor` defaults to the absolute Kaki Tiang floor;
+ * the hourly job passes the per-listing protected floor (see listingFloor).
+ */
+export function dailyRateForRank(
+  rank: number,
+  grip: number,
+  cfg: RosotConfig,
+  floor: number = cfg.kakiTiang,
+): number {
+  if (grip <= floor) return 0;
   const { ambang, lajuRosot } = cfg;
   if (rank <= ambang.top1) return lajuRosot.r1;
   if (rank <= ambang.top3) return lajuRosot.r2_3;

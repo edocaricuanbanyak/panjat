@@ -29,6 +29,10 @@ export const KONFIGURASI: { key: string; value: unknown }[] = [
   },
   { key: "ambang_tier", value: { top1: 1, top3: 3, top10: 10, top30: 30 } },
   { key: "kaki_tiang", value: 1000 },
+  // Protected floor for paid listings: grip won't decay below this fraction of
+  // total paid, capped at lantai_maks (kept ≪ summit so #1 stays contestable).
+  { key: "lantai_rasio", value: 0.1 },
+  { key: "lantai_maks", value: 10000 },
   { key: "minimum_naik", value: 5000 },
   { key: "minimum_manjat_lagi", value: 1000 },
   // §18.5 fraud gate: a NEW listing reaching this grip goes to manual review

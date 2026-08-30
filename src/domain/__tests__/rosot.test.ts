@@ -5,6 +5,7 @@ import {
   decayGripOneHour,
   estimateDaysToThreshold,
   hourlyFactor,
+  listingFloor,
 } from "../rosot";
 
 // Mirrors the seeded §6.6 config.
@@ -12,6 +13,8 @@ const cfg: RosotConfig = {
   lajuRosot: { r1: 0.25, r2_3: 0.18, r4_10: 0.12, r11_30: 0.07, r31plus: 0.03 },
   ambang: { top1: 1, top3: 3, top10: 10, top30: 30 },
   kakiTiang: 1000,
+  lantaiRasio: 0.1,
+  lantaiMaks: 10000,
 };
 
 describe("dailyRateForRank", () => {
@@ -31,6 +34,24 @@ describe("dailyRateForRank", () => {
     expect(dailyRateForRank(1, 1000, cfg)).toBe(0);
     expect(dailyRateForRank(1, 999, cfg)).toBe(0);
     expect(dailyRateForRank(5, 500, cfg)).toBe(0);
+  });
+
+  it("honors a per-listing protected floor (stops decay at that floor)", () => {
+    // A listing whose protected floor is Rp10.000 doesn't decay once at/below it.
+    expect(dailyRateForRank(1, 10_000, cfg, 10_000)).toBe(0);
+    expect(dailyRateForRank(1, 9_999, cfg, 10_000)).toBe(0);
+    // Above the floor it still decays at the tier rate.
+    expect(dailyRateForRank(1, 10_001, cfg, 10_000)).toBe(0.25);
+  });
+});
+
+describe("listingFloor", () => {
+  it("protects a fraction of total paid, capped, never below Kaki Tiang", () => {
+    expect(listingFloor(0, cfg)).toBe(1000); // free/unpaid → absolute floor
+    expect(listingFloor(6_000, cfg)).toBe(1000); // 10% = 600 → below Kaki Tiang → 1000
+    expect(listingFloor(50_000, cfg)).toBe(5_000); // 10% = 5.000
+    expect(listingFloor(100_000, cfg)).toBe(10_000); // 10% = 10.000 (at cap)
+    expect(listingFloor(1_000_000, cfg)).toBe(10_000); // capped — whale can't lock the summit
   });
 });
 

@@ -3,7 +3,7 @@
  * current position, writes the decay to the append-only ledger, updates the
  * grip cache, and snapshots the standings — all in one serialized transaction.
  */
-import { eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import type { Database } from "@/db";
 import { listing, peganganLedger, posisiSnapshot } from "@/db/schema";
 import { loadRosotConfig } from "./config";
@@ -11,7 +11,7 @@ import { BOARD_LOCK_KEY } from "./constants";
 import { appendLedger } from "./ledger";
 import { detectDrops, type Drop } from "./notifikasi";
 import { computeRanks } from "./ranking";
-import { dailyRateForRank, decayGripOneHour } from "./rosot";
+import { dailyRateForRank, decayGripOneHour, listingFloor } from "./rosot";
 
 export interface RosotRunResult {
   ref: string;
@@ -59,6 +59,22 @@ export async function applyHourlyRosot(db: Database, now: Date): Promise<RosotRu
       .from(listing)
       .where(eq(listing.status, "tayang"));
 
+    // Total paid per listing (ledger `bayar` sum) → each listing's protected
+    // floor. Deterministic & auditable; never AI (§ kontrak produk).
+    const ids = rows.map((r) => r.id);
+    const bayarByListing = new Map<string, number>();
+    if (ids.length > 0) {
+      const bayarRows = await tx
+        .select({
+          listingId: peganganLedger.listingId,
+          total: sql<number>`coalesce(sum(${peganganLedger.nominalSigned}), 0)::bigint`,
+        })
+        .from(peganganLedger)
+        .where(and(eq(peganganLedger.jenis, "bayar"), inArray(peganganLedger.listingId, ids)))
+        .groupBy(peganganLedger.listingId);
+      for (const b of bayarRows) bayarByListing.set(b.listingId, Number(b.total));
+    }
+
     // Pre-decay ranks decide each listing's rate ("posisi saat jam berjalan").
     const preRanked = computeRanks(rows);
 
@@ -66,8 +82,9 @@ export async function applyHourlyRosot(db: Database, now: Date): Promise<RosotRu
     let totalDecayed = 0;
 
     for (const { rank, listing: l } of preRanked) {
-      const rate = dailyRateForRank(rank, l.peganganCached, cfg);
-      const newGrip = decayGripOneHour(l.peganganCached, rate, cfg.kakiTiang);
+      const floor = listingFloor(bayarByListing.get(l.id) ?? 0, cfg);
+      const rate = dailyRateForRank(rank, l.peganganCached, cfg, floor);
+      const newGrip = decayGripOneHour(l.peganganCached, rate, floor);
       const delta = newGrip - l.peganganCached; // ≤ 0
 
       if (delta !== 0) {
