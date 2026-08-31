@@ -9,7 +9,7 @@ name: Cron
 #   rosot          hourly :00        moderasi       hourly :30
 #   jaga-posisi    hourly :05        tebak          daily 00:00 WIB
 #   screenshot     hourly :15        lencana        daily 01:00 WIB
-#   reconcile      daily 02:00 WIB   juara-mingguan  Fri 00:05 WIB
+#   reconcile      daily 02:00 WIB   juara-mingguan  Wed 17:05 WIB
 
 on:
   workflow_dispatch:
