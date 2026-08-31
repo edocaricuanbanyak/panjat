@@ -145,10 +145,10 @@ async function HomeBody({
                     <VoteFavorit entries={voteEntries} leaderboard={favorit} myChoice={choice} />
                   }
                 />
-                {/* Weekly free-tier champion sits below rank 20 as a labelled
-                    showcase — never a paid rank (R16). */}
-                {juaraKakiTiang && <JuaraKakiTiang entry={juaraKakiTiang} />}
+                {/* Weekly free-tier showcases sit below rank 20 — labelled,
+                    never a paid rank (R16). Terfavorit first, then Kaki Tiang. */}
                 {juaraTerfavorit && <JuaraTerfavorit entry={juaraTerfavorit} />}
+                {juaraKakiTiang && <JuaraKakiTiang entry={juaraKakiTiang} />}
               </>
             ) : (
               <div className="flex flex-col gap-2.5">
