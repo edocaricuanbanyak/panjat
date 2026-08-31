@@ -68,9 +68,10 @@ export function ListingCard({
           <SiteLogo listingId={entry.id} nama={entry.nama} className="size-11 rounded-md text-lg" />
         ) : (
           <div className="flex shrink-0 flex-col items-center">
-            {/* Rank sits on the title's line (h-6 matches the title line-height);
-                the logo then drops down to align its top with the description. */}
-            <span className="flex h-6 items-center font-sans tabular text-sm font-semibold text-tinta-redup">
+            {/* Rank shares the title row's baseline (leading-6 = title line-height,
+                top-aligned), so it lines up with the name and the grip. The logo
+                then drops down to align its top with the description. */}
+            <span className="font-sans tabular text-sm font-semibold leading-6 text-tinta-redup">
               #{entry.rank}
             </span>
             <SiteLogo listingId={entry.id} nama={entry.nama} className="mt-0.5 size-9 rounded-md text-sm" />
