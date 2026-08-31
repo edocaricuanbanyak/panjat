@@ -1,6 +1,9 @@
+/** Sementara disembunyikan di UI (cron lencana ditunda). Set true untuk tampil lagi. */
+const LENCANA_TAMPIL = false;
+
 /** Permanent sponsor badges (R17). The trophy stays even as the position decays. */
 export function LencanaRow({ badges }: { badges: string[] }) {
-  if (badges.length === 0) return null;
+  if (!LENCANA_TAMPIL || badges.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-1">
       {badges.map((b) => {
