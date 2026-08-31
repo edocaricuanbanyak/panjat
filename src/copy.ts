@@ -155,11 +155,15 @@ export const copy = {
 
   favorit: {
     judul: "Pemanjat terfavorit",
-    hadiah: "Juara minggu ini diposting di Instagram + gratis iklan 1 hari.",
+    hadiah: "Juara minggu ini diposting di Threads & TikTok tiap Jumat.",
     labelBelumVote: "vote gratis · 1×/hari",
     sudahVote: "sudah vote",
     ajakan: "Pilih favoritmu — bukan soal uang, soal selera. Sekali sehari.",
     pilihListing: "Pilih listing…",
+    pilihLainnya: "Pilih lainnya",
+    pilihJudul: "Pilih pemanjat",
+    terpilih: "Pilihanmu",
+    batalPilih: "Batalkan pilihan",
     cari: "Cari pemanjat…",
     takAda: "Tidak ada listing yang cocok.",
     vote: "Vote",

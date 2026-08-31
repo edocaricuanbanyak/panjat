@@ -290,9 +290,9 @@ export const lencana = pgTable(
 );
 
 // Weekly champions archive — a snapshot the weekly cron writes at each week's
-// close: board #1/#2/#3 (by grip), the week's Terfavorit, and the Kaki Tiang
-// champion (most Sorak). One row per (week, kind). Feeds the archive page, the
-// featured showcase, and the weekly Instagram card.
+// Friday cut-off: board #1/#2/#3 (by grip), the week's Terfavorit, and the Kaki
+// Tiang champion (most Sorak). One row per (week, kind). Feeds the archive page,
+// the featured showcase, and the weekly Threads/TikTok card.
 export const juaraMingguan = pgTable(
   "juara_mingguan",
   {

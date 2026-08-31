@@ -7,9 +7,10 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Weekly at the Monday 00:00 WIB reset: snapshot the week's champions (board
- * #1/#2/#3, Terfavorit, Kaki Tiang) into the archive (H). WIB is UTC+7, so run
- * at 17:05 UTC Sunday (`5 17 * * 0`, see vercel.json).
+ * Weekly at the Friday 00:00 WIB cut-off: snapshot the week's champions (board
+ * #1/#2/#3, Terfavorit, Kaki Tiang) into the archive (H); the card is posted to
+ * Threads/TikTok each Friday. WIB is UTC+7, so schedule this on cron-job.org at
+ * 17:05 UTC Thursday (`5 17 * * 4`) — a few minutes past the cut-off.
  */
 export async function GET(req: Request) {
   const auth = assertCron(req);

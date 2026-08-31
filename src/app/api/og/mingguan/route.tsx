@@ -20,7 +20,7 @@ const medal = (n: number) => (n === 1 ? EMAS : n === 2 ? PERAK : PERUNGGU);
 const trim = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
 /**
- * GET /api/og/mingguan — the weekly champions Instagram-Story card (1080×1920):
+ * GET /api/og/mingguan — the weekly champions story card for Threads/TikTok (1080×1920):
  * board #1/#2/#3, the Terfavorit as a featured "ad" slot, and the Kaki Tiang
  * champion. Reads the latest archived week (B). 404 until a week is archived.
  */

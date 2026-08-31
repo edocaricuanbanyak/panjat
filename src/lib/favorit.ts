@@ -14,10 +14,14 @@ function wibDate(now: Date): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(now);
 }
 
-/** Stable weekly bucket id (7-day WIB windows) for accumulation. */
+/**
+ * Stable weekly bucket id — 7-day WIB windows that reset at the Friday 00:00 WIB
+ * cut-off (champions are posted every Friday). Epoch day 0 (1970-01-01) is a
+ * Thursday, so shifting by 1 aligns bucket boundaries to Fridays.
+ */
 function weekBucket(now: Date): number {
   const days = Math.floor(Date.parse(`${wibDate(now)}T00:00:00Z`) / 86_400_000);
-  return Math.floor(days / 7);
+  return Math.floor((days - 1) / 7);
 }
 
 const tallyKey = (now: Date) => `favorit:tally:w${weekBucket(now)}`;

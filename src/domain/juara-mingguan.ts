@@ -1,9 +1,10 @@
 /**
- * Weekly champions (H) — computed once a week by the cron and stored in the
- * `juara_mingguan` archive: board #1/#2/#3 by grip, the week's Terfavorit, and
- * the Kaki Tiang champion (most Sorak). Everything else (the featured showcase,
- * the archive page, the weekly Instagram card) reads from this archive, so
- * nothing "weekly" shows until a week has actually been archived (G).
+ * Weekly champions (H) — computed once a week at the Friday cut-off by the cron
+ * and stored in the `juara_mingguan` archive: board #1/#2/#3 by grip, the week's
+ * Terfavorit, and the Kaki Tiang champion (most Sorak). Everything else (the
+ * featured showcase, the archive page, the weekly Threads/TikTok card) reads
+ * from this archive, so nothing "weekly" shows until a week has actually been
+ * archived (G).
  */
 import { and, desc, eq, gt, sql } from "drizzle-orm";
 import type { Database } from "@/db";
@@ -13,11 +14,11 @@ import { getJuaraKakiTiangMingguan } from "./sorak";
 
 export type JuaraJenis = "papan1" | "papan2" | "papan3" | "terfavorit" | "kaki_tiang";
 
-/** WIB week-start (Monday), YYYY-MM-DD — the archive bucket id. */
+/** WIB week-start (Friday), YYYY-MM-DD — the archive bucket id. */
 export function mingguId(now: Date): string {
   const wib = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(now);
   const d = new Date(`${wib}T00:00:00Z`);
-  const back = (d.getUTCDay() + 6) % 7; // days since Monday
+  const back = (d.getUTCDay() + 2) % 7; // days since Friday (Fri=5)
   d.setUTCDate(d.getUTCDate() - back);
   return d.toISOString().slice(0, 10);
 }
@@ -36,7 +37,12 @@ export async function simpanJuaraMingguan(db: Database, now = new Date()) {
   const papan: JuaraJenis[] = ["papan1", "papan2", "papan3"];
   top.forEach((t, i) => rows.push({ jenis: papan[i], listingId: t.id, metrik: t.p }));
 
-  const [fav] = await favoritBoard(db, now, 1);
+  // The favourite tally to archive is the week that just closed at the Friday
+  // cut-off — the current bucket resets empty at 00:00 WIB Friday, so step back
+  // two days to land safely inside the closed week (robust whether the cron
+  // fires early Friday or a little later).
+  const mingguTutup = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+  const [fav] = await favoritBoard(db, mingguTutup, 1);
   if (fav) rows.push({ jenis: "terfavorit", listingId: fav.id, metrik: fav.votes });
 
   const kaki = await getJuaraKakiTiangMingguan(db);
