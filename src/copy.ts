@@ -155,7 +155,7 @@ export const copy = {
 
   favorit: {
     judul: "Pemanjat terfavorit",
-    hadiah: "Juara minggu ini diposting di Threads & TikTok tiap Jumat.",
+    hadiah: "Juara ditentukan tiap Rabu 17.00 WIB, diposting di Threads & TikTok tiap Jumat.",
     labelBelumVote: "vote gratis · 1×/hari",
     sudahVote: "sudah vote",
     ajakan: "Pilih favoritmu — bukan soal uang, soal selera. Sekali sehari.",

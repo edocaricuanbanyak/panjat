@@ -15,13 +15,16 @@ function wibDate(now: Date): string {
 }
 
 /**
- * Stable weekly bucket id — 7-day WIB windows that reset at the Friday 00:00 WIB
- * cut-off (champions are posted every Friday). Epoch day 0 (1970-01-01) is a
- * Thursday, so shifting by 1 aligns bucket boundaries to Fridays.
+ * The weekly competition resets at the Wednesday 17:00 WIB cut-off — champions
+ * are *determined* then, and posted to Threads/TikTok the following Friday. WIB
+ * has no DST, so the cut-off is a fixed weekly UTC instant (Wed 10:00 UTC).
  */
-function weekBucket(now: Date): number {
-  const days = Math.floor(Date.parse(`${wibDate(now)}T00:00:00Z`) / 86_400_000);
-  return Math.floor((days - 1) / 7);
+export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+export const WEEK_ANCHOR_MS = Date.UTC(1970, 0, 7, 10, 0, 0); // a Wednesday 17:00 WIB
+
+/** Stable weekly bucket id, incrementing at each Wednesday 17:00 WIB cut-off. */
+export function weekBucket(now: Date): number {
+  return Math.floor((now.getTime() - WEEK_ANCHOR_MS) / WEEK_MS);
 }
 
 const tallyKey = (now: Date) => `favorit:tally:w${weekBucket(now)}`;
