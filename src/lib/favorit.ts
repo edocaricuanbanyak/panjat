@@ -27,6 +27,12 @@ export function weekBucket(now: Date): number {
   return Math.floor((now.getTime() - WEEK_ANCHOR_MS) / WEEK_MS);
 }
 
+/** The WIB date "YYYY-MM-DD" of the Wednesday 17:00 cut-off that OPENED the week `now` falls in. */
+export function weekStartWIB(now: Date): string {
+  const cutoff = new Date(WEEK_ANCHOR_MS + weekBucket(now) * WEEK_MS);
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(cutoff);
+}
+
 const tallyKey = (now: Date) => `favorit:tally:w${weekBucket(now)}`;
 const votedKey = (day: string, vid: string) => `favorit:voted:${day}:${vid}`;
 const VOTED_TTL_S = 60 * 60 * 30; // ~30h, covers the WIB day

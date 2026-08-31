@@ -4,8 +4,9 @@ import type { JuaraKakiTiang as Juara } from "@/domain/sorak";
 import { SiteLogo } from "./SiteLogo";
 
 /**
- * Weekly Kaki Tiang champion — the most-cheered free (Rp0) listing of the last 7
- * days, featured at the TOP of the board as a clearly-labelled showcase. It is
+ * Weekly Kaki Tiang champion — the most-cheered free (Rp0) listing of the current
+ * week (since the Wed 17:00 WIB cut-off), featured at the TOP of the board as a
+ * clearly-labelled showcase. It is
  * NOT a grip rank and never displaces a paid listing (R16 / "ranking = grip").
  * A gentle bridge from the free tier toward a first payment; shows the pitch and
  * the traffic it earned this week.

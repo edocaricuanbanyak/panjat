@@ -9,7 +9,7 @@
 import { and, desc, eq, gt, sql } from "drizzle-orm";
 import type { Database } from "@/db";
 import { juaraMingguan, listing } from "@/db/schema";
-import { favoritBoard, WEEK_ANCHOR_MS, WEEK_MS, weekBucket } from "@/lib/favorit";
+import { favoritBoard, weekStartWIB } from "@/lib/favorit";
 import { getJuaraKakiTiangMingguan } from "./sorak";
 
 export type JuaraJenis = "papan1" | "papan2" | "papan3" | "terfavorit" | "kaki_tiang";
@@ -19,8 +19,7 @@ export type JuaraJenis = "papan1" | "papan2" | "papan3" | "terfavorit" | "kaki_t
  * day champions are determined (posted to Threads/TikTok the following Friday).
  */
 export function mingguId(now: Date): string {
-  const cutoff = new Date(WEEK_ANCHOR_MS + weekBucket(now) * WEEK_MS);
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(cutoff);
+  return weekStartWIB(now);
 }
 
 /** Compute this week's champions and upsert them into the archive. */
@@ -45,7 +44,7 @@ export async function simpanJuaraMingguan(db: Database, now = new Date()) {
   const [fav] = await favoritBoard(db, mingguTutup, 1);
   if (fav) rows.push({ jenis: "terfavorit", listingId: fav.id, metrik: fav.votes });
 
-  const kaki = await getJuaraKakiTiangMingguan(db);
+  const kaki = await getJuaraKakiTiangMingguan(db, mingguTutup);
   if (kaki) rows.push({ jenis: "kaki_tiang", listingId: kaki.id, metrik: kaki.sorak });
 
   for (const r of rows) {

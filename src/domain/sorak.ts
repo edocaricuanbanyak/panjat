@@ -7,6 +7,7 @@
 import { and, count, desc, eq, sql } from "drizzle-orm";
 import type { Database } from "@/db";
 import { listing, pengunjungAnon, sorak } from "@/db/schema";
+import { weekStartWIB } from "@/lib/favorit";
 import { wibDate } from "./papan-hari-ini";
 
 export const SORAK_PER_DAY = 5;
@@ -62,35 +63,43 @@ export interface JuaraKakiTiang {
   nama: string;
   urlNormal: string;
   deskripsi: string | null;
-  /** Sorak earned in the last 7 days (the weekly contest). */
+  /** Sorak earned within the weekly bucket (since the Wed 17:00 WIB cut-off). */
   sorak: number;
-  /** Valid clicks delivered in the last 7 days. */
+  /** Valid clicks delivered within the same weekly bucket. */
   klik: number;
 }
 
 /**
- * Weekly Kaki Tiang champion: the free listing with the most Sorak over the last
- * 7 days. Shown as a labelled showcase (never a paid rank — R16). Carries its
- * pitch + weekly clicks so the board can feature it at the top. Null if nobody
- * was cheered this week.
+ * Weekly Kaki Tiang champion: the free listing with the most Sorak in the current
+ * weekly bucket — anchored to the Wednesday 17:00 WIB cut-off (matches Terfavorit),
+ * so it resets cleanly each week rather than drifting on a rolling window. Shown as
+ * a labelled showcase (never a paid rank — R16). Carries its pitch + weekly clicks
+ * so the board can feature it at the top. Null if nobody was cheered this week.
+ *
+ * `now` picks the bucket: the cron passes the just-closed week's timestamp so the
+ * archived champion reflects the week that just ended, not the empty new week.
  */
-export async function getJuaraKakiTiangMingguan(db: Database): Promise<JuaraKakiTiang | null> {
-  const sorak7 = sql<number>`(select count(*)::int from "sorak"
-    where "sorak"."listing_id" = "listing"."id" and "sorak"."tanggal" >= current_date - 7)`;
-  const klik7 = sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian"
-    where "klik_harian"."listing_id" = "listing"."id" and "klik_harian"."tanggal" >= current_date - 7)`;
+export async function getJuaraKakiTiangMingguan(
+  db: Database,
+  now = new Date(),
+): Promise<JuaraKakiTiang | null> {
+  const weekStart = weekStartWIB(now); // WIB "YYYY-MM-DD" of this week's Wed 17:00 cut-off
+  const sorakMinggu = sql<number>`(select count(*)::int from "sorak"
+    where "sorak"."listing_id" = "listing"."id" and "sorak"."tanggal" >= ${weekStart})`;
+  const klikMinggu = sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian"
+    where "klik_harian"."listing_id" = "listing"."id" and "klik_harian"."tanggal" >= ${weekStart})`;
   const [row] = await db
     .select({
       id: listing.id,
       nama: listing.nama,
       urlNormal: listing.urlNormal,
       deskripsi: listing.deskripsi,
-      sorak: sorak7,
-      klik: klik7,
+      sorak: sorakMinggu,
+      klik: klikMinggu,
     })
     .from(listing)
     .where(and(eq(listing.status, "tayang"), eq(listing.peganganCached, 0)))
-    .orderBy(desc(sorak7), desc(listing.createdAt))
+    .orderBy(desc(sorakMinggu), desc(listing.createdAt))
     .limit(1);
   return row && row.sorak > 0 ? row : null;
 }
