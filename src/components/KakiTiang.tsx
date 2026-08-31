@@ -4,6 +4,8 @@ import { Heart, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { copy } from "@/copy";
 import type { KakiTiangEntry } from "@/domain/sorak";
+import { KategoriIcon } from "./KategoriIcon";
+import { KlikChip } from "./KlikChip";
 import { SiteLogo } from "./SiteLogo";
 
 /** Sort by live support desc; ties keep the server order (origIndex) as the stable
@@ -185,16 +187,36 @@ export function KakiTiang({
                   {e.nama}
                 </a>
                 {e.deskripsi && <p className="truncate text-xs text-tinta-redup">{e.deskripsi}</p>}
+                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
+                  <span className="truncate font-mono text-tinta-redup">
+                    {e.urlNormal.replace(/^https?:\/\//, "").replace(/\/+$/, "")}
+                  </span>
+                  {e.kategoriNama && (
+                    <span className="hidden shrink-0 items-center gap-1 lg:flex">
+                      <span aria-hidden>·</span>
+                      <KategoriIcon slug={e.kategoriSlug} className="size-3.5 text-tinta-redup" />
+                      {e.kategoriNama}
+                    </span>
+                  )}
+                  {e.klik > 0 && (
+                    <>
+                      <span aria-hidden>·</span>
+                      <KlikChip n={e.klik} />
+                    </>
+                  )}
+                </p>
               </div>
-              <span className="font-sans tabular text-xs text-tinta-redup">
-                {copy.kakiTiang.dukungan_n(counts[e.id] ?? 0)}
-              </span>
-              <DukungButton
-                onDukung={() => dukung(e.id)}
-                disabled={remaining <= 0}
-                supported={(mine[e.id] ?? 0) > 0}
-                mineCount={mine[e.id] ?? 0}
-              />
+              <div className="flex shrink-0 flex-col items-end gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+                <span className="font-sans tabular text-xs text-tinta-redup">
+                  {copy.kakiTiang.dukungan_n(counts[e.id] ?? 0)}
+                </span>
+                <DukungButton
+                  onDukung={() => dukung(e.id)}
+                  disabled={remaining <= 0}
+                  supported={(mine[e.id] ?? 0) > 0}
+                  mineCount={mine[e.id] ?? 0}
+                />
+              </div>
             </article>
           ))}
         </div>

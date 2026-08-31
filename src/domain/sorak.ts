@@ -6,7 +6,7 @@
  */
 import { and, count, desc, eq, sql } from "drizzle-orm";
 import type { Database } from "@/db";
-import { listing, pengunjungAnon, sorak } from "@/db/schema";
+import { kategori, listing, pengunjungAnon, sorak } from "@/db/schema";
 import { weekStartWIB } from "@/lib/favorit";
 import { wibDate } from "./papan-hari-ini";
 
@@ -55,7 +55,11 @@ export interface KakiTiangEntry {
   nama: string;
   urlNormal: string;
   deskripsi: string | null;
+  kategoriNama: string | null;
+  kategoriSlug: string | null;
   sorak: number;
+  /** All-time valid clicks delivered — shown as social proof. */
+  klik: number;
 }
 
 export interface JuaraKakiTiang {
@@ -110,15 +114,20 @@ export async function getKakiTiang(db: Database): Promise<KakiTiangEntry[]> {
   // qualifiers, so `${listing.id}` would resolve to sorak.id inside the subquery
   // and always count 0. Reference both sides explicitly.
   const sorakCount = sql<number>`(select count(*)::int from "sorak" where "sorak"."listing_id" = "listing"."id")`;
+  const klikTotal = sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian" where "klik_harian"."listing_id" = "listing"."id")`;
   return db
     .select({
       id: listing.id,
       nama: listing.nama,
       urlNormal: listing.urlNormal,
       deskripsi: listing.deskripsi,
+      kategoriNama: kategori.nama,
+      kategoriSlug: kategori.slug,
       sorak: sorakCount,
+      klik: klikTotal,
     })
     .from(listing)
+    .leftJoin(kategori, eq(kategori.id, listing.kategoriId))
     .where(and(eq(listing.status, "tayang"), eq(listing.peganganCached, 0)))
     .orderBy(desc(sorakCount), desc(listing.createdAt))
     .limit(30);

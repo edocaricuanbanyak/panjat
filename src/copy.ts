@@ -73,6 +73,7 @@ export const copy = {
     juara: (rank: number) => `Juara ${rank}`,
     salipSingkat: "Salip",
     klik: (n: number) => `${n.toLocaleString("id-ID")} klik`,
+    klikProof: "Klik nyata yang sudah dikirim ke situs ini — dihitung di server.",
     // Card rosot status (revealed on hover) — two states + the at-floor case.
     rosotTerjaga: "masih terjaga",
     rosotAktif: (rp: string) => `merosot ~${rp}/hari`,
@@ -174,7 +175,8 @@ export const copy = {
   kakiTiang: {
     judul: "Kaki Tiang",
     sisaDukungan: (n: number) => `${n} dukungan tersisa hari ini`,
-    ajakan: "Listing gratis. Beri dukungan untuk yang bagus — yang paling didukung naik ke tiang.",
+    ajakan:
+      "Listing gratis — dukung yang menurutmu bagus. Tiap Rabu, yang paling banyak didukung jadi Juara Kaki Tiang dan naik tampil di papan.",
     dukung: "Dukung",
     dukungan_n: (n: number) => `${n.toLocaleString("id-ID")} dukungan`,
     kosong: "Belum ada yang nunggu, kamu gak ada pesaing",
@@ -235,7 +237,7 @@ export const copy = {
   },
 
   jelajah: {
-    cariPlaceholder: "cari AI tools, jasa, game…",
+    cariPlaceholder: "Cari AI tools, jasa, game…",
     cari: "Cari",
     cariLabel: "Cari listing",
     juaraKategori: "Juara kategori",

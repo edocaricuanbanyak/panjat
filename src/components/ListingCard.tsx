@@ -2,6 +2,7 @@ import { copy } from "@/copy";
 import type { BoardEntry } from "@/domain/board";
 import { formatRupiah } from "@/lib/format";
 import { KategoriIcon } from "./KategoriIcon";
+import { KlikChip } from "./KlikChip";
 import { LencanaRow } from "./LencanaRow";
 import { SiteLogo } from "./SiteLogo";
 import { ManjatButton } from "./ManjatModal";
@@ -34,9 +35,7 @@ export function ListingCard({
   // Cost hint to overtake this listing (just above its grip; final amount is
   // computed in the modal). The board never floors below Rp1.000.
   const salipCost = entry.pegangan + 1000;
-  const medali = puncak
-    ? MEDALI[entry.rank as 1 | 2 | 3]
-    : undefined;
+  const medali = puncak ? MEDALI[entry.rank as 1 | 2 | 3] : undefined;
 
   return (
     <article
@@ -62,21 +61,21 @@ export function ListingCard({
 
       {/* Rank + logo + the listing block. Only on lg+ (desktop) the wrapper dissolves
           (contents) into the editorial row; tablet & mobile keep the stacked card. */}
-      <div className="flex min-w-0 items-center gap-3 lg:contents">
-        {/* Rank 4+ shows the number inline; the podium wears its medal as a badge
-            on the logo, freeing the whole row width for a one-line title. */}
-        {/* Rank 4+ shows the number inline; podium wears its medal ribbon on the
-            card (above), so the row is just logo + text. */}
-        {!puncak && (
-          <div className="w-9 shrink-0 text-right font-sans tabular text-base font-semibold text-tinta-redup">
-            #{entry.rank}
+      <div className={`flex min-w-0 gap-3 lg:contents ${puncak ? "items-center" : "items-start"}`}>
+        {/* Podium wears its medal ribbon; rank 4+ shows the number stacked above
+            the logo, in line with the title — same hierarchy, no ribbon. */}
+        {puncak ? (
+          <SiteLogo listingId={entry.id} nama={entry.nama} className="size-11 rounded-md text-lg" />
+        ) : (
+          <div className="flex shrink-0 flex-col items-center">
+            {/* Rank sits on the title's line (h-6 matches the title line-height);
+                the logo then drops down to align its top with the description. */}
+            <span className="flex h-6 items-center font-sans tabular text-sm font-semibold text-tinta-redup">
+              #{entry.rank}
+            </span>
+            <SiteLogo listingId={entry.id} nama={entry.nama} className="mt-0.5 size-9 rounded-md text-sm" />
           </div>
         )}
-        <SiteLogo
-          listingId={entry.id}
-          nama={entry.nama}
-          className={puncak ? "size-11 rounded-md text-lg" : "size-9 rounded-md text-sm"}
-        />
         <div className="min-w-0 flex-1">
           {/* Title stretches; grip pinned to the end of the line — same position
               on every card (podium just larger + summit-red). */}
@@ -101,7 +100,7 @@ export function ListingCard({
           {entry.deskripsi && (
             <p
               className={`mt-0.5 text-tinta-redup ${
-                puncak ? "line-clamp-2 text-sm" : "line-clamp-1 text-xs lg:text-sm"
+                puncak ? "line-clamp-2 text-sm" : "line-clamp-2 text-xs lg:text-sm"
               }`}
             >
               {entry.deskripsi}
@@ -117,8 +116,12 @@ export function ListingCard({
                 {entry.kategoriNama}
               </span>
             )}
-            <span aria-hidden>·</span>
-            <span className="shrink-0 font-sans tabular">{copy.papan.klik(entry.klikTotal)}</span>
+            {entry.klikTotal > 0 && (
+              <>
+                <span aria-hidden>·</span>
+                <KlikChip n={entry.klikTotal} />
+              </>
+            )}
             {/* Rosot status — always visible on touch, revealed on hover on desktop. */}
             <span
               className={`shrink-0 opacity-100 transition-opacity ease-panjat lg:opacity-0 lg:group-hover:opacity-100 ${

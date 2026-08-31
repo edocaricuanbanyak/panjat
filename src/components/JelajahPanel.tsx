@@ -36,7 +36,7 @@ export function JelajahPanel({ items, categories }: { items: Card[]; categories:
   }, [items, q, cat]);
 
   const chip = (on: boolean) =>
-    `inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-sm transition ${
+    `inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm transition ${
       on
         ? "border-merah bg-merah text-kertas-1"
         : "border-garis bg-kertas-1 text-tinta-redup hover:bg-kertas-2"
@@ -51,8 +51,9 @@ export function JelajahPanel({ items, categories }: { items: Card[]; categories:
         className={fieldClasses}
       />
 
-      {/* Selectable category chips */}
-      <div className="mt-3 flex flex-wrap gap-2">
+      {/* Selectable category chips — one scrollable line on mobile (categories stay
+          visible for discovery), wrapping on sm+ where there's room. */}
+      <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
         <button type="button" onClick={() => setCat(null)} className={chip(cat === null)}>
           <KategoriIcon slug={null} className="size-3.5" />
           {copy.jelajah.semua}
