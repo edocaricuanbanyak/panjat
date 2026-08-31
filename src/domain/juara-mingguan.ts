@@ -6,9 +6,9 @@
  * from this archive, so nothing "weekly" shows until a week has actually been
  * archived (G).
  */
-import { and, desc, eq, gt, sql } from "drizzle-orm";
+import { and, desc, eq, gt, ne, sql } from "drizzle-orm";
 import type { Database } from "@/db";
-import { juaraMingguan, listing } from "@/db/schema";
+import { juaraMingguan, kategori, listing, moderasiLog } from "@/db/schema";
 import { favoritBoard, weekStartWIB } from "@/lib/favorit";
 import { getJuaraKakiTiangMingguan } from "./sorak";
 
@@ -47,6 +47,10 @@ export async function simpanJuaraMingguan(db: Database, now = new Date()) {
   const kaki = await getJuaraKakiTiangMingguan(db, mingguTutup);
   if (kaki) rows.push({ jenis: "kaki_tiang", listingId: kaki.id, metrik: kaki.sorak });
 
+  // Weekly Kaki Tiang reset: the champion "graduates" to the board (Rp0 row); the
+  // rest of the free tier expires so next week starts fresh.
+  const hangus = await hanguskanKakiTiang(db, kaki?.id ?? null);
+
   for (const r of rows) {
     await db
       .insert(juaraMingguan)
@@ -56,7 +60,41 @@ export async function simpanJuaraMingguan(db: Database, now = new Date()) {
         set: { listingId: r.listingId, metrik: r.metrik },
       });
   }
-  return { minggu, jumlah: rows.length };
+  return { minggu, jumlah: rows.length, hangus };
+}
+
+/**
+ * Weekly Kaki Tiang reset — expire every free (Rp0, `tayang`) listing except the
+ * just-crowned champion (`kecualiId`). Runs at the Wed 17:00 cut-off so the free
+ * tier empties for a fresh contest; expired listings stop counting toward the
+ * per-domain free cap, so owners can post again next week. No grip/ledger touched.
+ */
+export async function hanguskanKakiTiang(db: Database, kecualiId: string | null): Promise<number> {
+  const rows = await db
+    .select({ id: listing.id })
+    .from(listing)
+    .where(
+      and(
+        eq(listing.status, "tayang"),
+        eq(listing.peganganCached, 0),
+        kecualiId ? ne(listing.id, kecualiId) : undefined,
+      ),
+    );
+  if (rows.length === 0) return 0;
+  await db.transaction(async (tx) => {
+    for (const r of rows) {
+      await tx.update(listing).set({ status: "kedaluwarsa" }).where(eq(listing.id, r.id));
+      await tx.insert(moderasiLog).values({
+        listingId: r.id,
+        aktor: "sistem",
+        keputusan: "kedaluwarsa",
+        alasan: "Kaki Tiang reset mingguan",
+        sebelum: "tayang",
+        sesudah: "kedaluwarsa",
+      });
+    }
+  });
+  return rows.length;
 }
 
 export interface JuaraArsip {
@@ -96,6 +134,8 @@ export interface JuaraKakiTiangArsip {
   nama: string;
   urlNormal: string;
   deskripsi: string | null;
+  kategoriNama: string | null;
+  kategoriSlug: string | null;
   sorak: number;
   klik: number;
 }
@@ -144,11 +184,14 @@ export async function getJuaraKakiTiangArsip(db: Database): Promise<JuaraKakiTia
       nama: listing.nama,
       urlNormal: listing.urlNormal,
       deskripsi: listing.deskripsi,
+      kategoriNama: kategori.nama,
+      kategoriSlug: kategori.slug,
       sorak: juaraMingguan.metrik,
       klik: sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian" where "klik_harian"."listing_id" = "listing"."id")`,
     })
     .from(juaraMingguan)
     .innerJoin(listing, eq(listing.id, juaraMingguan.listingId))
+    .leftJoin(kategori, eq(kategori.id, listing.kategoriId))
     .where(eq(juaraMingguan.jenis, "kaki_tiang"))
     .orderBy(desc(juaraMingguan.minggu))
     .limit(1);

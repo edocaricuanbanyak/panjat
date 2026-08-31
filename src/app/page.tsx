@@ -7,7 +7,6 @@ import { HariIniBoard } from "@/components/HariIniBoard";
 import { HeroManjat } from "@/components/HeroManjat";
 import { HomeTabs } from "@/components/HomeTabs";
 import { JelajahPanel } from "@/components/JelajahPanel";
-import { JuaraKakiTiang } from "@/components/JuaraKakiTiang";
 import { JuaraTerfavorit } from "@/components/JuaraTerfavorit";
 import { KakiTiang } from "@/components/KakiTiang";
 import { ListingCard } from "@/components/ListingCard";
@@ -18,7 +17,7 @@ import { HomeSkeleton } from "@/components/Skeleton";
 import { VoteFavorit } from "@/components/VoteFavorit";
 import { copy } from "@/copy";
 import { db } from "@/db";
-import { getBoard } from "@/domain/board";
+import { type BoardEntry, getBoard } from "@/domain/board";
 import { jelajahAll, listCategories } from "@/domain/jelajah";
 import { getHariIni } from "@/domain/papan-hari-ini";
 import { getJuaraKakiTiangArsip, getJuaraTerfavoritArsip } from "@/domain/juara-mingguan";
@@ -90,7 +89,41 @@ async function HomeBody({
   const page = Math.min(Math.max(1, Number(sp.hal) || 1), totalPages);
   const pageEntries = entries.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  const voteEntries = entries.map((e) => ({ id: e.id, nama: e.nama, urlNormal: e.urlNormal }));
+  // The weekly Kaki Tiang champion (free, Rp0) also earns a shot at "pemanjat
+  // terfavorit" — added to the free vote pool (never touches money/ranking).
+  const voteEntries = [
+    ...entries.map((e) => ({ id: e.id, nama: e.nama, urlNormal: e.urlNormal })),
+    ...(juaraKakiTiang
+      ? [{ id: juaraKakiTiang.id, nama: juaraKakiTiang.nama, urlNormal: juaraKakiTiang.urlNormal }]
+      : []),
+  ].filter((e, i, a) => a.findIndex((x) => x.id === e.id) === i);
+
+  // The weekly Kaki Tiang champion joins the board as its bottom row at Rp0 — a
+  // free entry (no grip), easily overtaken by any paid listing. Same look as a
+  // rank 4+ row; it rotates each week as a new champion is crowned.
+  const championEntry: BoardEntry | null = juaraKakiTiang
+    ? {
+        rank: entries.length + 1,
+        id: juaraKakiTiang.id,
+        nama: juaraKakiTiang.nama,
+        urlNormal: juaraKakiTiang.urlNormal,
+        deskripsi: juaraKakiTiang.deskripsi,
+        kategoriNama: juaraKakiTiang.kategoriNama,
+        kategoriSlug: juaraKakiTiang.kategoriSlug,
+        pegangan: 0,
+        klikTotal: juaraKakiTiang.klik,
+        rosotPerHari: 0,
+        masihTerjaga: false,
+        screenshotUrl: null,
+        badges: [],
+      }
+    : null;
+
+  // The champion "graduates" to the board row above, so drop it from the Kaki
+  // Tiang list (no empty slot — the rest shift up).
+  const kakiTiangEntries = championEntry
+    ? kakiTiang.filter((e) => e.id !== championEntry.id)
+    : kakiTiang;
 
   return (
     <>
@@ -145,10 +178,15 @@ async function HomeBody({
                     <VoteFavorit entries={voteEntries} leaderboard={favorit} myChoice={choice} />
                   }
                 />
-                {/* Weekly free-tier showcases sit below rank 20 — labelled,
-                    never a paid rank (R16). Terfavorit first, then Kaki Tiang. */}
+                {/* Weekly Kaki Tiang champion as the board's bottom row (Rp0, free
+                    — easily overtaken, no grip, never a paid rank / R16). */}
+                {championEntry && (
+                  <div className="mt-2.5">
+                    <ListingCard entry={championEntry} />
+                  </div>
+                )}
+                {/* Terfavorit showcase (free spectator-vote winner). */}
                 {juaraTerfavorit && <JuaraTerfavorit entry={juaraTerfavorit} />}
-                {juaraKakiTiang && <JuaraKakiTiang entry={juaraKakiTiang} />}
               </>
             ) : (
               <div className="flex flex-col gap-2.5">
@@ -162,7 +200,7 @@ async function HomeBody({
             {/* KAKI TIANG (gratis) — lives under the main board only, not the
                 Jelajah / Hari Ini tabs. */}
             <div className="mt-12">
-              <KakiTiang entries={kakiTiang} remaining={sisaSorak} baruId={sp.baru ?? null} />
+              <KakiTiang entries={kakiTiangEntries} remaining={sisaSorak} baruId={sp.baru ?? null} />
               <div className="mt-3 text-xs text-tinta-redup">
                 {copy.beranda.punyaProduk}{" "}
                 <PasangGratisModal kategori={kats} className="text-merah-teks hover:underline" />.

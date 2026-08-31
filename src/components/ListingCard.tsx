@@ -1,3 +1,4 @@
+import { Star } from "lucide-react";
 import { copy } from "@/copy";
 import type { BoardEntry } from "@/domain/board";
 import { formatRupiah } from "@/lib/format";
@@ -52,12 +53,15 @@ export function ListingCard({
         </span>
       )}
 
-      {/* Above-center floating action, revealed on hover (desktop pointer devices). */}
-      <div className="pointer-events-none absolute -top-3 left-1/2 z-20 hidden -translate-x-1/2 opacity-0 transition-all ease-panjat group-hover:pointer-events-auto group-hover:-top-3.5 group-hover:opacity-100 lg:block">
-        <ManjatButton nominal={salipCost} size="sm" className="h-7 px-2.5 text-xs">
-          {copy.papan.salipRank(entry.rank, formatRupiah(salipCost))}
-        </ManjatButton>
-      </div>
+      {/* Above-center floating action, revealed on hover (desktop pointer devices).
+          A free (Rp0) showcase — the Kaki Tiang champion — has nothing to salip. */}
+      {entry.pegangan > 0 && (
+        <div className="pointer-events-none absolute -top-3 left-1/2 z-20 hidden -translate-x-1/2 opacity-0 transition-all ease-panjat group-hover:pointer-events-auto group-hover:-top-3.5 group-hover:opacity-100 lg:block">
+          <ManjatButton nominal={salipCost} size="sm" className="h-7 px-2.5 text-xs">
+            {copy.papan.salipRank(entry.rank, formatRupiah(salipCost))}
+          </ManjatButton>
+        </div>
+      )}
 
       {/* Rank + logo + the listing block. Only on lg+ (desktop) the wrapper dissolves
           (contents) into the editorial row; tablet & mobile keep the stacked card. */}
@@ -69,11 +73,18 @@ export function ListingCard({
         ) : (
           <div className="flex shrink-0 flex-col items-center">
             {/* Rank shares the title row's baseline (leading-6 = title line-height,
-                top-aligned), so it lines up with the name and the grip. The logo
-                then drops down to align its top with the description. */}
-            <span className="font-sans tabular text-sm font-semibold leading-6 text-tinta-redup">
-              #{entry.rank}
-            </span>
+                top-aligned), so it lines up with the name and the grip. A free
+                (Rp0) showcase — the Kaki Tiang champion — has no paid rank, so it
+                shows a star instead of a number. */}
+            {entry.pegangan > 0 ? (
+              <span className="font-sans tabular text-sm font-semibold leading-6 text-tinta-redup">
+                #{entry.rank}
+              </span>
+            ) : (
+              <span className="flex h-6 items-center text-emas" aria-label={copy.papan.juaraKakiTiang}>
+                <Star className="size-4" aria-hidden />
+              </span>
+            )}
             <SiteLogo listingId={entry.id} nama={entry.nama} className="mt-0.5 size-9 rounded-md text-sm" />
           </div>
         )}
@@ -145,17 +156,20 @@ export function ListingCard({
           )}
 
           {/* Mobile & tablet: full-width Salip CTA (desktop uses the hover button).
-              Summit stays primary red; rank 4+ gets an outline (secondary) button. */}
-          <div className="relative z-10 mt-2 lg:hidden">
-            <ManjatButton
-              nominal={salipCost}
-              size="sm"
-              variant={puncak ? "primary" : "secondary"}
-              className="h-9 w-full"
-            >
-              {copy.papan.salipRank(entry.rank, formatRupiah(salipCost))}
-            </ManjatButton>
-          </div>
+              Summit stays primary red; rank 4+ gets an outline (secondary) button.
+              A free (Rp0) showcase has nothing to salip. */}
+          {entry.pegangan > 0 && (
+            <div className="relative z-10 mt-2 lg:hidden">
+              <ManjatButton
+                nominal={salipCost}
+                size="sm"
+                variant={puncak ? "primary" : "secondary"}
+                className="h-9 w-full"
+              >
+                {copy.papan.salipRank(entry.rank, formatRupiah(salipCost))}
+              </ManjatButton>
+            </div>
+          )}
         </div>
       </div>
     </article>
