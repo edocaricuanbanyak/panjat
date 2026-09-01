@@ -12,8 +12,9 @@ const TARGETS: Target[] = ["#1", "top3", "top10"];
 
 /**
  * POST /api/manjat
- *  - no `url`  -> quote: { target } or { nominal } => { nominal, rank, rosotPerHari, estimasiHari }
- *  - with `url` -> create/top-up + Snap invoice => { orderId, redirectUrl, ... }
+ *  - `bayar` falsy -> quote: { target|nominal, url? } => projection incl. accumulation
+ *      when `url` matches a paid listing (top-up); Kaki Tiang (grip 0) is a fresh climb.
+ *  - `bayar: true` -> create/top-up + Snap invoice => { orderId, redirectUrl, ... }
  * Grip is granted only later, by the verified webhook.
  */
 export async function POST(req: Request) {
@@ -25,8 +26,8 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Quote mode (no url).
-    if (typeof body.url !== "string") {
+    // Quote mode — the projection may include the url to accumulate a top-up.
+    if (body.bayar !== true) {
       const target = body.target as Target | undefined;
       if (target !== undefined && !TARGETS.includes(target)) {
         return NextResponse.json({ error: copy.error.targetTidakDikenal }, { status: 400 });
@@ -34,11 +35,18 @@ export async function POST(req: Request) {
       if (target === undefined && typeof body.nominal !== "number") {
         return NextResponse.json({ error: copy.error.targetWajib }, { status: 400 });
       }
-      const q = await quote(db, { target, nominal: body.nominal as number | undefined });
+      const q = await quote(db, {
+        target,
+        nominal: body.nominal as number | undefined,
+        url: typeof body.url === "string" ? body.url : undefined,
+      });
       return NextResponse.json(q);
     }
 
     // Create/top-up mode — rate-limit invoice creation per IP (§18.4).
+    if (typeof body.url !== "string") {
+      return NextResponse.json({ error: copy.error.bodyTidakValid }, { status: 400 });
+    }
     const rl = await rateLimit(`manjat:${clientIp(req.headers)}`, 10, 60);
     if (!rl.ok) {
       return NextResponse.json({ error: copy.error.terlaluBanyakPermintaan }, { status: 429 });

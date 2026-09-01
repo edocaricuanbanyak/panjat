@@ -9,7 +9,7 @@ import type { Database } from "@/db";
 import { kategori, listing, sponsorKontak, transaksi } from "@/db/schema";
 import { loadManjatConfig, loadRosotConfig } from "./config";
 import { getRanking } from "./ranking";
-import { dailyRateForRank, estimateDaysToThreshold } from "./rosot";
+import { dailyRateForRank, estimateDaysToThreshold, type RosotConfig } from "./rosot";
 import { normalizeUrl } from "./url";
 import type { SnapClient } from "@/lib/midtrans";
 
@@ -68,7 +68,14 @@ export interface QuoteNeighbor {
 }
 
 export interface Quote {
+  /** Amount to pay now — the top-up itself, not the accumulated total. */
   nominal: number;
+  /** Whether this payment lands on a fresh listing or accumulates onto a paid one. */
+  mode: "naik" | "manjat_lagi";
+  /** Existing grip being topped up (0 for a fresh climb / Kaki Tiang). */
+  peganganSaatIni: number;
+  /** Grip your row sits at after this payment (peganganSaatIni + nominal). */
+  peganganProyeksi: number;
   /** Rank this grip would take right now. */
   rank: number;
   rosotPerHari: number;
@@ -80,43 +87,55 @@ export interface Quote {
   bawah: QuoteNeighbor[];
   /** The listing directly above + the extra rupiah to overtake it; null at #1. */
   salipAtas: { nama: string; rank: number; extra: number } | null;
-  /** Total listings currently on the paid board. */
+  /** Total other listings currently on the paid board. */
   totalPapan: number;
 }
 
-/**
- * Price + projection for a target position or a free nominal, against the live
- * board. Supports R2's target selector and the "estimasi bertahan sebelum bayar".
- */
-export async function quote(
-  db: Database,
-  input: { target?: Target; nominal?: number },
-): Promise<Quote> {
-  const [ranking, manjatCfg, rosotCfg] = await Promise.all([
-    getRanking(db),
-    loadManjatConfig(db),
-    loadRosotConfig(db),
-  ]);
-  const gripsDesc = ranking.map((r) => r.listing.peganganCached);
+/** A row on the live board, as fed to the pure projection. */
+export interface BoardEntry {
+  id: string;
+  nama: string;
+  pegangan: number;
+}
 
-  const nominal =
-    input.target !== undefined
-      ? nominalForTarget(input.target, gripsDesc, manjatCfg.minimumNaik)
-      : Math.max(manjatCfg.minimumNaik, Math.round(input.nominal ?? 0));
+/**
+ * Pure: project where a payment lands on the PAID board (§5). Kaki Tiang (grip 0)
+ * never appears here — the board is money-only ("Kaki tiang tidak masuk kesini").
+ * For a top-up the visitor's own row leaves the board and re-enters at the
+ * accumulated grip (existing + nominal); `existing` is null for a fresh climb.
+ */
+export function projectQuote(params: {
+  /** Full `tayang` board (may include grip-0 rows, which are filtered out). */
+  board: readonly BoardEntry[];
+  /** The paid listing being topped up, or null for a fresh climb. */
+  existing: { id: string; pegangan: number } | null;
+  /** Amount paid now, already clamped to the applicable minimum. */
+  nominal: number;
+  /** Minimum grip floor used for the "bertahan" threshold. */
+  minimum: number;
+  rosotCfg: RosotConfig;
+}): Quote {
+  const { existing, nominal, minimum, rosotCfg } = params;
+  // Money-only board, excluding the visitor's own row (it's moving up from it).
+  const others = params.board
+    .filter((b) => b.pegangan > 0 && b.id !== existing?.id)
+    .sort((a, b) => b.pegangan - a.pegangan);
+  const gripsDesc = others.map((b) => b.pegangan);
+
+  const peganganSaatIni = existing?.pegangan ?? 0;
+  const peganganProyeksi = peganganSaatIni + nominal;
 
   // A new equal grip ranks below existing ones (ties: first-to-reach wins, §5).
-  const rank = gripsDesc.filter((g) => g >= nominal).length + 1;
-  const rate = dailyRateForRank(rank, nominal, rosotCfg);
-  const threshold = Math.max(gripsDesc[rank - 1] ?? 0, manjatCfg.minimumNaik);
-  const hari = estimateDaysToThreshold(nominal, rate, threshold);
+  const rank = gripsDesc.filter((g) => g >= peganganProyeksi).length + 1;
+  const rate = dailyRateForRank(rank, peganganProyeksi, rosotCfg);
+  const threshold = Math.max(gripsDesc[rank - 1] ?? 0, minimum);
+  const hari = estimateDaysToThreshold(peganganProyeksi, rate, threshold);
 
-  // Board window around where you slot in (for the live-board preview). Listings
-  // above keep their rank; the ones you pass drop by one.
+  // Board window around where you slot in. Listings above keep their rank; the
+  // ones you pass drop by one.
   const nb = (r: number, displayRank: number): QuoteNeighbor | null => {
-    const item = ranking[r - 1];
-    return item
-      ? { nama: item.listing.nama, pegangan: item.listing.peganganCached, rank: displayRank }
-      : null;
+    const item = others[r - 1];
+    return item ? { nama: item.nama, pegangan: item.pegangan, rank: displayRank } : null;
   };
   const atas = [nb(rank - 2, rank - 2), nb(rank - 1, rank - 1)].filter(
     (x): x is QuoteNeighbor => x !== null,
@@ -124,21 +143,80 @@ export async function quote(
   const bawah = [nb(rank, rank + 1), nb(rank + 1, rank + 2)].filter(
     (x): x is QuoteNeighbor => x !== null,
   );
-  const above = ranking[rank - 2]?.listing;
+  const above = others[rank - 2];
   const salipAtas = above
-    ? { nama: above.nama, rank: rank - 1, extra: Math.max(1, above.peganganCached + 1 - nominal) }
+    ? { nama: above.nama, rank: rank - 1, extra: Math.max(1, above.pegangan + 1 - peganganProyeksi) }
     : null;
 
   return {
     nominal,
+    mode: existing ? "manjat_lagi" : "naik",
+    peganganSaatIni,
+    peganganProyeksi,
     rank,
-    rosotPerHari: Math.round(nominal * rate),
+    rosotPerHari: Math.round(peganganProyeksi * rate),
     estimasiHari: Number.isFinite(hari) ? hari : null,
     atas,
     bawah,
     salipAtas,
-    totalPapan: ranking.length,
+    totalPapan: others.length,
   };
+}
+
+/**
+ * Price + projection for a target position or a free nominal, against the live
+ * board. Supports R2's target selector and the "estimasi bertahan sebelum bayar".
+ *
+ * When `url` matches a paid `tayang` listing, the payment accumulates onto its
+ * existing grip (top-up / "manjat lagi", §6.2). Kaki Tiang (grip 0) never
+ * accumulates — paying on it is a fresh climb at the first-climb minimum.
+ */
+export async function quote(
+  db: Database,
+  input: { target?: Target; nominal?: number; url?: string },
+): Promise<Quote> {
+  const [ranking, manjatCfg, rosotCfg] = await Promise.all([
+    getRanking(db),
+    loadManjatConfig(db),
+    loadRosotConfig(db),
+  ]);
+
+  let existing: { id: string; pegangan: number } | null = null;
+  if (input.url?.trim()) {
+    const urlNormal = normalizeUrl(input.url);
+    const [row] = await db
+      .select({ id: listing.id, status: listing.status, pegangan: listing.peganganCached })
+      .from(listing)
+      .where(eq(listing.urlNormal, urlNormal))
+      .limit(1);
+    // Only a paid listing accumulates; a grip-0 Kaki Tiang row is a fresh climb.
+    if (row && row.status === "tayang" && row.pegangan > 0) {
+      existing = { id: row.id, pegangan: row.pegangan };
+    }
+  }
+
+  const minimum = existing ? manjatCfg.minimumManjatLagi : manjatCfg.minimumNaik;
+  const board: BoardEntry[] = ranking.map((r) => ({
+    id: r.listing.id,
+    nama: r.listing.nama,
+    pegangan: r.listing.peganganCached,
+  }));
+
+  let nominal: number;
+  if (input.target !== undefined) {
+    // Target grip is a board total; a top-up pays only the shortfall over its
+    // existing grip.
+    const gripsDesc = board
+      .filter((b) => b.pegangan > 0 && b.id !== existing?.id)
+      .map((b) => b.pegangan)
+      .sort((a, b) => b - a);
+    const totalNeeded = nominalForTarget(input.target, gripsDesc, minimum);
+    nominal = Math.max(minimum, totalNeeded - (existing?.pegangan ?? 0));
+  } else {
+    nominal = Math.max(minimum, Math.round(input.nominal ?? 0));
+  }
+
+  return projectQuote({ board, existing, nominal, minimum, rosotCfg });
 }
 
 export async function createOrTopUp(
@@ -153,13 +231,15 @@ export async function createOrTopUp(
   const prepared = await db.transaction(async (tx) => {
     const cfg = await loadManjatConfig(tx);
     const [existing] = await tx
-      .select({ id: listing.id, status: listing.status })
+      .select({ id: listing.id, status: listing.status, pegangan: listing.peganganCached })
       .from(listing)
       .where(eq(listing.urlNormal, urlNormal))
       .limit(1);
 
+    // A paid `tayang` listing accumulates (manjat lagi). A grip-0 Kaki Tiang row
+    // is a fresh climb at the first-climb minimum — it never gets the top-up rate.
     const mode: "naik" | "manjat_lagi" =
-      existing?.status === "tayang" ? "manjat_lagi" : "naik";
+      existing?.status === "tayang" && existing.pegangan > 0 ? "manjat_lagi" : "naik";
     const minimum = mode === "manjat_lagi" ? cfg.minimumManjatLagi : cfg.minimumNaik;
     if (!Number.isInteger(input.nominal) || input.nominal < minimum) {
       throw new Error(

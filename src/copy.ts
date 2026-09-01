@@ -116,6 +116,8 @@ export const copy = {
     nominalPlaceholder: "25.000",
     nominalTanya: "Mau bayar berapa? Posisi dihitung otomatis.",
     nominalNaik: "Makin besar bayarannya, makin tinggi posisimu. Minimal Rp5.000.",
+    manjatLagiHint: (saatIni: string, total: string) =>
+      `Manjat lagi — pegangan ${saatIni} + bayaranmu jadi ${total}.`,
     nominalDinaikkan: (rp: string) => `Di bawah minimum — otomatis dinaikkan ke ${rp}.`,
     diPosisi: "Kamu akan di posisi",
     ketikNominal: "Ketik nominal untuk lihat posisimu di papan.",

@@ -112,7 +112,7 @@ export function ManjatWizard({
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function refreshQuote(payload: { nominal: number }) {
+  async function refreshQuote(payload: { nominal: number; url?: string }) {
     setError(null);
     setLoadingQuote(true);
     try {
@@ -125,16 +125,17 @@ export function ManjatWizard({
   }
 
   // Open amount → auto-compute the resulting position (debounced as you type).
+  // The url is sent so a top-up onto a paid listing accumulates (§6.2).
   useEffect(() => {
     const n = Number(nominalInput);
     if (!n) {
       setQuote(null);
       return;
     }
-    const t = setTimeout(() => void refreshQuote({ nominal: n }), 400);
+    const t = setTimeout(() => void refreshQuote({ nominal: n, url: url.trim() || undefined }), 400);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nominalInput]);
+  }, [nominalInput, url]);
 
   async function onPay() {
     if (!quote) return;
@@ -142,6 +143,7 @@ export function ManjatWizard({
     setSubmitting(true);
     try {
       const result = await postManjat({
+        bayar: true,
         url,
         email: email || undefined,
         nominal: quote.nominal,
@@ -415,6 +417,13 @@ export function ManjatWizard({
               <p className="mt-1.5 text-xs font-medium text-galat">
                 {copy.manjat.nominalDinaikkan(formatRupiah(quote.nominal))}
               </p>
+            ) : quote?.mode === "manjat_lagi" ? (
+              <p className="mt-1.5 text-xs text-tinta-redup">
+                {copy.manjat.manjatLagiHint(
+                  formatRupiah(quote.peganganSaatIni),
+                  formatRupiah(quote.peganganProyeksi),
+                )}
+              </p>
             ) : (
               <p className="mt-1.5 text-xs text-tinta-redup">{copy.manjat.nominalNaik}</p>
             )}
@@ -432,9 +441,10 @@ export function ManjatWizard({
                 {quote.atas.map((n) => (
                   <BoardRow key={`a${n.rank}`} rank={n.rank} nama={n.nama} rp={n.pegangan} />
                 ))}
-                {/* KAMU — re-keyed on rank so it re-animates when you move. */}
+                {/* KAMU — re-keyed on rank so it re-animates when you move. A
+                    top-up shows the accumulated grip, not just what you pay now. */}
                 <div key={quote.rank} className="manjat-slot">
-                  <BoardRow rank={quote.rank} nama={nama || host} rp={quote.nominal} kamu />
+                  <BoardRow rank={quote.rank} nama={nama || host} rp={quote.peganganProyeksi} kamu />
                 </div>
                 {quote.bawah.map((n) => (
                   <BoardRow key={`b${n.rank}`} rank={n.rank} nama={n.nama} rp={n.pegangan} />
