@@ -18,7 +18,7 @@ export function middleware(req: NextRequest) {
     "font-src 'self' data:",
     // SSE board stream + Umami + Google Analytics 4 (beacons hit www. + regional *.google-analytics.com)
     "connect-src 'self' https://cloud.umami.is https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com",
-    "frame-src https://cloud.umami.is https://www.googletagmanager.com", // Umami embed + GTM <noscript>
+    "frame-src https://www.googletagmanager.com", // GTM <noscript>
     "frame-ancestors 'none'", // no clickjacking (papan tak boleh di-iframe)
     "base-uri 'self'",
     "form-action 'self'",

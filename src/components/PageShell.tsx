@@ -17,18 +17,26 @@ type Kategori = { slug: string; nama: string };
  */
 export async function PageShell({
   manjatKategori,
+  padBottomMobile = false,
   children,
 }: {
   manjatKategori?: Kategori[];
+  /** Reserve extra bottom space on mobile for a floating bar (home board toggle). */
+  padBottomMobile?: boolean;
   children: React.ReactNode;
 }) {
   const [kats, aktivitas] = await Promise.all([
     manjatKategori ? Promise.resolve(manjatKategori) : listCategories(db),
     recentAktivitas(20),
   ]);
+  const pbMobile = padBottomMobile
+    ? "pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:pb-[calc(1rem+env(safe-area-inset-bottom))]"
+    : "pb-[calc(1rem+env(safe-area-inset-bottom))]";
   return (
     <ManjatProvider kategori={kats}>
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-2 sm:px-5 sm:pt-4">
+      <main
+        className={`mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pt-2 sm:px-5 sm:pt-4 ${pbMobile}`}
+      >
         <div className="sticky top-0 z-30 -mx-4 border-b border-garis/70 bg-kertas px-4 pt-[env(safe-area-inset-top)] sm:-mx-5 sm:px-5">
           <Spotlight initialItems={aktivitas} />
           <SiteHeader />

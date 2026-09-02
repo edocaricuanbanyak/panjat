@@ -44,31 +44,36 @@ export function JelajahPanel({ items, categories }: { items: Card[]; categories:
 
   return (
     <div>
-      <input
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder={copy.jelajah.cariPlaceholder}
-        className={fieldClasses}
-      />
+      {/* Search + category filter stick just under the app header (77px mobile /
+          85px desktop) so they stay reachable while the results scroll. Full-bleed
+          bg-kertas (matching the header) hides content passing underneath. */}
+      <div className="sticky top-[77px] z-20 -mx-4 border-b border-garis/70 bg-kertas px-4 pb-3 pt-2 sm:top-[85px] sm:-mx-5 sm:px-5">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={copy.jelajah.cariPlaceholder}
+          className={fieldClasses}
+        />
 
-      {/* Selectable category chips — one scrollable line on mobile (categories stay
-          visible for discovery), wrapping on sm+ where there's room. */}
-      <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
-        <button type="button" onClick={() => setCat(null)} className={chip(cat === null)}>
-          <KategoriIcon slug={null} className="size-3.5" />
-          {copy.jelajah.semua}
-        </button>
-        {categories.map((k) => (
-          <button
-            key={k.slug}
-            type="button"
-            onClick={() => setCat((c) => (c === k.slug ? null : k.slug))}
-            className={chip(cat === k.slug)}
-          >
-            <KategoriIcon slug={k.slug} className="size-3.5" />
-            {k.nama}
+        {/* Selectable category chips — one scrollable line on mobile (categories stay
+            visible for discovery), wrapping on sm+ where there's room. */}
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
+          <button type="button" onClick={() => setCat(null)} className={chip(cat === null)}>
+            <KategoriIcon slug={null} className="size-3.5" />
+            {copy.jelajah.semua}
           </button>
-        ))}
+          {categories.map((k) => (
+            <button
+              key={k.slug}
+              type="button"
+              onClick={() => setCat((c) => (c === k.slug ? null : k.slug))}
+              className={chip(cat === k.slug)}
+            >
+              <KategoriIcon slug={k.slug} className="size-3.5" />
+              {k.nama}
+            </button>
+          ))}
+        </div>
       </div>
 
       {results.length === 0 ? (

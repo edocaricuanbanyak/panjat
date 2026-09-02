@@ -6,7 +6,6 @@ import { EmptyState } from "@/components/EmptyState";
 import { HariIniBoard } from "@/components/HariIniBoard";
 import { HeroManjat } from "@/components/HeroManjat";
 import { HomeTabs } from "@/components/HomeTabs";
-import { JelajahPanel } from "@/components/JelajahPanel";
 import { JuaraTerfavorit } from "@/components/JuaraTerfavorit";
 import { KakiTiang } from "@/components/KakiTiang";
 import { ListingCard } from "@/components/ListingCard";
@@ -18,7 +17,7 @@ import { VoteFavorit } from "@/components/VoteFavorit";
 import { copy } from "@/copy";
 import { db } from "@/db";
 import { type BoardEntry, getBoard } from "@/domain/board";
-import { jelajahAll, listCategories } from "@/domain/jelajah";
+import { listCategories } from "@/domain/jelajah";
 import { getHariIni } from "@/domain/papan-hari-ini";
 import { getJuaraKakiTiangArsip, getJuaraTerfavoritArsip } from "@/domain/juara-mingguan";
 import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
@@ -41,7 +40,7 @@ export default function Home({
   searchParams: Promise<{ hal?: string; baru?: string }>;
 }) {
   return (
-    <PageShell>
+    <PageShell padBottomMobile>
       <Suspense fallback={<HomeSkeleton />}>
         <HomeBody searchParams={searchParams} />
       </Suspense>
@@ -70,7 +69,6 @@ async function HomeBody({
     favorit,
     choice,
     hariIni,
-    jelajahItems,
   ] = await Promise.all([
     getKakiTiang(db),
     getJuaraKakiTiangArsip(db),
@@ -81,7 +79,6 @@ async function HomeBody({
     favoritBoard(db, now, 5),
     myFavoritToday(vid, now),
     getHariIni(db, now),
-    jelajahAll(db),
   ]);
 
   const sp = await searchParams;
@@ -135,29 +132,31 @@ async function HomeBody({
         >
           {copy.beranda.heroJudul}
         </h1>
-        <p className="mt-3 max-w-xl text-base text-tinta-redup sm:text-lg">{copy.beranda.heroSub}</p>
-        {/* Live social proof — the USP, leading into the CTA (one compact line). */}
-        <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5">
-          <div className="inline-flex items-center gap-1.5">
-            <span className="blink inline-block size-1.5 rounded-full bg-hidup" aria-hidden />
-            <dd className="font-display text-lg font-bold leading-none text-hidup tabular">
-              {visitor.online.toLocaleString("id-ID")}
-            </dd>
-            <dt className="text-xs text-tinta-redup">{copy.beranda.statOnline}</dt>
-          </div>
-          <div className="inline-flex items-center gap-1.5">
-            <dd className="font-display text-lg font-bold leading-none text-tinta tabular">
-              {visitor.total.toLocaleString("id-ID")}
-            </dd>
-            <dt className="text-xs text-tinta-redup">{copy.beranda.statPengunjung}</dt>
-          </div>
-          <div className="inline-flex items-center gap-1.5">
-            <dd className="font-display text-lg font-bold leading-none text-tinta tabular">
-              {entries.length.toLocaleString("id-ID")}
-            </dd>
-            <dt className="text-xs text-tinta-redup">{copy.beranda.statPeserta}</dt>
-          </div>
-        </dl>
+        {/* Live social proof — the USP as one soft chip linking to full stats. */}
+        <div className="mt-6">
+          <a
+            href="/statistik"
+            className="group inline-flex items-center gap-2.5 rounded-full bg-kertas-2 px-4 py-2 text-sm"
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <span className="blink inline-block size-1.5 rounded-full bg-hidup" aria-hidden />
+              <span className="font-semibold tabular text-hidup">
+                {visitor.online.toLocaleString("id-ID")}
+              </span>
+              <span className="text-tinta-redup">{copy.beranda.statOnline}</span>
+            </span>
+            <span className="h-3.5 w-px bg-garis" aria-hidden />
+            <span className="inline-flex items-center gap-1.5">
+              <span className="font-semibold tabular text-tinta">
+                {visitor.total.toLocaleString("id-ID")}
+              </span>
+              <span className="text-tinta-redup">{copy.beranda.statPengunjung}</span>
+            </span>
+            <span className="text-merah-teks group-hover:underline">
+              {copy.beranda.lihatStatistik}
+            </span>
+          </a>
+        </div>
         <HeroManjat kategori={kats} />
       </section>
 
@@ -198,7 +197,7 @@ async function HomeBody({
             <Pagination page={page} totalPages={totalPages} />
 
             {/* KAKI TIANG (gratis) — lives under the main board only, not the
-                Jelajah / Hari Ini tabs. */}
+                Hari Ini tab. */}
             <div className="mt-12">
               <KakiTiang entries={kakiTiangEntries} remaining={sisaSorak} baruId={sp.baru ?? null} />
               <div className="mt-3 text-xs text-tinta-redup">
@@ -210,11 +209,10 @@ async function HomeBody({
         }
         hariIni={
           <>
-            <p className="mb-4 max-w-xl text-tinta-redup">{copy.hariIni.sub}</p>
+            <p className="mb-4 text-tinta-redup">{copy.hariIni.sub}</p>
             <HariIniBoard entries={hariIni} />
           </>
         }
-        jelajah={<JelajahPanel items={jelajahItems} categories={kats} />}
       />
 
       {/* CARA MAIN */}

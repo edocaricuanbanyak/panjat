@@ -246,11 +246,10 @@ function QuickTile({
       <span className="w-full truncate font-display text-sm font-semibold text-tinta">
         {entry.nama}
       </span>
-      {entry.votes > 0 && (
-        <span className="font-sans tabular text-xs text-tinta-redup">
-          {copy.favorit.vote_n(entry.votes)}
-        </span>
-      )}
+      {/* Always shown — a 0-vote tile keeps the same height as voted ones. */}
+      <span className="font-sans tabular text-xs text-tinta-redup">
+        {copy.favorit.vote_n(entry.votes)}
+      </span>
     </button>
   );
 }

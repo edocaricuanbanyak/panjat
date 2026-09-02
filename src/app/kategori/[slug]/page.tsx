@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
-import { BoardTabs } from "@/components/BoardTabs";
 import { JelajahCard } from "@/components/JelajahCard";
 import { KategoriIcon } from "@/components/KategoriIcon";
 import { SiteLogo } from "@/components/SiteLogo";
@@ -43,7 +42,12 @@ export default async function KategoriPage({
 
   return (
     <PageShell>
-      <BoardTabs active="jelajah" className="mb-5" />
+      <a
+        href="/jelajah"
+        className="mb-5 inline-block text-sm text-tinta-redup transition-colors hover:text-tinta"
+      >
+        {copy.jelajah.kembali}
+      </a>
       <h1
         className="flex items-center gap-2.5 font-display text-3xl font-bold text-tinta sm:text-4xl"
         style={{ fontStretch: "125%" }}

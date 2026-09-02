@@ -22,6 +22,7 @@ export const copy = {
     sepanjangMasa: "Papan Utama",
     hariIni: "Hari Ini",
     jelajah: "Jelajah",
+    cari: "Cari",
     manjat: "Manjat",
     leaderboard: "Leaderboard",
     statistik: "Statistik",
@@ -32,11 +33,10 @@ export const copy = {
 
   beranda: {
     heroJudul: "Panjat. Salip. Jadi #1.",
-    heroSub:
-      "Pegangan paling kuat duduk paling atas. Tiangnya licin — yang berhenti manjat, merosot.",
     statOnline: "online",
     statPengunjung: "pengunjung",
-    statPeserta: "pemanjat",
+    lihatStatistik: "Lihat statistik →",
+    tabSepanjang: "All time",
     papanKosongJudul: "Belum ada yang manjat.",
     papanKosongPesan: "Tiangnya masih kinclong.",
     caraMainJudul: "Cara main",
@@ -242,6 +242,7 @@ export const copy = {
     cariPlaceholder: "Cari AI tools, jasa, game…",
     cari: "Cari",
     cariLabel: "Cari listing",
+    kembali: "← Kembali ke Cari",
     juaraKategori: "Juara kategori",
     diPapan: "di papan →",
     lihatDetail: "Lihat detail →",
@@ -288,9 +289,9 @@ export const copy = {
     online: "Online sekarang",
     onlineSub: "lagi lihat papan",
     onlineMetode: "Pengunjung yang aktif dalam beberapa menit terakhir.",
-    trafikJudul: "Trafik web",
-    trafikSub: "Tampilan halaman dan pengunjung, dari Umami — alat analitik yang tidak pakai cookie.",
-    trafikBuka: "Buka dashboard Umami →",
+    ga4Lokasi: "Lokasi pengunjung",
+    ga4Perangkat: "Perangkat",
+    ga4Sumber: "Data ini berasal dari Google Analytics",
   },
 
   arsip: {
