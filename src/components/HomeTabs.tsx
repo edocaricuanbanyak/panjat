@@ -1,14 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { IconCalendarEvent, IconInfinity } from "@tabler/icons-react";
 import { copy } from "@/copy";
 
 type TabKey = "sekarang" | "hari-ini";
 
-const ITEMS: { key: TabKey; label: string; Icon: typeof IconInfinity }[] = [
-  { key: "sekarang", label: copy.beranda.tabSepanjang, Icon: IconInfinity },
-  { key: "hari-ini", label: copy.nav.hariIni, Icon: IconCalendarEvent },
+const ITEMS: { key: TabKey; label: string }[] = [
+  { key: "sekarang", label: copy.beranda.tabSepanjang },
+  { key: "hari-ini", label: copy.nav.hariIni },
 ];
 
 /**
@@ -69,11 +68,10 @@ export function HomeTabs({
               tabIndex={on ? 0 : -1}
               onClick={() => setTab(it.key)}
               onKeyDown={onKey}
-              className={`relative z-10 inline-flex touch-manipulation select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-5 py-2 font-display text-sm font-semibold transition-colors ease-panjat [-webkit-tap-highlight-color:transparent] active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah max-sm:min-h-11 ${
+              className={`relative z-10 inline-flex touch-manipulation select-none items-center justify-center whitespace-nowrap rounded-full px-5 py-2 font-display text-sm font-semibold transition-colors ease-panjat [-webkit-tap-highlight-color:transparent] active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah max-sm:min-h-11 ${
                 on ? "text-tinta" : "text-tinta-redup hover:text-tinta"
               }`}
             >
-              <it.Icon className="size-3.5" aria-hidden />
               {it.label}
             </button>
           );

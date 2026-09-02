@@ -67,10 +67,26 @@ DATABASE_URL="<SUPABASE_DIRECT_URL>" pnpm db:seed:prod
 4. Redirect "selesai bayar" sudah otomatis ke `panjat.id` (via `callbacks.finish` per-transaksi di kode).
 5. **Jika Merchant ID dipakai bareng situs lain milikmu**: set env `MIDTRANS_NOTIFICATION_URL=https://panjat.id/api/webhook/midtrans` (mengirim `X-Override-Notification` per-transaksi; situs lain tetap pakai URL dashboard). Kosongkan bila MID khusus Panjat.
 
-## 8. Cron (Vercel Pro)
-- `vercel.json` sudah mendeklarasikan jadwal: **rosot per-jam** (`0 * * * *`), reconcile, moderasi, screenshot, tebak, lencana, juara-mingguan.
-- Vercel Cron mengirim `Authorization: Bearer $CRON_SECRET` otomatis; `src/lib/cron.ts` **fail-closed 503** bila `CRON_SECRET` tak diset. Pastikan `CRON_SECRET` ada di env produksi.
-- **Cron per-jam butuh plan Pro.** Rosot (§6) & reconcile (alarm drift ledger) adalah job kritis.
+## 8. Cron (cron-job.org — eksternal)
+- **Semua cron dijadwalkan di cron-job.org, BUKAN Vercel.** Plan kita Hobby (Vercel Cron di Hobby: harian saja, maks 2 job), jadi jadwal dipindah ke cron-job.org. `vercel.json` **tidak** punya `crons` — jangan andalkan Vercel untuk memanggil `/api/cron/*`.
+- `.github/workflows/cron.yml` **hanya trigger manual** (`workflow_dispatch`), bukan penjadwal. Dipakai untuk fallback/manual saja.
+- **URL wajib pakai `https://www.panjat.id`** (www), bukan apex `panjat.id`. Apex melakukan redirect 308 → www yang **membuang header `Authorization`**, jadi request sampai tanpa Bearer → `assertCron` balas **401** dan job gagal diam-diam.
+- Tiap job kirim header `Authorization: Bearer <CRON_SECRET>`. `src/lib/cron.ts` **fail-closed**: `503` bila `CRON_SECRET` tak diset di env produksi, `401` bila secret salah. Pastikan `CRON_SECRET` di Vercel === yang dipasang di cron-job.org.
+- Jadwal (waktu WIB / UTC+7 — cron-job.org pakai cron expression UTC):
+
+  | Job | WIB | UTC (cron) |
+  |---|---|---|
+  | `rosot` | tiap jam :00 | `0 * * * *` |
+  | `jaga-posisi` | tiap jam :05 | `5 * * * *` |
+  | `screenshot` | tiap jam :15 | `15 * * * *` |
+  | `moderasi` | tiap jam :30 | `30 * * * *` |
+  | `tebak` | harian 00:00 | `0 17 * * *` |
+  | `lencana` | harian 01:00 | `0 18 * * *` |
+  | `reconcile` | harian 02:00 | `0 19 * * *` |
+  | `juara-mingguan` | **Rabu 17:05** | `5 10 * * 3` |
+
+- Rosot (§6) & reconcile (alarm drift ledger) adalah job kritis. `juara-mingguan` menentukan pemenang mingguan (Kaki Tiang, Terfavorit, board #1–3) **dan** mereset Kaki Tiang — hanya jalan bila cron-job.org benar-benar memanggilnya.
+- **Verifikasi:** cek execution history tiap job di cron-job.org (harus `200 {"ok":true}`). `401`/`503` = secret/URL salah. Bukan di runtime log Vercel — retensi Hobby pendek & tak semua bisa dibaca via API.
 
 ## 9. Admin + 2FA (§18.5) — sebelum publik
 1. Generate TOTP: `pnpm admin:2fa` → set `ADMIN_TOTP_SECRET` di env, scan otpauth URL ke authenticator.
