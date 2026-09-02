@@ -34,7 +34,11 @@ export function weekStartWIB(now: Date): string {
 }
 
 const tallyKey = (now: Date) => `favorit:tally:w${weekBucket(now)}`;
-const votedKey = (day: string, vid: string) => `favorit:voted:${day}:${vid}`;
+// Scope the daily vote-lock to the weekly bucket too: the week flips mid-day at
+// the Wed 17:00 WIB cut-off, so without the bucket a Wednesday-morning voter
+// would stay locked out of the fresh week until midnight. With it, the closing
+// and opening weeks are distinct locks on the boundary day.
+const votedKey = (now: Date, vid: string) => `favorit:voted:w${weekBucket(now)}:${wibDate(now)}:${vid}`;
 const VOTED_TTL_S = 60 * 60 * 30; // ~30h, covers the WIB day
 const TALLY_TTL_S = 60 * 60 * 24 * 21; // keep a few weeks
 
@@ -46,7 +50,7 @@ export async function voteFavorit(vid: string, listingId: string, now = new Date
   if (!r) return { ok: false, reason: "gagal" };
   try {
     // Atomic day-lock: SET NX succeeds only on the first vote of the day.
-    const locked = await r.set(votedKey(wibDate(now), vid), listingId, "EX", VOTED_TTL_S, "NX");
+    const locked = await r.set(votedKey(now, vid), listingId, "EX", VOTED_TTL_S, "NX");
     if (locked === null) return { ok: false, reason: "sudah" };
     const key = tallyKey(now);
     await r.zincrby(key, 1, listingId);
@@ -63,7 +67,7 @@ export async function myFavoritToday(vid: string | undefined, now = new Date()):
   const r = redis();
   if (!r) return null;
   try {
-    return (await r.get(votedKey(wibDate(now), vid))) ?? null;
+    return (await r.get(votedKey(now, vid))) ?? null;
   } catch {
     return null;
   }

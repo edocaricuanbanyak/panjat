@@ -174,6 +174,7 @@ async function HomeBody({
               <>
                 <BoardLive
                   initial={{ entries, max }}
+                  terfavoritId={juaraTerfavorit?.id ?? null}
                   middle={
                     <VoteFavorit entries={voteEntries} leaderboard={favorit} myChoice={choice} />
                   }

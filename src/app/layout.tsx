@@ -61,6 +61,11 @@ export const viewport: Viewport = {
   themeColor: "#f3f0e9",
   width: "device-width",
   initialScale: 1,
+  // Explicitly allow pinch-zoom (WCAG 1.4.4). Without this a `display: standalone`
+  // PWA locks zoom on iOS/Android; 5× + userScalable keeps the board readable for
+  // low-vision users. Never set maximumScale:1 / userScalable:false.
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: "cover",
 };
 

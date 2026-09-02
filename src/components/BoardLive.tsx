@@ -14,10 +14,13 @@ import { ListingCard } from "./ListingCard";
 export function BoardLive({
   initial,
   middle,
+  terfavoritId = null,
 }: {
   initial: Board;
   /** Slot rendered between the top-3 podium and rank 4+ (e.g. Tebak Juara). */
   middle?: React.ReactNode;
+  /** The reigning weekly Terfavorit — gets a cosmetic chip on its card. */
+  terfavoritId?: string | null;
 }) {
   const [board, setBoard] = useState<Board>(initial);
   const [announce, setAnnounce] = useState("");
@@ -109,7 +112,7 @@ export function BoardLive({
                 e.rank === 1 ? "podium-1" : e.rank === 2 ? "podium-2" : "podium-3"
               }`}
             >
-              <ListingCard entry={e} max={board.max} density="puncak" />
+              <ListingCard entry={e} max={board.max} density="puncak" terfavoritId={terfavoritId} />
             </div>
           ))}
         </section>
@@ -118,7 +121,7 @@ export function BoardLive({
           <section className="mt-5 flex flex-col gap-2.5">
             {sisa.map((e) => (
               <div key={e.id} style={{ viewTransitionName: `vt-${e.id}` } as React.CSSProperties}>
-                <ListingCard entry={e} max={board.max} />
+                <ListingCard entry={e} max={board.max} terfavoritId={terfavoritId} />
               </div>
             ))}
           </section>

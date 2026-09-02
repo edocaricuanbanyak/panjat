@@ -157,7 +157,13 @@ export interface JuaraTerfavoritArsip {
  * a paid rank) — a labelled showcase on the board, mirroring the Kaki Tiang
  * champion. Null until a week is archived.
  */
-export async function getJuaraTerfavoritArsip(db: Database): Promise<JuaraTerfavoritArsip | null> {
+export async function getJuaraTerfavoritArsip(
+  db: Database,
+  now = new Date(),
+): Promise<JuaraTerfavoritArsip | null> {
+  // Only the champion of the *current* week (the one that just closed, displayed
+  // through this week). A prior-week winner auto-hides once the next cut-off
+  // passes — so the "minggu ini" showcase never lingers on a stale champion.
   const [row] = await db
     .select({
       id: listing.id,
@@ -169,8 +175,7 @@ export async function getJuaraTerfavoritArsip(db: Database): Promise<JuaraTerfav
     })
     .from(juaraMingguan)
     .innerJoin(listing, eq(listing.id, juaraMingguan.listingId))
-    .where(eq(juaraMingguan.jenis, "terfavorit"))
-    .orderBy(desc(juaraMingguan.minggu))
+    .where(and(eq(juaraMingguan.jenis, "terfavorit"), eq(juaraMingguan.minggu, weekStartWIB(now))))
     .limit(1);
   return row ?? null;
 }
@@ -180,7 +185,12 @@ export async function getJuaraTerfavoritArsip(db: Database): Promise<JuaraTerfav
  * featured showcase. Null until a week is archived — so the showcase stays hidden
  * before the first weekly run (G).
  */
-export async function getJuaraKakiTiangArsip(db: Database): Promise<JuaraKakiTiangArsip | null> {
+export async function getJuaraKakiTiangArsip(
+  db: Database,
+  now = new Date(),
+): Promise<JuaraKakiTiangArsip | null> {
+  // Current week only — same rule as Terfavorit, so the board's Rp0 champion row
+  // rotates strictly each week and never shows a stale graduate.
   const [row] = await db
     .select({
       id: listing.id,
@@ -195,8 +205,7 @@ export async function getJuaraKakiTiangArsip(db: Database): Promise<JuaraKakiTia
     .from(juaraMingguan)
     .innerJoin(listing, eq(listing.id, juaraMingguan.listingId))
     .leftJoin(kategori, eq(kategori.id, listing.kategoriId))
-    .where(eq(juaraMingguan.jenis, "kaki_tiang"))
-    .orderBy(desc(juaraMingguan.minggu))
+    .where(and(eq(juaraMingguan.jenis, "kaki_tiang"), eq(juaraMingguan.minggu, weekStartWIB(now))))
     .limit(1);
   return row ?? null;
 }

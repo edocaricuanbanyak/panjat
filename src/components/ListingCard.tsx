@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { copy } from "@/copy";
 import type { BoardEntry } from "@/domain/board";
 import { formatRupiah } from "@/lib/format";
@@ -24,12 +24,16 @@ const MEDALI: Record<1 | 2 | 3, { bg: string; label: string }> = {
 export function ListingCard({
   entry,
   density = "row",
+  terfavoritId = null,
 }: {
   entry: BoardEntry;
   max?: number;
   density?: "puncak" | "row";
+  /** When this card is the reigning weekly Terfavorit, show a cosmetic chip. */
+  terfavoritId?: string | null;
 }) {
   const puncak = density === "puncak";
+  const terfavorit = terfavoritId != null && entry.id === terfavoritId;
   const wdth = puncak ? Math.max(105, 130 - (entry.rank - 1) * 10) : 100;
   // Title is owner-editable; show the real URL host so the board stays honest.
   const host = entry.urlNormal.replace(/^https?:\/\//, "").replace(/\/+$/, "");
@@ -134,6 +138,15 @@ export function ListingCard({
                 <span aria-hidden>·</span>
                 <KlikChip n={entry.klikTotal} />
               </>
+            )}
+            {/* Reigning weekly Terfavorit — a quiet, cosmetic honour (never a rank
+                or a lencana; merah stays summit-only, so the heart is neutral). */}
+            {terfavorit && (
+              <span className="inline-flex shrink-0 items-center gap-1 text-tinta-redup">
+                <span aria-hidden>·</span>
+                <Heart className="size-3 fill-tinta-redup" aria-hidden />
+                {copy.papan.terfavoritPekanIni}
+              </span>
             )}
             {/* Rosot status — always visible on touch, revealed on hover on desktop. */}
             <span

@@ -71,6 +71,7 @@ export const copy = {
     juaraKakiTiang: "Juara Kaki Tiang minggu ini · gratis",
     juaraTerfavorit: "Pemanjat terfavorit minggu ini",
     juaraTerfavoritVote: (n: number) => `${n.toLocaleString("id-ID")} vote`,
+    terfavoritPekanIni: "Terfavorit pekan ini",
     salip: (rp: string) => `Salip ${rp}`,
     salipRank: (rank: number, rp: string) => `Salip #${rank} ${rp}`,
     juara: (rank: number) => `Juara ${rank}`,
