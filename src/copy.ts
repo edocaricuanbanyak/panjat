@@ -260,6 +260,7 @@ export const copy = {
   hariIni: {
     judul: "Papan Hari Ini",
     sub: "Hanya pegangan yang dibayar sejak tengah malam. Uang kemarin tidak berlaku — siapa pun dengan Rp20.000 punya peluang jadi juara. Reset 00:00 WIB.",
+    kosong: "Belum ada yang membayar hari ini. Juara hari ini masih terbuka lebar.",
     metaTitle: "Papan Hari Ini — Panjat",
     metaDesc: "Papan yang reset tiap tengah malam WIB. Siapa pun bisa juara hari ini.",
   },

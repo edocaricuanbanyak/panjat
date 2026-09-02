@@ -26,6 +26,7 @@ export interface HariIniEntry {
   nama: string;
   urlNormal: string;
   kategoriNama: string | null;
+  kategoriSlug: string | null;
   todayGrip: number;
 }
 
@@ -45,6 +46,7 @@ export async function getPapanHariIni(
       nama: listing.nama,
       urlNormal: listing.urlNormal,
       kategoriNama: kategori.nama,
+      kategoriSlug: kategori.slug,
       todayGrip: grip,
     })
     .from(peganganLedger)
@@ -58,7 +60,7 @@ export async function getPapanHariIni(
         eq(listing.status, "tayang"),
       ),
     )
-    .groupBy(listing.id, listing.nama, listing.urlNormal, kategori.nama)
+    .groupBy(listing.id, listing.nama, listing.urlNormal, kategori.nama, kategori.slug)
     .orderBy(desc(grip));
 
   return rows.map((r, i) => ({ ...r, todayGrip: Number(r.todayGrip), rank: i + 1 }));

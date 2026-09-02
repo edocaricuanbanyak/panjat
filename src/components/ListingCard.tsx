@@ -25,12 +25,15 @@ export function ListingCard({
   entry,
   density = "row",
   terfavoritId = null,
+  showRosot = true,
 }: {
   entry: BoardEntry;
   max?: number;
   density?: "puncak" | "row";
   /** When this card is the reigning weekly Terfavorit, show a cosmetic chip. */
   terfavoritId?: string | null;
+  /** Rosot status is an all-time-board mechanic; hide it on the 24h Hari Ini board. */
+  showRosot?: boolean;
 }) {
   const puncak = density === "puncak";
   const terfavorit = terfavoritId != null && entry.id === terfavoritId;
@@ -124,8 +127,8 @@ export function ListingCard({
             </p>
           )}
 
-          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
-            <span className="truncate font-mono text-tinta-redup">{host}</span>
+          <p className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-tinta-redup">
+            <span className="min-w-0 max-w-full truncate tabular text-tinta-redup">{host}</span>
             {entry.kategoriNama && (
               <span className="hidden shrink-0 items-center gap-1 lg:flex">
                 <span aria-hidden>·</span>
@@ -149,18 +152,20 @@ export function ListingCard({
               </span>
             )}
             {/* Rosot status — always visible on touch, revealed on hover on desktop. */}
-            <span
-              className={`shrink-0 opacity-100 transition-opacity ease-panjat lg:opacity-0 lg:group-hover:opacity-100 ${
-                entry.masihTerjaga ? "text-hidup" : "text-tinta-redup"
-              }`}
-            >
-              <span aria-hidden> · </span>
-              {entry.masihTerjaga
-                ? copy.papan.rosotTerjaga
-                : entry.rosotPerHari > 0
-                  ? copy.papan.rosotAktif(formatRupiah(entry.rosotPerHari))
-                  : copy.papan.rosotLantai}
-            </span>
+            {showRosot && (
+              <span
+                className={`shrink-0 opacity-100 transition-opacity ease-panjat lg:opacity-0 lg:group-hover:opacity-100 ${
+                  entry.masihTerjaga ? "text-hidup" : "text-tinta-redup"
+                }`}
+              >
+                <span aria-hidden> · </span>
+                {entry.masihTerjaga
+                  ? copy.papan.rosotTerjaga
+                  : entry.rosotPerHari > 0
+                    ? copy.papan.rosotAktif(formatRupiah(entry.rosotPerHari))
+                    : copy.papan.rosotLantai}
+              </span>
+            )}
           </p>
 
           {entry.badges.length > 0 && (
