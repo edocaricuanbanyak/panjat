@@ -7,7 +7,7 @@
 import { and, count, desc, eq, sql } from "drizzle-orm";
 import type { Database } from "@/db";
 import { kategori, listing, pengunjungAnon, sorak } from "@/db/schema";
-import { weekStartWIB } from "@/lib/favorit";
+import { WEEK_MS, weekStartWIB } from "@/lib/favorit";
 import { wibDate } from "./papan-hari-ini";
 
 export const SORAK_PER_DAY = 5;
@@ -88,10 +88,14 @@ export async function getJuaraKakiTiangMingguan(
   now = new Date(),
 ): Promise<JuaraKakiTiang | null> {
   const weekStart = weekStartWIB(now); // WIB "YYYY-MM-DD" of this week's Wed 17:00 cut-off
+  // Upper bound too: without it, a past `now` (the cron passes the just-closed
+  // week) folds the *new* week's Sorak into the closed-week tally and can crown
+  // the wrong listing. Bound to [weekStart, nextWeekStart).
+  const weekEnd = weekStartWIB(new Date(now.getTime() + WEEK_MS));
   const sorakMinggu = sql<number>`(select count(*)::int from "sorak"
-    where "sorak"."listing_id" = "listing"."id" and "sorak"."tanggal" >= ${weekStart})`;
+    where "sorak"."listing_id" = "listing"."id" and "sorak"."tanggal" >= ${weekStart} and "sorak"."tanggal" < ${weekEnd})`;
   const klikMinggu = sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian"
-    where "klik_harian"."listing_id" = "listing"."id" and "klik_harian"."tanggal" >= ${weekStart})`;
+    where "klik_harian"."listing_id" = "listing"."id" and "klik_harian"."tanggal" >= ${weekStart} and "klik_harian"."tanggal" < ${weekEnd})`;
   const [row] = await db
     .select({
       id: listing.id,
