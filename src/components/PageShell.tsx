@@ -44,7 +44,7 @@ export async function PageShell({
         >
           {copy.sistem.lompatKeIsi}
         </a>
-        <div className="sticky top-0 z-30 -mx-4 border-b border-garis/70 bg-kertas px-4 pt-[env(safe-area-inset-top)] sm:-mx-5 sm:px-5">
+        <div className="kaca-header sticky top-0 z-30 -mx-4 border-b border-garis/70 px-4 pt-[env(safe-area-inset-top)] sm:-mx-5 sm:px-5">
           <Spotlight initialItems={aktivitas} />
           <SiteHeader />
         </div>

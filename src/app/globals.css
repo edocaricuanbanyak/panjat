@@ -29,8 +29,11 @@
 
   /* Fonts (bound in layout via next/font CSS variables) */
   --font-display: var(--font-poppins); /* headings */
-  --font-sans: var(--font-jakarta); /* body / content / caption */
-  --font-mono: var(--font-martian-mono); /* numbers / tabular */
+  --font-sans: var(--font-jakarta); /* body / content / caption / numbers */
+  /* Only two typefaces ship: Poppins + Jakarta. `font-mono` is retired — numbers
+     use Jakarta with the .tabular utility (font-variant-numeric: tabular-nums).
+     Aliased to Jakarta so any stray `font-mono` still renders a shipped font. */
+  --font-mono: var(--font-jakarta);
 
   /* Radius (§9.5) */
   --radius-sm: 6px;
@@ -73,6 +76,33 @@ html {
 
 body {
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/*
+ * Native-app feel for the installed PWA. No grey tap-flash, no text auto-inflation,
+ * snappy taps on controls, and — only when launched standalone — no browser-y
+ * rubber-band / pull-to-refresh. Content stays selectable; only chrome/controls
+ * opt out of selection + the long-press callout so buttons behave like native ones.
+ */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+[role="tab"],
+[role="button"],
+summary {
+  touch-action: manipulation; /* no double-tap-zoom / tap delay on controls */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+@media (display-mode: standalone) {
+  html,
+  body {
+    overscroll-behavior: none;
+  }
 }
 
 /* Tabular figures everywhere numbers matter (§9.5). */

@@ -4,7 +4,7 @@ export type ButtonVariant = "primary" | "secondary" | "ghost";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center font-display font-semibold rounded-xl select-none " +
+  "inline-flex items-center justify-center font-display font-semibold rounded-xl select-none touch-manipulation " +
   "transition-[transform,background-color,filter,box-shadow] ease-panjat duration-150 " +
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah " +
   "disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none";
