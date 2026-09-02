@@ -222,7 +222,7 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
           style={{ resize: "none", overflow: "hidden" }}
           className={textareaClasses}
         />
-        <span className="mt-1 block text-right font-mono text-xs text-tinta-redup">
+        <span className="mt-1 block text-right tabular text-xs text-tinta-redup">
           {deskripsi.length}/160
         </span>
       </label>

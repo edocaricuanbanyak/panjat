@@ -61,7 +61,7 @@ export default async function KategoriPage({
         <div className="mt-4 flex items-center gap-3 rounded-lg border border-emas/50 bg-emas/8 p-3">
           <SiteLogo listingId={dir.champion.id} nama={dir.champion.nama} />
           <div className="min-w-0">
-            <p className="font-mono text-xs text-tinta-redup">{copy.jelajah.juaraKategori}</p>
+            <p className="tabular text-xs text-tinta-redup">{copy.jelajah.juaraKategori}</p>
             <a
               href={`/k/${dir.champion.id}?asal=jelajah`}
               target="_blank"
@@ -71,7 +71,7 @@ export default async function KategoriPage({
               {dir.champion.nama}
             </a>
           </div>
-          <a href="/" className="ml-auto shrink-0 font-mono text-xs text-tinta-redup hover:text-tinta">
+          <a href="/" className="ml-auto shrink-0 tabular text-xs text-tinta-redup hover:text-tinta">
             {copy.jelajah.diPapan}
           </a>
         </div>

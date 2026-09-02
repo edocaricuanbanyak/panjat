@@ -45,7 +45,7 @@ export default async function DasborListing({
       <h1 className="mt-2 font-display text-3xl font-bold text-tinta sm:text-4xl" style={{ fontStretch: "125%" }}>
         {d.nama}
       </h1>
-      <p className="mt-1 font-mono text-xs text-tinta-redup">
+      <p className="mt-1 tabular text-xs text-tinta-redup">
         {d.urlNormal} · {d.status}
       </p>
       {d.badges.length > 0 && (

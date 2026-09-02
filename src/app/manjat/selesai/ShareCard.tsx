@@ -122,7 +122,7 @@ export function ShareCard({
       <div className="flex flex-wrap items-end justify-center gap-x-4 gap-y-3">
         {/* Rasio — 4-way */}
         <div className="flex flex-col items-center gap-1.5">
-          <span className="font-mono text-[11px] font-medium uppercase tracking-wide text-tinta-redup">
+          <span className="tabular text-[11px] font-medium uppercase tracking-wide text-tinta-redup">
             {copy.momen.rasio}
           </span>
           <div
@@ -153,7 +153,7 @@ export function ShareCard({
 
         {/* Gambar — 2-way */}
         <div className="flex flex-col items-center gap-1.5">
-          <span className="font-mono text-[11px] font-medium uppercase tracking-wide text-tinta-redup">
+          <span className="tabular text-[11px] font-medium uppercase tracking-wide text-tinta-redup">
             {copy.momen.gambar}
           </span>
           <div

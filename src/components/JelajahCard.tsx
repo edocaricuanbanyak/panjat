@@ -24,7 +24,7 @@ export function JelajahCard({ card, asal }: { card: Card; asal: "jelajah" | "pen
         {card.deskripsi && (
           <p className="mt-0.5 line-clamp-2 text-sm text-tinta-redup">{card.deskripsi}</p>
         )}
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-tinta-redup">
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 tabular text-xs text-tinta-redup">
           {card.kategoriSlug && (
             <a href={`/kategori/${card.kategoriSlug}`} className="inline-flex items-center gap-1 hover:text-tinta">
               <KategoriIcon slug={card.kategoriSlug} className="size-3.5" />

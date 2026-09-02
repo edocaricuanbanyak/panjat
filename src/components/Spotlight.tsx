@@ -124,7 +124,7 @@ export function Spotlight({ initialItems = [] }: { initialItems?: Aktivitas[] })
 
   return (
     <div className="flex items-center gap-3 overflow-hidden py-1.5">
-      <span className="shrink-0 font-mono text-[11px] font-semibold uppercase tracking-wide text-merah-teks">
+      <span className="shrink-0 tabular text-[11px] font-semibold uppercase tracking-wide text-merah-teks">
         {copy.papan.aktivitas}
       </span>
       <div className="min-w-0 flex-1 overflow-hidden">

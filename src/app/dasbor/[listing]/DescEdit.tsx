@@ -43,7 +43,7 @@ export function DescEdit({ listingId, initial }: { listingId: string; initial: s
         <Button size="sm" disabled={status === "saving"} onClick={save}>
           {status === "saving" ? "Menyimpan…" : "Simpan deskripsi"}
         </Button>
-        <span className="font-mono text-xs text-tinta-redup">{value.length}/160</span>
+        <span className="tabular text-xs text-tinta-redup">{value.length}/160</span>
         {status === "saved" && <span className="text-xs text-tinta-redup">Tersimpan ✓</span>}
         {status === "error" && <span className="text-xs text-galat">{msg}</span>}
       </div>

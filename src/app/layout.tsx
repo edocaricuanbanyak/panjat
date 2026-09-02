@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Martian_Mono, Plus_Jakarta_Sans, Poppins } from "next/font/google";
+import { Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import Script from "next/script";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { copy } from "@/copy";
@@ -12,14 +12,9 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
 });
-// Body / content / caption.
+// Body / content / caption — and numbers (tabular figures via the .tabular utility).
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
-  subsets: ["latin"],
-});
-// Numbers / tabular data.
-const martianMono = Martian_Mono({
-  variable: "--font-martian-mono",
   subsets: ["latin"],
 });
 
@@ -74,7 +69,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="id"
-      className={`${poppins.variable} ${jakarta.variable} ${martianMono.variable} h-full antialiased`}
+      className={`${poppins.variable} ${jakarta.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-kertas text-tinta">
         {/* GTM <noscript> fallback — immediately after <body> per Google's guide. */}

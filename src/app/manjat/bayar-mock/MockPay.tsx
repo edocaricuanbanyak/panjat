@@ -30,7 +30,7 @@ export function MockPay({ orderId, nominal }: { orderId: string; nominal: number
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-16">
-      <p className="mb-3 inline-flex w-fit rounded-full bg-kertas-2 px-2 py-0.5 font-mono text-xs text-tinta-redup">
+      <p className="mb-3 inline-flex w-fit rounded-full bg-kertas-2 px-2 py-0.5 tabular text-xs text-tinta-redup">
         MODE UJI
       </p>
 
@@ -51,7 +51,7 @@ export function MockPay({ orderId, nominal }: { orderId: string; nominal: number
           <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
             Pembayaran simulasi
           </h1>
-          <p className="mt-1 font-mono text-xs text-tinta-redup">{orderId}</p>
+          <p className="mt-1 tabular text-xs text-tinta-redup">{orderId}</p>
           <div className="mt-4 flex items-baseline justify-between rounded-xl border border-garis bg-kertas-1 px-4 py-3 shadow-kartu">
             <span className="text-sm text-tinta-redup">Total</span>
             <span className="font-sans tabular text-lg font-semibold text-tinta">

@@ -45,7 +45,7 @@ export default async function ArsipPage() {
         <section className="mt-6 rounded-2xl border border-emas/50 bg-gradient-to-b from-emas/12 to-kertas-1 p-4 shadow-kartu">
           <div>
             <h2 className="font-display font-semibold text-tinta">{copy.arsip.mingguanJudul}</h2>
-            <p className="mt-0.5 font-mono text-xs font-medium text-tinta">
+            <p className="mt-0.5 tabular text-xs font-medium text-tinta">
               {copy.arsip.mingguanPekan(juaraMingguan[0].minggu)}
             </p>
             <p className="mt-0.5 text-xs text-tinta-redup">{copy.arsip.mingguanInfo}</p>
@@ -56,7 +56,7 @@ export default async function ArsipPage() {
                 key={j.jenis}
                 className="flex items-center gap-3 rounded-lg bg-kertas-1/60 px-3 py-2"
               >
-                <span className="w-24 shrink-0 font-mono text-[11px] uppercase tracking-wide text-tinta-redup">
+                <span className="w-24 shrink-0 tabular text-[11px] uppercase tracking-wide text-tinta-redup">
                   {copy.arsip.jenis[j.jenis] ?? j.jenis}
                 </span>
                 <SiteLogo listingId={j.listingId} nama={j.nama} className="size-8 rounded-md text-xs" />
@@ -94,7 +94,7 @@ export default async function ArsipPage() {
                   <span className="block truncate font-display font-semibold text-tinta">
                     {r.nama}
                   </span>
-                  <span className="font-mono text-xs text-tinta-redup">{r.tanggal}</span>
+                  <span className="tabular text-xs text-tinta-redup">{r.tanggal}</span>
                 </div>
               </a>
             </li>

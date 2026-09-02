@@ -53,7 +53,7 @@ export default async function AdminPage() {
                 <LogoTile nama={q.nama} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-display font-semibold text-tinta">{q.nama}</p>
-                  <p className="font-mono text-xs text-tinta-redup">
+                  <p className="tabular text-xs text-tinta-redup">
                     {q.urlNormal} · {formatRupiah(q.pegangan)}
                   </p>
                 </div>
@@ -84,7 +84,7 @@ export default async function AdminPage() {
         <ul className="mt-3 flex flex-col gap-3">
           {laporan.map((r) => (
             <li key={r.id} className="rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu">
-              <p className="font-mono text-xs text-tinta-redup">
+              <p className="tabular text-xs text-tinta-redup">
                 {r.jenis === "klaim" ? copy.admin.klaimUrl : copy.admin.laporan} ·{" "}
                 <a href={`/l/${r.listingId}`} className="hover:text-tinta">{r.nama}</a> ({r.urlNormal})
               </p>

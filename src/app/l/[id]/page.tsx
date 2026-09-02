@@ -53,7 +53,7 @@ export default async function ListingPublikPage({
           <h1 className="font-display text-3xl font-bold text-tinta" style={{ fontStretch: "125%" }}>
             {l.nama}
           </h1>
-          <p className="font-mono text-xs text-tinta-redup">
+          <p className="tabular text-xs text-tinta-redup">
             {l.urlNormal}
             {l.kategoriSlug && (
               <>

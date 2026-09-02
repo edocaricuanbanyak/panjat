@@ -71,7 +71,7 @@ export function JagaPosisiPanel({ listingId, jaga }: { listingId: string; jaga: 
         </div>
       </div>
       {jaga && (
-        <p className="mt-2 font-mono text-xs text-tinta-redup">
+        <p className="mt-2 tabular text-xs text-tinta-redup">
           {copy.dasbor.jagaSisa(formatRupiah(jaga.budgetSisa))}
         </p>
       )}

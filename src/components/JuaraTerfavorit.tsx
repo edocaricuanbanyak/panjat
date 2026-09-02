@@ -12,7 +12,7 @@ import { SiteLogo } from "./SiteLogo";
 export function JuaraTerfavorit({ entry }: { entry: Juara }) {
   return (
     <div className="mt-5 rounded-2xl border border-merah/40 bg-gradient-to-b from-merah/8 to-kertas-1 p-4 shadow-kartu">
-      <p className="mb-2 flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-tinta-redup">
+      <p className="mb-2 flex items-center gap-1.5 tabular text-[11px] font-semibold uppercase tracking-wide text-tinta-redup">
         <Heart className="size-3.5 shrink-0 fill-merah text-merah" aria-hidden />
         {copy.papan.juaraTerfavorit}
       </p>

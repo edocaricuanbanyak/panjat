@@ -38,7 +38,7 @@ export default async function ArsipHariIni({
   return (
     <PageShell>
       <BoardTabs active="hari-ini" className="mb-5" />
-      <p className="font-mono text-xs text-tinta-redup">Arsip</p>
+      <p className="tabular text-xs text-tinta-redup">Arsip</p>
       <h1
         className="font-display text-3xl font-bold text-tinta sm:text-4xl"
         style={{ fontStretch: "125%" }}

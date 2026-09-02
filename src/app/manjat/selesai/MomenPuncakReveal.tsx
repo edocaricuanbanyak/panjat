@@ -58,7 +58,7 @@ export function MomenPuncakReveal({
       <div className="flex w-full flex-col items-center gap-7 md:flex-row md:items-center md:justify-center md:gap-14 md:text-left">
         <div className="flex w-full flex-col items-center gap-6 md:order-2 md:w-auto md:max-w-sm md:items-start">
           <div className="flex flex-col items-center md:items-start">
-            <p className="reveal font-mono text-xs uppercase tracking-wide text-tinta-redup">
+            <p className="reveal tabular text-xs uppercase tracking-wide text-tinta-redup">
               {copy.momen.eyebrow}
             </p>
             <div className="relative mt-2">

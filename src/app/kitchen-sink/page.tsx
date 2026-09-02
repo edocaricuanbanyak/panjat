@@ -32,7 +32,7 @@ const entry = (over: Partial<BoardEntry> = {}): BoardEntry => ({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="font-mono text-xs uppercase tracking-wide text-tinta-redup">{title}</h2>
+      <h2 className="tabular text-xs uppercase tracking-wide text-tinta-redup">{title}</h2>
       <div className="flex flex-wrap items-center gap-3">{children}</div>
     </section>
   );

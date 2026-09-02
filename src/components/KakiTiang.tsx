@@ -143,7 +143,7 @@ export function KakiTiang({
     <section id="kaki-tiang" className="mt-8">
       <div className="flex items-center justify-between">
         <h2 className="font-display font-semibold text-tinta">{copy.kakiTiang.judul}</h2>
-        <span className="font-mono text-xs text-tinta-redup">
+        <span className="tabular text-xs text-tinta-redup">
           {copy.kakiTiang.sisaDukungan(remaining)}
         </span>
       </div>
@@ -197,7 +197,7 @@ export function KakiTiang({
                 </a>
                 {e.deskripsi && <p className="truncate text-xs text-tinta-redup">{e.deskripsi}</p>}
                 <p className="mt-0.5 flex items-center gap-1.5 text-xs text-tinta-redup">
-                  <span className="truncate font-mono text-tinta-redup">
+                  <span className="truncate tabular text-tinta-redup">
                     {e.urlNormal.replace(/^https?:\/\//, "").replace(/\/+$/, "")}
                   </span>
                   {e.kategoriNama && (
@@ -296,7 +296,7 @@ function DukungButton({
           className="pointer-events-none absolute left-1/2 top-1 -translate-x-1/2"
           aria-hidden
         >
-          <span className="dukung-plus absolute left-1/2 -translate-x-1/2 font-mono text-xs font-semibold text-merah-teks">
+          <span className="dukung-plus absolute left-1/2 -translate-x-1/2 tabular text-xs font-semibold text-merah-teks">
             +1
           </span>
           {PARTICLES.map((p, i) => (

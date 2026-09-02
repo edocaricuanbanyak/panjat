@@ -55,7 +55,7 @@ export default async function AturanPage() {
             </tbody>
           </table>
         </div>
-        <p className="mt-2 font-mono text-xs text-tinta-redup">
+        <p className="mt-2 tabular text-xs text-tinta-redup">
           {copy.aturan.contoh(formatRupiah(100_000), formatRupiah(25_000), formatRupiah(24_000))}
         </p>
       </section>

@@ -9,7 +9,7 @@ export function Steps({ current, labels }: { current: number; labels: string[] }
         return (
           <li key={label} className="flex items-center gap-2 text-xs">
             <span
-              className={`grid size-6 place-items-center rounded-full font-mono ${
+              className={`grid size-6 place-items-center rounded-full tabular ${
                 active
                   ? "bg-merah text-kertas-1"
                   : done

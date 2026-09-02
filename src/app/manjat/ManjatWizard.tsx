@@ -343,7 +343,7 @@ export function ManjatWizard({
               style={{ resize: "none", overflow: "hidden" }}
               className={textareaClasses}
             />
-            <span className="mt-1 block text-right font-mono text-xs text-tinta-redup">
+            <span className="mt-1 block text-right tabular text-xs text-tinta-redup">
               {deskripsi.length}/160
             </span>
           </label>
@@ -386,7 +386,7 @@ export function ManjatWizard({
               )}
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-tinta">{nama || host}</p>
-                <p className="truncate font-mono text-xs text-tinta-redup">{host}</p>
+                <p className="truncate tabular text-xs text-tinta-redup">{host}</p>
               </div>
               <span className="shrink-0 text-xs font-medium text-merah-teks">
                 {copy.manjat.ubahDetail}
@@ -400,7 +400,7 @@ export function ManjatWizard({
               {copy.manjat.nominalTanya}
             </label>
             <div className="relative">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-xl text-tinta-redup">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 tabular text-xl text-tinta-redup">
                 Rp
               </span>
               <input
@@ -409,7 +409,7 @@ export function ManjatWizard({
                 placeholder={copy.manjat.nominalPlaceholder}
                 value={nominalInput ? Number(nominalInput).toLocaleString("id-ID") : ""}
                 onChange={(e) => setNominalInput(e.target.value.replace(/\D/g, ""))}
-                className={`h-14 w-full rounded-xl border bg-kertas-1 pl-12 pr-4 font-mono text-2xl font-bold text-tinta shadow-kartu focus-visible:outline-none focus-visible:ring-2 ${
+                className={`h-14 w-full rounded-xl border bg-kertas-1 pl-12 pr-4 tabular text-2xl font-bold text-tinta shadow-kartu focus-visible:outline-none focus-visible:ring-2 ${
                   nominalDinaikkan
                     ? "border-galat focus-visible:border-galat focus-visible:ring-galat/25"
                     : "border-garis focus-visible:border-merah focus-visible:ring-merah/25"
