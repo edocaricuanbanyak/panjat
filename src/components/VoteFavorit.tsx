@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { copy } from "@/copy";
 import type { FavoritEntry } from "@/lib/favorit";
+import { StatusText, useTransientStatus } from "@/lib/use-status";
 import { Button, buttonClasses } from "./Button";
 import { fieldClasses } from "./Input";
 import { Modal } from "./Modal";
@@ -32,6 +33,7 @@ export function VoteFavorit({
   const [q, setQ] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { status, show } = useTransientStatus();
   const voted = myChoice !== null;
 
   const picked = useMemo(() => entries.find((e) => e.id === pick), [entries, pick]);
@@ -46,13 +48,16 @@ export function VoteFavorit({
     if (!pick || saving) return;
     setSaving(true);
     try {
-      await fetch("/api/favorit", {
+      const res = await fetch("/api/favorit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ listingId: pick }),
       });
+      if (!res.ok) throw new Error();
+      // Only lock into the "voted" UI once the server actually accepted it.
       router.refresh();
-    } finally {
+    } catch {
+      show("galat", copy.favorit.voteGagal);
       setSaving(false);
     }
   }
@@ -158,9 +163,15 @@ export function VoteFavorit({
               {copy.favorit.pilihLainnya}
             </button>
             <Button onClick={vote} disabled={!pick || saving} className="sm:flex-1">
-              {saving ? "…" : copy.favorit.vote}
+              {saving ? copy.favorit.voteMengirim : copy.favorit.vote}
             </Button>
           </div>
+
+          {status && (
+            <p className="mt-2">
+              <StatusText status={status} />
+            </p>
+          )}
 
           {/* "Pilih lainnya" — searchable sheet over every live climber. */}
           <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={copy.favorit.pilihJudul}>

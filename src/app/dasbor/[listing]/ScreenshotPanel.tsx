@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/Button";
 import { copy } from "@/copy";
+import { StatusText, useTransientStatus } from "@/lib/use-status";
 
 /** Dashboard site-preview panel with a "Segarkan pratinjau" button (R21, 1×/day). */
 export function ScreenshotPanel({
@@ -17,18 +18,18 @@ export function ScreenshotPanel({
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { status, show } = useTransientStatus();
 
   async function refresh() {
     setBusy(true);
-    setError(null);
     try {
       const res = await fetch(`/api/dasbor/${listingId}/screenshot`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? copy.error.gagalProses);
+      show("sukses", copy.dasbor.pratinjauTersegarkan);
       router.refresh();
     } catch (e) {
-      setError(e instanceof Error ? e.message : copy.error.gagalProses);
+      show("galat", e instanceof Error ? e.message : copy.error.gagalProses);
     } finally {
       setBusy(false);
     }
@@ -54,7 +55,7 @@ export function ScreenshotPanel({
         <Button variant="secondary" size="sm" onClick={refresh} disabled={busy}>
           {busy ? copy.dasbor.menyegarkan : copy.dasbor.segarkan}
         </Button>
-        {error && <span className="text-xs text-galat">{error}</span>}
+        <StatusText status={status} />
       </div>
     </div>
   );

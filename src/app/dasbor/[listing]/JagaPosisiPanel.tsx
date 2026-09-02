@@ -6,6 +6,7 @@ import { Dropdown } from "@/components/Dropdown";
 import { Input } from "@/components/Input";
 import { copy } from "@/copy";
 import { formatRupiah } from "@/lib/format";
+import { StatusText, useTransientStatus } from "@/lib/use-status";
 
 type Jaga = { target: string; budgetSisa: number; aktif: boolean } | null;
 
@@ -15,19 +16,21 @@ export function JagaPosisiPanel({ listingId, jaga }: { listingId: string; jaga: 
   const [tambah, setTambah] = useState("");
   const [aktif, setAktif] = useState(jaga?.aktif ?? true);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const { status, show } = useTransientStatus();
 
   async function save() {
     setSaving(true);
-    setSaved(false);
     try {
-      await fetch(`/api/dasbor/${listingId}/jaga`, {
+      const res = await fetch(`/api/dasbor/${listingId}/jaga`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ target, tambahBudget: Number(tambah) || 0, aktif }),
       });
-      setSaved(true);
+      if (!res.ok) throw new Error();
+      show("sukses", copy.dasbor.jagaTersimpan);
       setTambah("");
+    } catch {
+      show("galat", copy.dasbor.jagaGagal);
     } finally {
       setSaving(false);
     }
@@ -60,9 +63,12 @@ export function JagaPosisiPanel({ listingId, jaga }: { listingId: string; jaga: 
           <input type="checkbox" checked={aktif} onChange={(e) => setAktif(e.target.checked)} />
           {copy.dasbor.jagaAktif}
         </label>
-        <Button size="sm" onClick={save} disabled={saving}>
-          {saved ? copy.dasbor.jagaTersimpan : copy.dasbor.jagaSimpan}
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button size="sm" onClick={save} disabled={saving}>
+            {saving ? copy.dasbor.jagaMenyimpan : copy.dasbor.jagaSimpan}
+          </Button>
+          <StatusText status={status} />
+        </div>
       </div>
       {jaga && (
         <p className="mt-2 font-mono text-xs text-tinta-redup">

@@ -100,6 +100,7 @@ export function ListingCard({
               style={{ fontStretch: `${wdth}%` }}
             >
               {entry.nama}
+              <span className="sr-only"> ({copy.papan.bukaTabBaru})</span>
             </a>
             <span
               className={`shrink-0 font-sans tabular font-medium text-tinta-redup ${puncak ? "text-sm lg:text-base" : "text-xs lg:text-sm"}`}

@@ -168,6 +168,7 @@ async function HomeBody({
               <EmptyState
                 title={copy.beranda.papanKosongJudul}
                 message={copy.beranda.papanKosongPesan}
+                action={{ label: copy.beranda.papanKosongCta, href: "/manjat" }}
               />
             ) : page === 1 ? (
               <>

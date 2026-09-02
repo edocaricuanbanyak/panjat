@@ -1,3 +1,4 @@
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { listCategories } from "@/domain/jelajah";
 import { recentAktivitas } from "@/lib/aktivitas";
@@ -37,11 +38,19 @@ export async function PageShell({
       <main
         className={`mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pt-2 sm:px-5 sm:pt-4 ${pbMobile}`}
       >
+        <a
+          href="#isi"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:border focus:border-garis focus:bg-kertas-1 focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-tinta focus:shadow-naik focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah"
+        >
+          {copy.sistem.lompatKeIsi}
+        </a>
         <div className="sticky top-0 z-30 -mx-4 border-b border-garis/70 bg-kertas px-4 pt-[env(safe-area-inset-top)] sm:-mx-5 sm:px-5">
           <Spotlight initialItems={aktivitas} />
           <SiteHeader />
         </div>
-        <div className="flex-1 pt-4">{children}</div>
+        <div id="isi" tabIndex={-1} className="flex-1 pt-4 focus:outline-none">
+          {children}
+        </div>
         <Footer />
       </main>
     </ManjatProvider>

@@ -172,7 +172,7 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
                 type="button"
                 onClick={clearUrl}
                 aria-label={copy.manjat.hapusUrl}
-                className="group/clr flex size-6 items-center justify-center rounded-full hover:bg-kertas-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah"
+                className="group/clr flex size-8 items-center justify-center rounded-full hover:bg-kertas-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah"
               >
                 {prefilled ? (
                   <>
@@ -222,6 +222,9 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
           style={{ resize: "none", overflow: "hidden" }}
           className={textareaClasses}
         />
+        <span className="mt-1 block text-right font-mono text-xs text-tinta-redup">
+          {deskripsi.length}/160
+        </span>
       </label>
 
       <Input

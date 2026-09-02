@@ -293,7 +293,7 @@ export function ManjatWizard({
                     type="button"
                     onClick={clearUrl}
                     aria-label={copy.manjat.hapusUrl}
-                    className="group/clr flex size-6 items-center justify-center rounded-full hover:bg-kertas-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah"
+                    className="group/clr flex size-8 items-center justify-center rounded-full hover:bg-kertas-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah"
                   >
                     {prefilled ? (
                       <>
@@ -343,6 +343,9 @@ export function ManjatWizard({
               style={{ resize: "none", overflow: "hidden" }}
               className={textareaClasses}
             />
+            <span className="mt-1 block text-right font-mono text-xs text-tinta-redup">
+              {deskripsi.length}/160
+            </span>
           </label>
 
           <Input
@@ -488,9 +491,10 @@ export function ManjatWizard({
               type="checkbox"
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
+              aria-describedby="consent-teks"
               className="mt-0.5 size-4 shrink-0 accent-merah"
             />
-            <span>
+            <span id="consent-teks">
               {copy.manjat.consentSetuju}{" "}
               <a
                 href="/ketentuan"

@@ -4,6 +4,7 @@ import { Heart, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { copy } from "@/copy";
 import type { KakiTiangEntry } from "@/domain/sorak";
+import { StatusText, useTransientStatus } from "@/lib/use-status";
 import { KategoriIcon } from "./KategoriIcon";
 import { KlikChip } from "./KlikChip";
 import { SiteLogo } from "./SiteLogo";
@@ -45,6 +46,7 @@ export function KakiTiang({
   const [mine, setMine] = useState<Record<string, number>>({});
   // The row that just climbed on a dukung — gets a soft "lift" glow for a beat.
   const [lifted, setLifted] = useState<string | null>(null);
+  const { status, show } = useTransientStatus();
 
   // Stable tiebreak (server order) + the live-support ordering used for display.
   const origIndex = useMemo(
@@ -132,6 +134,8 @@ export function KakiTiang({
         setRemaining((r) => r + 1);
         setMine((m) => ({ ...m, [id]: Math.max(0, (m[id] ?? 1) - 1) }));
       });
+      // The revert alone is silent — say what happened.
+      show("galat", copy.kakiTiang.dukungGagal);
     }
   }
 
@@ -144,6 +148,11 @@ export function KakiTiang({
         </span>
       </div>
       <p className="mt-1 text-xs text-tinta-redup">{copy.kakiTiang.ajakan}</p>
+      {status && (
+        <p className="mt-1.5">
+          <StatusText status={status} />
+        </p>
+      )}
 
       {showBaru && (
         <div className="mt-3 flex items-center gap-2 rounded-lg border border-merah/40 bg-merah/5 px-3 py-2 text-sm text-tinta">

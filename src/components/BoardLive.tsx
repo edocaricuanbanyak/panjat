@@ -21,33 +21,61 @@ export function BoardLive({
 }) {
   const [board, setBoard] = useState<Board>(initial);
   const [announce, setAnnounce] = useState("");
+  const [stale, setStale] = useState(false);
   const topRef = useRef<string | undefined>(initial.entries[0]?.id);
 
   useEffect(() => {
-    const es = new EventSource("/api/board/stream");
-    es.onmessage = (ev) => {
-      const next = JSON.parse(ev.data) as Board;
-      const prevTop = topRef.current;
-      const nextTop = next.entries[0]?.id;
-      topRef.current = nextTop;
+    let es: EventSource;
+    let retry: ReturnType<typeof setTimeout>;
+    let announceTimer: ReturnType<typeof setTimeout>;
 
-      const msg =
-        nextTop && prevTop && nextTop !== prevTop && next.entries[0]
-          ? copy.papan.puncakBerganti(next.entries[0].nama)
-          : copy.papan.papanDiperbarui;
+    const connect = () => {
+      es = new EventSource("/api/board/stream");
+      es.onopen = () => setStale(false);
+      es.onmessage = (ev) => {
+        setStale(false);
+        const next = JSON.parse(ev.data) as Board;
+        const prevTop = topRef.current;
+        const nextTop = next.entries[0]?.id;
+        topRef.current = nextTop;
 
-      const commit = () => {
-        setBoard(next);
-        setAnnounce(msg);
+        const msg =
+          nextTop && prevTop && nextTop !== prevTop && next.entries[0]
+            ? copy.papan.puncakBerganti(next.entries[0].nama)
+            : copy.papan.papanDiperbarui;
+
+        const commit = () => {
+          setBoard(next);
+          setAnnounce(msg);
+          // Clear after a beat so an identical next message still announces —
+          // a live region only fires when its text actually changes.
+          clearTimeout(announceTimer);
+          announceTimer = setTimeout(() => setAnnounce(""), 1000);
+        };
+
+        const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+        const start = (document as unknown as { startViewTransition?: (cb: () => void) => void })
+          .startViewTransition;
+        if (!reduce && typeof start === "function") start.call(document, commit);
+        else commit();
       };
-
-      const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-      const start = (document as unknown as { startViewTransition?: (cb: () => void) => void })
-        .startViewTransition;
-      if (!reduce && typeof start === "function") start.call(document, commit);
-      else commit();
+      es.onerror = () => {
+        setStale(true);
+        // The browser auto-retries transient drops; only when it fully gives up
+        // (CLOSED) do we rebuild the connection ourselves.
+        if (es.readyState === EventSource.CLOSED) {
+          clearTimeout(retry);
+          retry = setTimeout(connect, 3000);
+        }
+      };
     };
-    return () => es.close();
+    connect();
+
+    return () => {
+      clearTimeout(retry);
+      clearTimeout(announceTimer);
+      es.close();
+    };
   }, []);
 
   // Page one shows at most 20; deeper ranks live on paginated (static) pages.
@@ -57,6 +85,17 @@ export function BoardLive({
 
   return (
     <div className="flex flex-1 flex-col gap-4">
+      {/* Quiet notice when the live feed drops — the board keeps showing the last
+          standings while we reconnect, so it never just freezes silently. */}
+      {stale && (
+        <p
+          role="status"
+          className="flex items-center gap-1.5 text-xs text-tinta-redup"
+        >
+          <span className="size-1.5 shrink-0 rounded-full bg-tinta-redup" aria-hidden />
+          {copy.papan.koneksiPutus}
+        </p>
+      )}
       {/* Board updates must not be read row-by-row (R20-e). */}
       <div aria-live="off">
         {/* Summit zone — the top three each get their own rank-tinted card;
