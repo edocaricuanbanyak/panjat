@@ -42,7 +42,10 @@ export async function simpanJuaraMingguan(db: Database, now = new Date()) {
   // or a little later).
   const mingguTutup = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
   const [fav] = await favoritBoard(db, mingguTutup, 1);
-  if (fav) rows.push({ jenis: "terfavorit", listingId: fav.id, metrik: fav.votes });
+  // Only archive a real winner: favoritBoard pads with top *paid* climbers (0
+  // votes) so the vote UI never looks empty — but a padded paid listing must
+  // never be crowned "Terfavorit". No genuine votes this week → no champion.
+  if (fav && fav.votes > 0) rows.push({ jenis: "terfavorit", listingId: fav.id, metrik: fav.votes });
 
   const kaki = await getJuaraKakiTiangMingguan(db, mingguTutup);
   if (kaki) rows.push({ jenis: "kaki_tiang", listingId: kaki.id, metrik: kaki.sorak });
