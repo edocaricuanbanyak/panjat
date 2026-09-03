@@ -210,12 +210,7 @@ async function HomeBody({
             </div>
           </>
         }
-        hariIni={
-          <>
-            <p className="mb-4 text-tinta-redup">{copy.hariIni.sub}</p>
-            <HariIniBoard entries={hariIni} />
-          </>
-        }
+        hariIni={<HariIniBoard entries={hariIni} />}
       />
 
       {/* CARA MAIN */}

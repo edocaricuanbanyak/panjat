@@ -22,7 +22,6 @@ export default function HariIniPage() {
   return (
     <PageShell>
       <BoardTabs active="hari-ini" className="mb-5" />
-      <p className="text-tinta-redup">{copy.hariIni.sub}</p>
       <Suspense fallback={<ListRowsSkeleton n={10} />}>
         <HariIniList />
       </Suspense>
