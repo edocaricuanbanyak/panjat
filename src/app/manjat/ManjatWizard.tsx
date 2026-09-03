@@ -390,7 +390,10 @@ export function ManjatWizard({
               {logoUrl && !logoFailed ? (
                 // biome-ignore lint/performance/noImgElement: remote site logo, not a static asset
                 <img
-                  src={logoUrl}
+                  // Resolve via the same server pipeline as the board, so this
+                  // confirmation preview matches the actual card (not just a raw
+                  // client load that the server might later reject).
+                  src={`/api/logo-preview?url=${encodeURIComponent(url)}&img=${encodeURIComponent(logoUrl)}`}
                   alt=""
                   onError={() => setLogoFailed(true)}
                   className="size-10 shrink-0 rounded-full border border-garis bg-kertas-1 object-contain p-1"
