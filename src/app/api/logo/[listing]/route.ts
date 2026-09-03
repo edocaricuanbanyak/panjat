@@ -22,7 +22,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ listing
   if (!UUID.test(id)) return new Response("Not found", { status: 404 });
 
   const [l] = await db
-    .select({ urlNormal: listing.urlNormal })
+    .select({ urlNormal: listing.urlNormal, logoPath: listing.logoPath })
     .from(listing)
     .where(eq(listing.id, id))
     .limit(1);
@@ -35,7 +35,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ listing
     hostname = "";
   }
 
-  const png = await resolveSiteLogoPng(l.urlNormal, hostname, 128);
+  const png = await resolveSiteLogoPng(l.urlNormal, hostname, 128, l.logoPath);
   // Cache the "no logo" verdict too — resolving it is expensive (preview + fetch +
   // sharp), so re-running it on every board render for a site with no icon is waste.
   if (!png) return new Response("No logo", { status: 404, headers: { "Cache-Control": CACHE } });

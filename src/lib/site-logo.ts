@@ -17,11 +17,14 @@ export async function resolveSiteLogoPng(
   urlNormal: string,
   hostname: string,
   size = 384,
+  override?: string | null,
 ): Promise<Buffer | null> {
   const sharp = await import("sharp").then((m) => m.default).catch(() => null);
   if (!sharp) return null;
 
   const candidates: string[] = [];
+  // A visitor-provided image (e.g. a social profile photo) wins over scraping.
+  if (override) candidates.push(override);
   try {
     const pv = await getPreview(urlNormal);
     if (pv.logoUrl) candidates.push(pv.logoUrl);

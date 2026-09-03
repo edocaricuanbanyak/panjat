@@ -95,6 +95,7 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
           deskripsi: deskripsi || undefined,
           kategoriSlug: kategoriSlug || undefined,
           email: email || undefined,
+          logoUrl: logoUrl || undefined,
         }),
       });
       const data = await res.json();
@@ -234,6 +235,19 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
         hint={copy.pasangGratis.emailHint}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <Input
+        label={copy.manjat.gambarLabel}
+        type="url"
+        inputMode="url"
+        placeholder={copy.manjat.gambarPlaceholder}
+        hint={copy.manjat.gambarHint}
+        value={logoUrl ?? ""}
+        onChange={(e) => {
+          setLogoUrl(e.target.value || null);
+          setLogoFailed(false);
+        }}
       />
 
       <Button disabled={!url.trim() || submitting || penuh} onClick={submit}>

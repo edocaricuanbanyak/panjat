@@ -63,6 +63,7 @@ export async function POST(req: Request) {
       nama: typeof body.nama === "string" ? body.nama : undefined,
       deskripsi: typeof body.deskripsi === "string" ? body.deskripsi : undefined,
       kategoriSlug: typeof body.kategoriSlug === "string" ? body.kategoriSlug : undefined,
+      logoUrl: typeof body.logoUrl === "string" ? body.logoUrl : undefined,
     });
     return NextResponse.json(result);
   } catch (err) {

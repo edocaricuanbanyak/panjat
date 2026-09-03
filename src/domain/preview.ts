@@ -113,8 +113,6 @@ export async function getPreview(inputUrl: string): Promise<Preview> {
     }
   }
 
-  // Social handles (x.com/..., instagram, tiktok) block scrapers — skip (R2).
-  const social = /^(x\.com|instagram\.com|tiktok\.com)\//.test(urlNormal);
   let preview: Preview = {
     urlNormal,
     nama: fallbackName,
@@ -123,9 +121,15 @@ export async function getPreview(inputUrl: string): Promise<Preview> {
     kategoriSlug: guessKategori(urlNormal),
   };
 
-  if (!social) {
+  {
     try {
-      const { finalUrl, html, contentType } = await safeFetch(`https://${urlNormal}`);
+      // A browser-compatible UA — many sites (incl. Instagram/TikTok profiles)
+      // only return og:image/meta to a browser-like agent, so this gives social
+      // profile photos a chance. Still best-effort: blocked/login-walled hosts
+      // just fall through (the manual "URL gambar" field is the reliable path).
+      const { finalUrl, html, contentType } = await safeFetch(`https://${urlNormal}`, {
+        userAgent: "Mozilla/5.0 (compatible; PanjatBot/1.0; +https://panjat.id)",
+      });
       if (contentType.includes("html")) {
         const og = parseOg(html, finalUrl);
         const nama = og.title ?? fallbackName;

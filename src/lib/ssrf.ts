@@ -136,7 +136,11 @@ export interface FetchResult {
 
 export async function safeFetch(
   input: string,
-  { maxBytes = 1_000_000, timeoutMs = 3000 }: { maxBytes?: number; timeoutMs?: number } = {},
+  {
+    maxBytes = 1_000_000,
+    timeoutMs = 3000,
+    userAgent = "PanjatBot/1.0 (+https://panjat.id)",
+  }: { maxBytes?: number; timeoutMs?: number; userAgent?: string } = {},
 ): Promise<FetchResult> {
   let current = input;
   for (let hop = 0; hop <= 3; hop++) {
@@ -153,7 +157,7 @@ export async function safeFetch(
       res = await fetch(current, {
         redirect: "manual",
         signal: ctl.signal,
-        headers: { "user-agent": "PanjatBot/1.0 (+https://panjat.id)" },
+        headers: { "user-agent": userAgent },
       });
     } finally {
       clearTimeout(timer);

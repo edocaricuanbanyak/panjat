@@ -38,6 +38,7 @@ export async function POST(req: Request) {
       deskripsi: typeof body.deskripsi === "string" ? body.deskripsi : undefined,
       kategoriSlug: typeof body.kategoriSlug === "string" ? body.kategoriSlug : undefined,
       email: typeof body.email === "string" ? body.email : undefined,
+      logoUrl: typeof body.logoUrl === "string" ? body.logoUrl : undefined,
     });
     return NextResponse.json({ listingId });
   } catch (err) {

@@ -23,6 +23,20 @@ function canonicalHost(host: string): string {
  * dev-Twitter platform); full IG/TikTok handle disambiguation ships with the
  * preview slice.
  */
+/** A visitor-supplied image URL (e.g. a profile photo) → normalized http/https
+ *  string, or null if empty/invalid. The bytes are SSRF-guarded + rasterized
+ *  later by resolveSiteLogoPng, so this only gates scheme + shape. */
+export function imageUrlOrNull(input: string | null | undefined): string | null {
+  const raw = input?.trim();
+  if (!raw) return null;
+  try {
+    const u = new URL(raw);
+    return u.protocol === "http:" || u.protocol === "https:" ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 export function normalizeUrl(input: string, opts: { allowSelf?: boolean } = {}): string {
   const raw = input.trim();
   if (!raw) throw new Error("URL kosong");

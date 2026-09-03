@@ -10,7 +10,7 @@ import { kategori, listing, sponsorKontak, transaksi } from "@/db/schema";
 import { loadManjatConfig, loadRosotConfig } from "./config";
 import { getRanking } from "./ranking";
 import { dailyRateForRank, estimateDaysToThreshold, type RosotConfig } from "./rosot";
-import { normalizeUrl } from "./url";
+import { imageUrlOrNull, normalizeUrl } from "./url";
 import type { SnapClient } from "@/lib/midtrans";
 
 export type Target = "#1" | "top3" | "top10";
@@ -23,6 +23,8 @@ export interface ManjatInput {
   email?: string;
   wa?: string;
   nominal: number;
+  /** Optional visitor-supplied card image (e.g. a social profile photo). */
+  logoUrl?: string;
 }
 
 export interface ManjatResult {
@@ -283,6 +285,7 @@ export async function createOrTopUp(
           nama: input.nama?.trim() || urlNormal,
           deskripsi: input.deskripsi,
           kategoriId,
+          logoPath: imageUrlOrNull(input.logoUrl),
           status: "draft",
           kontakId,
         })

@@ -8,7 +8,7 @@ import type { Database, DbOrTx } from "@/db";
 import { listing, sponsorKontak } from "@/db/schema";
 import { loadMaksGratisPerDomain } from "./config";
 import { screenListing } from "./moderasi";
-import { normalizeUrl } from "./url";
+import { imageUrlOrNull, normalizeUrl } from "./url";
 
 export class GratisError extends Error {}
 
@@ -49,6 +49,8 @@ export interface GratisInput {
   deskripsi?: string;
   kategoriSlug?: string;
   email?: string;
+  /** Optional visitor-supplied card image (e.g. a social profile photo). */
+  logoUrl?: string;
 }
 
 export async function createGratis(db: Database, input: GratisInput): Promise<{ listingId: string }> {
@@ -115,6 +117,7 @@ export async function createGratis(db: Database, input: GratisInput): Promise<{ 
         nama: input.nama?.trim() || urlNormal,
         deskripsi: input.deskripsi,
         kategoriId,
+        logoPath: imageUrlOrNull(input.logoUrl),
         status: "tayang",
         peganganCached: 0,
         kontakId,

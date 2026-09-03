@@ -150,6 +150,7 @@ export function ManjatWizard({
         nama: nama || undefined,
         kategoriSlug: kategoriSlug || undefined,
         deskripsi: deskripsi || undefined,
+        logoUrl: logoUrl || undefined,
       });
       window.location.href = result.redirectUrl;
     } catch (e) {
@@ -355,6 +356,19 @@ export function ManjatWizard({
             hint={copy.manjat.emailHint}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <Input
+            label={copy.manjat.gambarLabel}
+            type="url"
+            inputMode="url"
+            placeholder={copy.manjat.gambarPlaceholder}
+            hint={copy.manjat.gambarHint}
+            value={logoUrl ?? ""}
+            onChange={(e) => {
+              setLogoUrl(e.target.value || null);
+              setLogoFailed(false);
+            }}
           />
 
           <Button disabled={!canStep1} onClick={() => setStep(2)}>
