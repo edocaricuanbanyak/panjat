@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { copy } from "@/copy";
+import { BoardSkeleton } from "./Skeleton";
 
 type TabKey = "sekarang" | "hari-ini";
 
@@ -26,8 +27,19 @@ export function HomeTabs({
   hariIni: React.ReactNode;
 }) {
   const [tab, setTab] = useState<TabKey>("sekarang");
+  const [loading, setLoading] = useState(false);
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const activeIndex = ITEMS.findIndex((t) => t.key === tab);
+
+  // Switch view: jump back to the top and flash a board skeleton so the change
+  // reads as a fresh load (the boards are separate islands that re-mount).
+  const switchTo = (key: TabKey) => {
+    if (key === tab) return;
+    setTab(key);
+    setLoading(true);
+    window.scrollTo({ top: 0, behavior: "auto" });
+    window.setTimeout(() => setLoading(false), 350);
+  };
 
   const onKey = (e: React.KeyboardEvent) => {
     const last = ITEMS.length - 1;
@@ -38,7 +50,7 @@ export function HomeTabs({
     else if (e.key === "End") next = last;
     else return;
     e.preventDefault();
-    setTab(ITEMS[next].key);
+    switchTo(ITEMS[next].key);
     btnRefs.current[next]?.focus();
   };
 
@@ -66,7 +78,7 @@ export function HomeTabs({
               role="tab"
               aria-selected={on}
               tabIndex={on ? 0 : -1}
-              onClick={() => setTab(it.key)}
+              onClick={() => switchTo(it.key)}
               onKeyDown={onKey}
               className={`relative z-10 inline-flex touch-manipulation select-none items-center justify-center whitespace-nowrap rounded-full px-5 py-2 font-display text-sm font-semibold transition-colors ease-panjat [-webkit-tap-highlight-color:transparent] active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-merah max-sm:min-h-11 ${
                 on ? "text-tinta" : "text-tinta-redup hover:text-tinta"
@@ -77,8 +89,7 @@ export function HomeTabs({
           );
         })}
       </div>
-      {tab === "sekarang" && sekarang}
-      {tab === "hari-ini" && hariIni}
+      {loading ? <BoardSkeleton /> : tab === "sekarang" ? sekarang : hariIni}
     </section>
   );
 }

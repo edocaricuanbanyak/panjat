@@ -15,11 +15,11 @@ function toBoardEntry(e: HariIniEntry): BoardEntry {
     id: e.id,
     nama: e.nama,
     urlNormal: e.urlNormal,
-    deskripsi: null,
+    deskripsi: e.deskripsi, // same description as the all-time card
     kategoriNama: e.kategoriNama,
     kategoriSlug: e.kategoriSlug, // real slug → same category icon as the all-time board
     pegangan: e.todayGrip, // today's paid grip drives rank + the Salip nominal
-    klikTotal: 0,
+    klikTotal: e.klikTotal, // same all-time click social-proof
     rosotPerHari: 0,
     masihTerjaga: false,
     screenshotUrl: null,

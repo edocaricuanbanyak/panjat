@@ -26,6 +26,7 @@ export function ListingCard({
   density = "row",
   terfavoritId = null,
   showRosot = true,
+  kakiTiangJuara = false,
 }: {
   entry: BoardEntry;
   max?: number;
@@ -34,6 +35,9 @@ export function ListingCard({
   terfavoritId?: string | null;
   /** Rosot status is an all-time-board mechanic; hide it on the 24h Hari Ini board. */
   showRosot?: boolean;
+  /** The Kaki Tiang champion graduated to the board: show its continued rank
+   *  number (not a star) + a "Dukungan terbanyak" chip. */
+  kakiTiangJuara?: boolean;
 }) {
   const puncak = density === "puncak";
   const terfavorit = terfavoritId != null && entry.id === terfavoritId;
@@ -80,10 +84,11 @@ export function ListingCard({
         ) : (
           <div className="flex shrink-0 flex-col items-center">
             {/* Rank shares the title row's baseline (leading-6 = title line-height,
-                top-aligned), so it lines up with the name and the grip. A free
-                (Rp0) showcase — the Kaki Tiang champion — has no paid rank, so it
-                shows a star instead of a number. */}
-            {entry.pegangan > 0 ? (
+                top-aligned), so it lines up with the name and the grip. The Kaki
+                Tiang champion graduated to the board — it takes the next available
+                rank slot (a real number), marked below with a "Dukungan terbanyak"
+                chip. A bare Rp0 row (no champion flag) keeps the star fallback. */}
+            {entry.pegangan > 0 || kakiTiangJuara ? (
               <span className="font-sans tabular text-sm font-semibold leading-6 text-tinta-redup">
                 #{entry.rank}
               </span>
@@ -149,6 +154,15 @@ export function ListingCard({
                 <span aria-hidden>·</span>
                 <Heart className="size-3 fill-tinta-redup" aria-hidden />
                 {copy.papan.terfavoritPekanIni}
+              </span>
+            )}
+            {/* Kaki Tiang champion — most-supported free listing, graduated to the
+                board. Gold star keeps its identity now that the rank is a number. */}
+            {kakiTiangJuara && (
+              <span className="inline-flex shrink-0 items-center gap-1 text-tinta-redup">
+                <span aria-hidden>·</span>
+                <Star className="size-3 fill-emas text-emas" aria-hidden />
+                {copy.papan.dukunganTerbanyak}
               </span>
             )}
             {/* Rosot status — always visible on touch, revealed on hover on desktop. */}

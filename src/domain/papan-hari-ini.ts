@@ -27,6 +27,8 @@ export interface HariIniEntry {
   urlNormal: string;
   kategoriNama: string | null;
   kategoriSlug: string | null;
+  deskripsi: string | null;
+  klikTotal: number;
   todayGrip: number;
 }
 
@@ -47,6 +49,9 @@ export async function getPapanHariIni(
       urlNormal: listing.urlNormal,
       kategoriNama: kategori.nama,
       kategoriSlug: kategori.slug,
+      deskripsi: listing.deskripsi,
+      // All-time valid clicks — same social-proof figure the main board shows.
+      klikTotal: sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian" where "klik_harian"."listing_id" = "listing"."id")`,
       todayGrip: grip,
     })
     .from(peganganLedger)
@@ -60,10 +65,15 @@ export async function getPapanHariIni(
         eq(listing.status, "tayang"),
       ),
     )
-    .groupBy(listing.id, listing.nama, listing.urlNormal, kategori.nama, kategori.slug)
+    .groupBy(listing.id, listing.nama, listing.urlNormal, kategori.nama, kategori.slug, listing.deskripsi)
     .orderBy(desc(grip));
 
-  return rows.map((r, i) => ({ ...r, todayGrip: Number(r.todayGrip), rank: i + 1 }));
+  return rows.map((r, i) => ({
+    ...r,
+    todayGrip: Number(r.todayGrip),
+    klikTotal: Number(r.klikTotal),
+    rank: i + 1,
+  }));
 }
 
 /** The day's champion listing id (Papan Hari Ini #1), or null if no one paid. */

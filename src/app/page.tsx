@@ -183,7 +183,7 @@ async function HomeBody({
                     — easily overtaken, no grip, never a paid rank / R16). */}
                 {championEntry && (
                   <div className="mt-2.5">
-                    <ListingCard entry={championEntry} />
+                    <ListingCard entry={championEntry} kakiTiangJuara />
                   </div>
                 )}
                 {/* Terfavorit showcase (free spectator-vote winner). */}
