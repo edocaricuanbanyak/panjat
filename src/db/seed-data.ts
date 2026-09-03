@@ -17,6 +17,7 @@ export const KATEGORI: { nama: string; slug: string }[] = [
   { nama: "Produktivitas", slug: "produktivitas" },
   { nama: "Komunitas", slug: "komunitas" },
   { nama: "Marketplace", slug: "marketplace" },
+  { nama: "Media Sosial", slug: "sosial" },
 ];
 
 // §6.6 parameters — stored in DB, never hard-coded in feature code. Missing keys

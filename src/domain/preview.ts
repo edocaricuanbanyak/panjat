@@ -95,6 +95,28 @@ function guessKategori(text: string): string | null {
   return null;
 }
 
+// First-path segments on social hosts that are NOT usernames.
+const NON_HANDLE = new Set([
+  "p", "reel", "reels", "explore", "stories", "story", "tv", "about", "home",
+  "search", "hashtag", "tag", "i", "messages", "settings", "live", "foryou",
+  "following", "followers", "accounts", "direct",
+]);
+
+/**
+ * For an Instagram/TikTok/X profile URL, the "@handle" (used as the listing
+ * title + the "sosial" category). Null for non-social or non-profile paths
+ * (posts, reels, etc.), so those fall back to normal scraping.
+ */
+export function socialHandle(urlNormal: string): string | null {
+  const m = urlNormal.match(
+    /^(?:www\.)?(?:instagram\.com|tiktok\.com|x\.com|twitter\.com)\/@?([a-z0-9_.]+)/i,
+  );
+  if (!m) return null;
+  const handle = m[1].toLowerCase();
+  if (!handle || NON_HANDLE.has(handle)) return null;
+  return `@${handle}`;
+}
+
 const CACHE_TTL = 24 * 3600;
 
 /** Best-effort preview for a URL. Cached 24h; social handles skip scraping. */
@@ -113,33 +135,37 @@ export async function getPreview(inputUrl: string): Promise<Preview> {
     }
   }
 
+  // Social profiles: title = @handle, category = Media Sosial (both reliable
+  // from the URL). Bio + photo are best-effort from the fetch below.
+  const social = socialHandle(urlNormal);
   let preview: Preview = {
     urlNormal,
-    nama: fallbackName,
+    nama: social ?? fallbackName,
     deskripsi: null,
     logoUrl: null,
-    kategoriSlug: guessKategori(urlNormal),
+    kategoriSlug: social ? "sosial" : guessKategori(urlNormal),
   };
 
   {
     try {
       // A browser-compatible UA — many sites (incl. Instagram/TikTok profiles)
       // only return og:image/meta to a browser-like agent, so this gives social
-      // profile photos a chance. Still best-effort: blocked/login-walled hosts
-      // just fall through (the manual "URL gambar" field is the reliable path).
+      // profile photos + bios a chance. Still best-effort: blocked/login-walled
+      // hosts fall through (the manual image/description fields are the fallback).
       const { finalUrl, html, contentType } = await safeFetch(`https://${urlNormal}`, {
         userAgent: "Mozilla/5.0 (compatible; PanjatBot/1.0; +https://panjat.id)",
       });
       if (contentType.includes("html")) {
         const og = parseOg(html, finalUrl);
-        const nama = og.title ?? fallbackName;
+        // For social, keep the clean @handle + sosial category; fill bio + photo.
+        const nama = social ?? og.title ?? fallbackName;
         const deskripsi = og.description?.slice(0, 160) ?? null;
         preview = {
           urlNormal,
           nama,
           deskripsi,
           logoUrl: og.logo,
-          kategoriSlug: guessKategori(`${nama} ${deskripsi ?? ""} ${urlNormal}`),
+          kategoriSlug: social ? "sosial" : guessKategori(`${nama} ${deskripsi ?? ""} ${urlNormal}`),
         };
       }
     } catch {

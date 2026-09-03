@@ -1,4 +1,5 @@
 import {
+  AtSign,
   Cloud,
   GraduationCap,
   Landmark,
@@ -28,6 +29,7 @@ const ICONS: Record<string, LucideIcon> = {
   produktivitas: ListChecks,
   komunitas: Users,
   marketplace: Store,
+  sosial: AtSign,
 };
 
 /** The lucide component for a slug — for surfaces that need the raw icon (e.g. satori/OG). */
