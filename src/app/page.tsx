@@ -162,6 +162,7 @@ async function HomeBody({
 
       {/* PAPAN — three in-place tabs (no page navigation) */}
       <HomeTabs
+        defaultTab={hariIni.length > 0 ? "hari-ini" : "sekarang"}
         sekarang={
           <>
             {entries.length === 0 ? (

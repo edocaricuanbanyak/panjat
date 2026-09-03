@@ -6,9 +6,11 @@ import { BoardSkeleton } from "./Skeleton";
 
 type TabKey = "sekarang" | "hari-ini";
 
+// Hari Ini leads (default view): a fresh 24h board resets daily — the lower-
+// barrier, more dynamic entry point. All time sits second.
 const ITEMS: { key: TabKey; label: string }[] = [
-  { key: "sekarang", label: copy.beranda.tabSepanjang },
   { key: "hari-ini", label: copy.nav.hariIni },
+  { key: "sekarang", label: copy.beranda.tabSepanjang },
 ];
 
 /**
@@ -22,11 +24,15 @@ const ITEMS: { key: TabKey; label: string }[] = [
 export function HomeTabs({
   sekarang,
   hariIni,
+  defaultTab = "hari-ini",
 }: {
   sekarang: React.ReactNode;
   hariIni: React.ReactNode;
+  /** Which view opens first. page.tsx falls back to "sekarang" when today's
+   *  board is empty so we never land on an empty Hari Ini. */
+  defaultTab?: TabKey;
 }) {
-  const [tab, setTab] = useState<TabKey>("sekarang");
+  const [tab, setTab] = useState<TabKey>(defaultTab);
   const [loading, setLoading] = useState(false);
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const activeIndex = ITEMS.findIndex((t) => t.key === tab);
