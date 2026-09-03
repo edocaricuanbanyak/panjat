@@ -69,7 +69,7 @@ export const copy = {
     koneksiPutus: "Koneksi papan live terputus — mencoba menyambung…",
     bukaTabBaru: "buka di tab baru",
     juaraKakiTiang: "Juara Kaki Tiang minggu ini · gratis",
-    juaraTerfavorit: "Pemanjat terfavorit minggu ini",
+    juaraTerfavorit: "Pemanjat terfavorit pekan lalu",
     juaraTerfavoritVote: (n: number) => `${n.toLocaleString("id-ID")} vote`,
     terfavoritPekanIni: "Terfavorit pekan ini",
     dukunganTerbanyak: "Dukungan terbanyak",
