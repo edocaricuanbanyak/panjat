@@ -6,13 +6,19 @@
  * from this archive, so nothing "weekly" shows until a week has actually been
  * archived (G).
  */
-import { and, desc, eq, gt, ne, sql } from "drizzle-orm";
+import { and, desc, eq, gt, gte, lt, ne, sql } from "drizzle-orm";
 import type { Database } from "@/db";
-import { juaraMingguan, kategori, listing, moderasiLog } from "@/db/schema";
-import { favoritBoard, weekStartWIB } from "@/lib/favorit";
+import { juaraMingguan, kategori, klikHarian, listing, moderasiLog } from "@/db/schema";
+import { WEEK_MS, favoritBoard, weekStartWIB } from "@/lib/favorit";
 import { getJuaraKakiTiangMingguan } from "./sorak";
 
-export type JuaraJenis = "papan1" | "papan2" | "papan3" | "terfavorit" | "kaki_tiang";
+export type JuaraJenis =
+  | "papan1"
+  | "papan2"
+  | "papan3"
+  | "terfavorit"
+  | "klik_terbanyak"
+  | "kaki_tiang";
 
 /**
  * The archive bucket id: the WIB date of the week's Wednesday 17:00 cut-off — the
@@ -49,6 +55,22 @@ export async function simpanJuaraMingguan(db: Database, now = new Date()) {
 
   const kaki = await getJuaraKakiTiangMingguan(db, mingguTutup);
   if (kaki) rows.push({ jenis: "kaki_tiang", listingId: kaki.id, metrik: kaki.sorak });
+
+  // Klik terbanyak — the most-clicked listing in the closed week, from anywhere
+  // (paid board OR Kaki Tiang). Bounded to [weekStart, nextWeekStart).
+  const kStart = weekStartWIB(mingguTutup);
+  const kEnd = weekStartWIB(new Date(mingguTutup.getTime() + WEEK_MS));
+  const klikSum = sql<number>`sum(${klikHarian.jumlahValid})::int`;
+  const [topKlik] = await db
+    .select({ id: klikHarian.listingId, total: klikSum })
+    .from(klikHarian)
+    .where(and(gte(klikHarian.tanggal, kStart), lt(klikHarian.tanggal, kEnd)))
+    .groupBy(klikHarian.listingId)
+    .orderBy(desc(klikSum))
+    .limit(1);
+  if (topKlik && topKlik.total > 0) {
+    rows.push({ jenis: "klik_terbanyak", listingId: topKlik.id, metrik: topKlik.total });
+  }
 
   // Weekly Kaki Tiang reset: the champion "graduates" to the board (Rp0 row); the
   // rest of the free tier expires so next week starts fresh.
@@ -106,6 +128,11 @@ export interface JuaraArsip {
   listingId: string;
   nama: string;
   urlNormal: string;
+  deskripsi: string | null;
+  kategoriNama: string | null;
+  kategoriSlug: string | null;
+  /** All-time valid clicks — full info for the archive (never the paid nominal). */
+  klik: number;
   metrik: number;
 }
 
@@ -124,10 +151,15 @@ export async function getJuaraMingguanTerbaru(db: Database): Promise<JuaraArsip[
       listingId: juaraMingguan.listingId,
       nama: listing.nama,
       urlNormal: listing.urlNormal,
+      deskripsi: listing.deskripsi,
+      kategoriNama: kategori.nama,
+      kategoriSlug: kategori.slug,
+      klik: sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian" where "klik_harian"."listing_id" = "listing"."id")`,
       metrik: juaraMingguan.metrik,
     })
     .from(juaraMingguan)
     .innerJoin(listing, eq(listing.id, juaraMingguan.listingId))
+    .leftJoin(kategori, eq(kategori.id, listing.kategoriId))
     .where(eq(juaraMingguan.minggu, latest.minggu));
   return rows as JuaraArsip[];
 }

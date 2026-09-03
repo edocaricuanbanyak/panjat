@@ -320,6 +320,7 @@ export const copy = {
       papan2: "Juara 2",
       papan3: "Juara 3",
       terfavorit: "Terfavorit",
+      klik_terbanyak: "Klik terbanyak",
       kaki_tiang: "Juara Kaki Tiang",
     } as Record<string, string>,
   },
