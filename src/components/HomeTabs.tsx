@@ -47,7 +47,7 @@ export function HomeTabs({
       <div
         role="tablist"
         aria-label={copy.nav.papanRingkas}
-        className="relative mb-5 inline-grid grid-cols-2 rounded-full p-1 sm:bg-kertas-2 max-sm:fixed max-sm:bottom-[calc(1rem+env(safe-area-inset-bottom))] max-sm:left-1/2 max-sm:z-40 max-sm:-translate-x-1/2 max-sm:bg-[color-mix(in_srgb,var(--color-kertas-1)_72%,transparent)] max-sm:shadow-naik max-sm:ring-1 max-sm:ring-garis/60 max-sm:backdrop-blur-md max-sm:backdrop-saturate-150"
+        className="relative mb-5 inline-grid grid-cols-2 rounded-full p-1 sm:bg-kertas-2 max-sm:fixed max-sm:bottom-[calc(1rem+env(safe-area-inset-bottom))] max-sm:left-1/2 max-sm:z-40 max-sm:-translate-x-1/2 max-sm:bg-kertas-1 max-sm:shadow-naik max-sm:ring-1 max-sm:ring-garis/60"
       >
         {/* Sliding thumb — transform only (compositor-friendly), brand easing. */}
         <span

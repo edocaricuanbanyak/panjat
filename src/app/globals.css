@@ -50,19 +50,11 @@
 }
 
 /*
- * Glass surfaces (modern UI direction) — translucent paper + backdrop blur.
- * Tokenized utilities so feature code never hand-rolls rgba/blur.
+ * Glass surface — ONLY for non-scrolling overlays (modal backdrop). Never put
+ * backdrop-filter on a sticky/fixed header or bar: content scrolling under it
+ * forces a re-blur every frame → mobile scroll jank. Scrolling chrome uses solid
+ * backgrounds instead.
  */
-.kaca {
-  background: color-mix(in srgb, var(--color-kertas-1) 72%, transparent);
-  backdrop-filter: blur(14px) saturate(1.3);
-  -webkit-backdrop-filter: blur(14px) saturate(1.3);
-}
-.kaca-header {
-  background: color-mix(in srgb, var(--color-kertas) 68%, transparent);
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
-}
 .kaca-overlay {
   background: color-mix(in srgb, var(--color-tinta) 32%, transparent);
   backdrop-filter: blur(4px);
