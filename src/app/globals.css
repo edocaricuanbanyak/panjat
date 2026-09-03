@@ -43,6 +43,9 @@
 
   /* Elevation — soft, paper-lit (design system) */
   --shadow-kartu: 0 1px 2px rgba(31, 27, 22, 0.04), 0 6px 20px rgba(31, 27, 22, 0.06);
+  /* Lighter — for repeating list/board rows (drops the wide 20px blur layer:
+     less visual heaviness + cheaper to paint when many are on screen). */
+  --shadow-baris: 0 1px 2px rgba(31, 27, 22, 0.05);
   --shadow-naik: 0 12px 40px rgba(31, 27, 22, 0.16), 0 2px 8px rgba(31, 27, 22, 0.08);
 
   /* Motion (§9.5) */

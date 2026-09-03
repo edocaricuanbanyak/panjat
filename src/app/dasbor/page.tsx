@@ -42,7 +42,7 @@ export default async function DasborIndex() {
             <li key={l.id}>
               <a
                 href={`/dasbor/${l.id}`}
-                className="flex items-center justify-between rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu transition-all ease-panjat hover:-translate-y-px hover:border-tinta/20"
+                className="flex items-center justify-between rounded-xl border border-garis bg-kertas-1 p-4 shadow-baris transition-all ease-panjat hover:-translate-y-px hover:border-tinta/20"
               >
                 <span className="min-w-0">
                   <span className="block truncate font-display font-semibold text-tinta">

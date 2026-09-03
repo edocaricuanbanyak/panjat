@@ -44,7 +44,7 @@ export function HariIniBoard({ entries }: { entries: HariIniEntry[] }) {
         {puncak.map((e) => (
           <div
             key={e.id}
-            className={`h-full rounded-2xl border shadow-kartu ${
+            className={`h-full rounded-2xl border shadow-baris ${
               e.rank === 1 ? "podium-1" : e.rank === 2 ? "podium-2" : "podium-3"
             }`}
           >
