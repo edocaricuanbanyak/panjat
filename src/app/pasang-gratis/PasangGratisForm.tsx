@@ -192,6 +192,19 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
         )}
       </label>
 
+      <Input
+        label={copy.manjat.gambarLabel}
+        type="url"
+        inputMode="url"
+        placeholder={copy.manjat.gambarPlaceholder}
+        hint={copy.manjat.gambarHint}
+        value={logoUrl ?? ""}
+        onChange={(e) => {
+          setLogoUrl(e.target.value || null);
+          setLogoFailed(false);
+        }}
+      />
+
       {/* Prefilled from the URL, but editable — tweak before you go up. */}
       <Input
         label={copy.manjat.judulListing}
@@ -235,19 +248,6 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
         hint={copy.pasangGratis.emailHint}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-      />
-
-      <Input
-        label={copy.manjat.gambarLabel}
-        type="url"
-        inputMode="url"
-        placeholder={copy.manjat.gambarPlaceholder}
-        hint={copy.manjat.gambarHint}
-        value={logoUrl ?? ""}
-        onChange={(e) => {
-          setLogoUrl(e.target.value || null);
-          setLogoFailed(false);
-        }}
       />
 
       <Button disabled={!url.trim() || submitting || penuh} onClick={submit}>
