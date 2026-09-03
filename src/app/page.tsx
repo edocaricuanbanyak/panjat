@@ -136,7 +136,7 @@ async function HomeBody({
         <div className="mt-6">
           <a
             href="/statistik"
-            className="group inline-flex items-center gap-2.5 rounded-full bg-kertas-2 px-4 py-2 text-sm"
+            className="group inline-flex max-w-full flex-wrap items-center justify-center gap-x-2.5 gap-y-1 rounded-full bg-kertas-2 px-4 py-2 text-sm"
           >
             <span className="inline-flex items-center gap-1.5">
               <span className="blink inline-block size-1.5 rounded-full bg-hidup" aria-hidden />

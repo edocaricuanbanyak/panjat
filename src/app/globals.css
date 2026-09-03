@@ -88,6 +88,13 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+  /* Never allow a stray-wide element to create horizontal drag / whitespace on
+     mobile. `clip` (not `hidden`) doesn't create a scroll container, so sticky
+     headers keep working. */
+  overflow-x: clip;
+}
+body {
+  overflow-x: clip;
 }
 button,
 [role="tab"],
