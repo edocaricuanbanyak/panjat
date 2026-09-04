@@ -20,6 +20,23 @@ export function wibDayWindow(tanggal: string): { start: Date; end: Date } {
   return { start, end: new Date(start.getTime() + 24 * 3600_000) };
 }
 
+/**
+ * Past WIB dates that have a daily board (≥1 `bayar` that day), newest first,
+ * excluding today. Feeds the sitemap so each archived day-board — unique,
+ * permanent, deterministically recomputed content (R7) — gets indexed.
+ */
+export async function archivedDailyDates(db: Database, now: Date, limit = 180): Promise<string[]> {
+  const d = sql<string>`to_char((${peganganLedger.createdAt} at time zone 'Asia/Jakarta')::date, 'YYYY-MM-DD')`;
+  const rows = await db
+    .selectDistinct({ d })
+    .from(peganganLedger)
+    .where(eq(peganganLedger.jenis, "bayar"))
+    .orderBy(sql`${d} desc`)
+    .limit(limit);
+  const today = wibDate(now);
+  return rows.map((r) => r.d).filter((x) => x < today);
+}
+
 export interface HariIniEntry {
   rank: number;
   id: string;
