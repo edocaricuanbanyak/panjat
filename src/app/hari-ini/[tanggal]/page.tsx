@@ -21,11 +21,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { tanggal } = await params;
   const title = `Papan Hari Ini ${tanggal} — ${copy.merek.nama}`;
+  const description = `Standings final Papan Hari Ini ${tanggal} di Panjat — dihitung ulang dari ledger permanen.`;
+  const image = {
+    url: `${BASE_URL}/api/og/hari-ini/${tanggal}`,
+    width: 1200,
+    height: 630,
+    alt: `Papan Hari Ini ${tanggal} di Panjat`,
+  };
   return {
     title,
-    description: `Standings final Papan Hari Ini ${tanggal} di Panjat — dihitung ulang dari ledger permanen.`,
+    description,
     alternates: { canonical: `${BASE_URL}/hari-ini/${tanggal}` },
-    openGraph: { type: "website", title },
+    openGraph: { type: "website", title, description, images: [image] },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
   };
 }
 
