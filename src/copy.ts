@@ -264,6 +264,9 @@ export const copy = {
     lihatDetail: "Lihat detail →",
     semua: "Semua",
     kosong: "Tidak ada listing yang cocok. Coba kata kunci atau kategori lain.",
+    kosongCari: (q: string) => `Tidak ada hasil untuk “${q}”. Coba kata kunci lain.`,
+    hasil: (n: number, q: string) => `${n} hasil untuk “${q}”`,
+    semuaListing: (n: number) => `${n} listing`,
   },
 
   hariIni: {
