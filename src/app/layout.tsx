@@ -29,18 +29,17 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   // og:image / twitter:image are auto-added by src/app/opengraph-image.tsx.
+  // title/description/url are intentionally omitted from openGraph/twitter so
+  // each route's own metadata flows into og:*/twitter:* — otherwise every
+  // sub-page share (kategori, hari-ini, …) inherits this site-wide headline.
+  // The home page falls back to the top-level title/description above.
   openGraph: {
     type: "website",
     siteName: copy.merek.nama,
-    title: `${copy.merek.nama} — ${copy.merek.tagline}`,
-    description: copy.merek.deskripsiSitus,
-    url: "/",
     locale: "id_ID",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${copy.merek.nama} — ${copy.merek.tagline}`,
-    description: copy.merek.deskripsiSitus,
   },
   // Google Search Console (URL-prefix "HTML tag" method). Set the token as the
   // GOOGLE_SITE_VERIFICATION env and the <meta> appears — nudges Google to crawl,

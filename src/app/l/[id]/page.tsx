@@ -28,12 +28,38 @@ export async function generateMetadata({
   if (!UUID.test(id)) return { title: "Panjat" };
   const l = await getListingPublik(db, id);
   if (!l) return { title: "Panjat" };
-  const title = `${l.nama}${l.rank ? ` · #${l.rank}` : ""} — Panjat`;
+
+  const title = `${l.nama}${l.rank ? ` · #${l.rank}` : ""} — ${copy.merek.nama}`;
+  const description = l.deskripsi ?? copy.listing.ogDeskripsi(l.nama);
+  const url = `${BASE_URL}/l/${id}`;
+  // The per-listing share card (/api/og/[id]) — 1200×630. Set dimensions + alt so
+  // scrapers render the large card immediately, and repeat title/description on
+  // both graphs so a Twitter/X share doesn't fall back to the site-wide default.
+  const image = {
+    url: `${BASE_URL}/api/og/${id}`,
+    width: 1200,
+    height: 630,
+    alt: copy.listing.ogAlt(l.nama, l.rank),
+  };
   return {
     title,
-    description: l.deskripsi ?? `${l.nama} di papan Panjat.`,
-    alternates: { canonical: `${BASE_URL}/l/${id}` },
-    openGraph: { title, images: [`${BASE_URL}/api/og/${id}`] },
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      siteName: copy.merek.nama,
+      locale: "id_ID",
+      title,
+      description,
+      url,
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
   };
 }
 

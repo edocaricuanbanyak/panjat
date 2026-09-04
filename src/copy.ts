@@ -56,6 +56,10 @@ export const copy = {
 
   listing: {
     pratinjauAlt: (nama: string) => `Pratinjau situs ${nama}`,
+    // Share-card alt + fallback description (used when a listing has no bio).
+    ogAlt: (nama: string, rank: number | null) =>
+      `${nama} di papan Panjat${rank ? ` — peringkat #${rank}` : ""}`,
+    ogDeskripsi: (nama: string) => `${nama} di papan Panjat. Salip untuk rebut posisinya.`,
   },
 
   papan: {
