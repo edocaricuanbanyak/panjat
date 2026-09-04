@@ -11,6 +11,7 @@ import { db } from "@/db";
 import { kategori } from "@/db/schema";
 import { categoryDirectory, KATEGORI_INTRO, parseSort, SORT_LABELS, type Sort } from "@/domain/jelajah";
 import { breadcrumbJsonLd, directoryItemListJsonLd } from "@/lib/jsonld";
+import { BASE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -22,9 +23,22 @@ export async function generateMetadata({
   const { slug } = await params;
   const [kat] = await db.select({ nama: kategori.nama }).from(kategori).where(eq(kategori.slug, slug)).limit(1);
   if (!kat) return { title: "Kategori — Panjat" };
+
+  const title = `${kat.nama} — ${copy.merek.nama}`;
+  const description = KATEGORI_INTRO[slug] ?? `Direktori ${kat.nama} di Panjat.`;
+  const url = `${BASE_URL}/kategori/${slug}`;
+  const image = {
+    url: `${BASE_URL}/api/og/kategori/${slug}`,
+    width: 1200,
+    height: 630,
+    alt: `Kategori ${kat.nama} di papan Panjat`,
+  };
   return {
-    title: `${kat.nama} — Panjat`,
-    description: KATEGORI_INTRO[slug] ?? `Direktori ${kat.nama} di Panjat.`,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: { type: "website", title, description, url, images: [image] },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
   };
 }
 
