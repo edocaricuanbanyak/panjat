@@ -3,6 +3,7 @@ import { JelajahCard } from "@/components/JelajahCard";
 import { JelajahSearch } from "@/components/JelajahSearch";
 import { KategoriIcon } from "@/components/KategoriIcon";
 import { PageShell } from "@/components/PageShell";
+import { TrackJelajahSearch } from "@/components/TrackJelajahSearch";
 import { copy } from "@/copy";
 import { db } from "@/db";
 import { jelajahAll, listCategories, searchListings } from "@/domain/jelajah";
@@ -35,6 +36,7 @@ export default async function JelajahPage({
 
   return (
     <PageShell>
+      {query && <TrackJelajahSearch query={query} jumlah={results.length} />}
       {/* Search + category chips stick just under the app header, matching the
           old in-place panel. Chips link to the dedicated (crawlable) category
           pages rather than filtering in place. */}

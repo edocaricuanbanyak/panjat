@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState } from "react";
 import { ManjatWizard } from "@/app/manjat/ManjatWizard";
+import { track } from "@/lib/analytics";
 import { copy } from "@/copy";
 import { buttonClasses, type ButtonSize, type ButtonVariant } from "./Button";
 import { Modal } from "./Modal";
@@ -48,13 +49,15 @@ export function ManjatProvider({
   return (
     <Ctx.Provider
       value={{
-        open: (o) =>
+        open: (o) => {
+          track("manjat_dimulai", { express: o?.express ?? false });
           setState({
             url: o?.url ?? "",
             kategoriSlug: o?.kategoriSlug ?? "",
             express: o?.express ?? false,
             nominal: o?.nominal ?? 0,
-          }),
+          });
+        },
       }}
     >
       {children}
