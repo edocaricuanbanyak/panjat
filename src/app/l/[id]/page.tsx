@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { buttonClasses } from "@/components/Button";
+import { JsonLd } from "@/components/JsonLd";
 import { LencanaRow } from "@/components/LencanaRow";
 import { KategoriIcon } from "@/components/KategoriIcon";
 import { ManjatButton } from "@/components/ManjatModal";
@@ -11,6 +12,7 @@ import { Sparkline } from "@/components/Sparkline";
 import { db } from "@/db";
 import { getListingPublik } from "@/domain/listing-publik";
 import { formatRupiah } from "@/lib/format";
+import { breadcrumbJsonLd, listingOrgJsonLd } from "@/lib/jsonld";
 import { BASE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -26,12 +28,38 @@ export async function generateMetadata({
   if (!UUID.test(id)) return { title: "Panjat" };
   const l = await getListingPublik(db, id);
   if (!l) return { title: "Panjat" };
-  const title = `${l.nama}${l.rank ? ` · #${l.rank}` : ""} — Panjat`;
+
+  const title = `${l.nama}${l.rank ? ` · #${l.rank}` : ""} — ${copy.merek.nama}`;
+  const description = l.deskripsi ?? copy.listing.ogDeskripsi(l.nama);
+  const url = `${BASE_URL}/l/${id}`;
+  // The per-listing share card (/api/og/[id]) — 1200×630. Set dimensions + alt so
+  // scrapers render the large card immediately, and repeat title/description on
+  // both graphs so a Twitter/X share doesn't fall back to the site-wide default.
+  const image = {
+    url: `${BASE_URL}/api/og/${id}`,
+    width: 1200,
+    height: 630,
+    alt: copy.listing.ogAlt(l.nama, l.rank),
+  };
   return {
     title,
-    description: l.deskripsi ?? `${l.nama} di papan Panjat.`,
-    alternates: { canonical: `${BASE_URL}/l/${id}` },
-    openGraph: { title, images: [`${BASE_URL}/api/og/${id}`] },
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      siteName: copy.merek.nama,
+      locale: "id_ID",
+      title,
+      description,
+      url,
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
   };
 }
 
@@ -45,8 +73,17 @@ export default async function ListingPublikPage({
   const l = await getListingPublik(db, id);
   if (!l) notFound();
 
+  const trail = [
+    { name: copy.nav.beranda, path: "/" },
+    ...(l.kategoriSlug && l.kategoriNama
+      ? [{ name: l.kategoriNama, path: `/kategori/${l.kategoriSlug}` }]
+      : []),
+    { name: l.nama, path: `/l/${l.id}` },
+  ];
+
   return (
     <PageShell>
+      <JsonLd data={[breadcrumbJsonLd(trail), listingOrgJsonLd(l)]} />
       <div className="flex items-start gap-4">
         <SiteLogo listingId={l.id} nama={l.nama} className="size-16 rounded-md text-3xl" />
         <div className="min-w-0 flex-1">

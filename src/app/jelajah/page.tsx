@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { JelajahPanel } from "@/components/JelajahPanel";
+import { JelajahCard } from "@/components/JelajahCard";
+import { JelajahSearch } from "@/components/JelajahSearch";
+import { KategoriIcon } from "@/components/KategoriIcon";
 import { PageShell } from "@/components/PageShell";
+import { copy } from "@/copy";
 import { db } from "@/db";
-import { jelajahAll, listCategories } from "@/domain/jelajah";
+import { jelajahAll, listCategories, searchListings } from "@/domain/jelajah";
 
 export const dynamic = "force-dynamic";
 
@@ -11,16 +14,65 @@ export const metadata: Metadata = {
   description: "Cari produk, tools, dan jasa buatan Indonesia di Panjat.",
 };
 
-export default async function JelajahPage() {
-  // Preload every live listing + the category list, then let JelajahPanel do the
-  // search and category filtering in-place (no page navigation). Default state
-  // ("Semua", no query) shows all URLs. Dedicated /kategori pages still exist and
-  // stay crawlable via each card's category tag, listing detail, and the sitemap.
-  const [items, cats] = await Promise.all([jelajahAll(db), listCategories(db)]);
+export default async function JelajahPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
+  const query = (q ?? "").trim();
+
+  // Search runs server-side through Postgres FTS (relevance-ranked); the empty
+  // state falls back to the full directory ordered by clicks (visitor-chosen,
+  // never money — R22). Both are SSR, so every query is crawlable/shareable.
+  const [items, cats] = await Promise.all([
+    query ? searchListings(db, query) : jelajahAll(db),
+    listCategories(db),
+  ]);
+  const browse = items.slice().sort((a, b) => b.klikTotal - a.klikTotal);
+  const results = query ? items : browse;
+  const asal = query ? ("pencarian" as const) : ("jelajah" as const);
 
   return (
     <PageShell>
-      <JelajahPanel items={items} categories={cats} />
+      {/* Search + category chips stick just under the app header, matching the
+          old in-place panel. Chips link to the dedicated (crawlable) category
+          pages rather than filtering in place. */}
+      <div className="sticky top-[77px] z-20 -mx-4 border-b border-garis/70 bg-kertas px-4 pb-3 pt-2 sm:top-[85px] sm:-mx-5 sm:px-5">
+        <JelajahSearch initialQuery={query} />
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
+          <span className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-merah bg-merah px-3 text-sm text-kertas-1">
+            <KategoriIcon slug={null} className="size-3.5" />
+            {copy.jelajah.semua}
+          </span>
+          {cats.map((k) => (
+            <a
+              key={k.slug}
+              href={`/kategori/${k.slug}`}
+              className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-garis bg-kertas-1 px-3 text-sm text-tinta-redup transition hover:bg-kertas-2"
+            >
+              <KategoriIcon slug={k.slug} className="size-3.5" />
+              {k.nama}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <p className="mt-4 tabular text-xs text-tinta-redup">
+        {query ? copy.jelajah.hasil(results.length, query) : copy.jelajah.semuaListing(results.length)}
+      </p>
+
+      {results.length === 0 ? (
+        <p className="mt-6 text-sm text-tinta-redup">
+          {query ? copy.jelajah.kosongCari(query) : copy.jelajah.kosong}
+        </p>
+      ) : (
+        <div className="mt-3 flex flex-col gap-2">
+          {results.map((c) => (
+            <JelajahCard key={c.id} card={c} asal={asal} />
+          ))}
+        </div>
+      )}
     </PageShell>
   );
 }

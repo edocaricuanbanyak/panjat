@@ -19,6 +19,7 @@ export const copy = {
   },
 
   nav: {
+    beranda: "Beranda",
     sepanjangMasa: "Papan Utama",
     hariIni: "Hari Ini",
     jelajah: "Jelajah",
@@ -55,6 +56,10 @@ export const copy = {
 
   listing: {
     pratinjauAlt: (nama: string) => `Pratinjau situs ${nama}`,
+    // Share-card alt + fallback description (used when a listing has no bio).
+    ogAlt: (nama: string, rank: number | null) =>
+      `${nama} di papan Panjat${rank ? ` — peringkat #${rank}` : ""}`,
+    ogDeskripsi: (nama: string) => `${nama} di papan Panjat. Salip untuk rebut posisinya.`,
   },
 
   papan: {
@@ -259,6 +264,9 @@ export const copy = {
     lihatDetail: "Lihat detail →",
     semua: "Semua",
     kosong: "Tidak ada listing yang cocok. Coba kata kunci atau kategori lain.",
+    kosongCari: (q: string) => `Tidak ada hasil untuk “${q}”. Coba kata kunci lain.`,
+    hasil: (n: number, q: string) => `${n} hasil untuk “${q}”`,
+    semuaListing: (n: number) => `${n} listing`,
   },
 
   hariIni: {
