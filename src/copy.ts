@@ -315,7 +315,6 @@ export const copy = {
 
   arsip: {
     judul: "Arsip Juara",
-    sub: "Posisi disewa, tapi sejarah permanen. Setiap juara harian tersimpan selamanya.",
     metaTitle: "Arsip Juara — Panjat",
     metaDesc: "Setiap juara harian, tersimpan permanen.",
     kosong: "Belum ada juara yang diarsipkan.",

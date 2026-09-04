@@ -50,7 +50,6 @@ export default async function ArsipPage() {
       >
         {copy.arsip.judul}
       </h1>
-      <p className="mt-2 max-w-xl text-tinta-redup">{copy.arsip.sub}</p>
 
       {juaraMingguan.length > 0 && (
         <section className="mt-6 rounded-2xl border border-emas/50 bg-gradient-to-b from-emas/12 to-kertas-1 p-4 shadow-kartu">
