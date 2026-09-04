@@ -79,7 +79,9 @@ export async function searchListings(db: Database, q: string): Promise<JelajahCa
   const query = q.trim();
   if (!query) return [];
 
-  const doc = sql`to_tsvector('simple', ${listing.nama} || ' ' || coalesce(${listing.deskripsi}, '') || ' ' || coalesce(${kategori.nama}, ''))`;
+  // Must mirror the expression in drizzle/0012_listing_search_gin.sql exactly
+  // (same 'simple' config, same name+desc concat) so the GIN index is used.
+  const doc = sql`to_tsvector('simple', ${listing.nama} || ' ' || coalesce(${listing.deskripsi}, ''))`;
   const tsq = sql`plainto_tsquery('simple', ${query})`;
 
   return db
