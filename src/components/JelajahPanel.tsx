@@ -14,8 +14,16 @@ type Kategori = { slug: string; nama: string };
  * preloaded live listings client-side. Ordered by relevance/recency, never by
  * money — this surface can't be bought.
  */
-export function JelajahPanel({ items, categories }: { items: Card[]; categories: Kategori[] }) {
-  const [q, setQ] = useState("");
+export function JelajahPanel({
+  items,
+  categories,
+  initialQuery = "",
+}: {
+  items: Card[];
+  categories: Kategori[];
+  initialQuery?: string;
+}) {
+  const [q, setQ] = useState(initialQuery);
   const [cat, setCat] = useState<string | null>(null);
 
   const results = useMemo(() => {

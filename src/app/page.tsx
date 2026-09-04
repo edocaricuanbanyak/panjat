@@ -13,8 +13,10 @@ import { PageShell } from "@/components/PageShell";
 import { Pagination } from "@/components/Pagination";
 import { PasangGratisModal } from "@/components/PasangGratisModal";
 import { HomeSkeleton } from "@/components/Skeleton";
+import { JsonLd } from "@/components/JsonLd";
 import { VoteFavorit } from "@/components/VoteFavorit";
 import { copy } from "@/copy";
+import { boardItemListJsonLd, websiteJsonLd } from "@/lib/jsonld";
 import { db } from "@/db";
 import { type BoardEntry, getBoard } from "@/domain/board";
 import { listCategories } from "@/domain/jelajah";
@@ -124,6 +126,19 @@ async function HomeBody({
 
   return (
     <>
+      {/* Structured data: the site (with a real search box) + the board as an
+          ordered ItemList. Position mirrors the on-page rank (pegangan desc), so
+          it asserts no ranking the board doesn't already show. */}
+      <JsonLd
+        data={[
+          websiteJsonLd(),
+          boardItemListJsonLd(
+            `${copy.merek.nama} — ${copy.nav.sepanjangMasa}`,
+            pageEntries.map((e) => ({ id: e.id, nama: e.nama, rank: e.rank })),
+          ),
+        ]}
+      />
+
       {/* HERO — value + the one action */}
       <section className="pt-1 pb-5">
         <h1

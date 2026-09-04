@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { JelajahCard } from "@/components/JelajahCard";
+import { JsonLd } from "@/components/JsonLd";
 import { KategoriIcon } from "@/components/KategoriIcon";
 import { SiteLogo } from "@/components/SiteLogo";
 import { PageShell } from "@/components/PageShell";
@@ -9,6 +10,7 @@ import { copy } from "@/copy";
 import { db } from "@/db";
 import { kategori } from "@/db/schema";
 import { categoryDirectory, KATEGORI_INTRO, parseSort, SORT_LABELS, type Sort } from "@/domain/jelajah";
+import { breadcrumbJsonLd, directoryItemListJsonLd } from "@/lib/jsonld";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +44,16 @@ export default async function KategoriPage({
 
   return (
     <PageShell>
+      <JsonLd
+        data={[
+          breadcrumbJsonLd([
+            { name: copy.nav.beranda, path: "/" },
+            { name: copy.nav.jelajah, path: "/jelajah" },
+            { name: dir.kategori.nama, path: `/kategori/${slug}` },
+          ]),
+          directoryItemListJsonLd(`${dir.kategori.nama} — ${copy.merek.nama}`, dir.items),
+        ]}
+      />
       <a
         href="/jelajah"
         className="mb-5 inline-block text-sm text-tinta-redup transition-colors hover:text-tinta"

@@ -19,6 +19,7 @@ export const copy = {
   },
 
   nav: {
+    beranda: "Beranda",
     sepanjangMasa: "Papan Utama",
     hariIni: "Hari Ini",
     jelajah: "Jelajah",

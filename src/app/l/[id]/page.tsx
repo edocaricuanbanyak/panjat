@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { buttonClasses } from "@/components/Button";
+import { JsonLd } from "@/components/JsonLd";
 import { LencanaRow } from "@/components/LencanaRow";
 import { KategoriIcon } from "@/components/KategoriIcon";
 import { ManjatButton } from "@/components/ManjatModal";
@@ -11,6 +12,7 @@ import { Sparkline } from "@/components/Sparkline";
 import { db } from "@/db";
 import { getListingPublik } from "@/domain/listing-publik";
 import { formatRupiah } from "@/lib/format";
+import { breadcrumbJsonLd, listingOrgJsonLd } from "@/lib/jsonld";
 import { BASE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -45,8 +47,17 @@ export default async function ListingPublikPage({
   const l = await getListingPublik(db, id);
   if (!l) notFound();
 
+  const trail = [
+    { name: copy.nav.beranda, path: "/" },
+    ...(l.kategoriSlug && l.kategoriNama
+      ? [{ name: l.kategoriNama, path: `/kategori/${l.kategoriSlug}` }]
+      : []),
+    { name: l.nama, path: `/l/${l.id}` },
+  ];
+
   return (
     <PageShell>
+      <JsonLd data={[breadcrumbJsonLd(trail), listingOrgJsonLd(l)]} />
       <div className="flex items-start gap-4">
         <SiteLogo listingId={l.id} nama={l.nama} className="size-16 rounded-md text-3xl" />
         <div className="min-w-0 flex-1">
