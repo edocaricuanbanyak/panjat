@@ -36,6 +36,30 @@ const TAK_DIKETAHUI = "(tidak diketahui)";
 /** GA4 returns "(not set)"/"" when a city or OS can't be determined. */
 const cleanLabel = (v: string) => (!v || v === "(not set)" ? TAK_DIKETAHUI : v);
 
+/**
+ * Accept the service-account key as raw JSON *or* base64-encoded JSON. Base64 is
+ * the robust way to store it in an env var: a pasted private_key's `\n` escapes
+ * and quotes routinely get mangled, breaking JSON.parse (that's the failure we
+ * hit in prod). `GA4_SA_JSON = base64(sa.json)` sidesteps all of it.
+ */
+function parseSaCredentials(raw: string): Record<string, unknown> | null {
+  const trimmed = raw.trim();
+  if (trimmed.startsWith("{")) {
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      /* not plain JSON — try base64 below */
+    }
+  }
+  try {
+    const decoded = Buffer.from(trimmed, "base64").toString("utf8").trim();
+    if (decoded.startsWith("{")) return JSON.parse(decoded);
+  } catch {
+    /* not base64-encoded JSON either */
+  }
+  return null;
+}
+
 let client: BetaAnalyticsDataClient | null = null;
 function ga4Client(): BetaAnalyticsDataClient | null {
   if (client) return client;
@@ -44,13 +68,19 @@ function ga4Client(): BetaAnalyticsDataClient | null {
     console.error("[ga4] GA4_SA_JSON is empty/unset at runtime"); // TEMP debug — remove after diagnosing
     return null;
   }
+  const creds = parseSaCredentials(raw);
+  if (!creds) {
+    // TEMP debug — remove after diagnosing. Set GA4_SA_JSON to the raw one-line
+    // JSON or its base64 (`base64 -i sa.json | tr -d '\n'`).
+    console.error("[ga4] GA4_SA_JSON is not valid JSON nor base64-encoded JSON");
+    return null;
+  }
   try {
-    client = new BetaAnalyticsDataClient({ credentials: JSON.parse(raw) });
+    client = new BetaAnalyticsDataClient({ credentials: creds });
     return client;
   } catch (e) {
-    // TEMP debug — remove after diagnosing
-    console.error("[ga4] GA4_SA_JSON parse / client init failed:", e instanceof Error ? e.message : e);
-    return null; // malformed JSON → treat as unconfigured
+    console.error("[ga4] client init failed:", e instanceof Error ? e.message : e); // TEMP debug
+    return null;
   }
 }
 
