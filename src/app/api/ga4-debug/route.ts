@@ -1,5 +1,6 @@
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
 import { NextResponse } from "next/server";
+import { parseSaCredentials } from "@/lib/ga4";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,18 +19,18 @@ export async function GET() {
     propertyIdLooksNumeric: /^[0-9]+$/.test(propertyId), // false ⇒ pasted a G-…/GTM-… by mistake
     saJsonSet: raw.length > 0,
     saJsonLen: raw.length,
-    hasLiteralNewlineInValue: /\r|\n/.test(raw), // true ⇒ multi-line paste (breaks JSON.parse)
+    saJsonLooksBase64: raw.length > 0 && !raw.trim().startsWith("{"), // base64 form
+    hasLiteralNewlineInValue: /\r|\n/.test(raw), // true ⇒ multi-line paste (breaks raw JSON.parse)
   };
 
-  let creds: { client_email?: string } | null = null;
-  try {
-    creds = JSON.parse(raw);
-    out.saJsonParses = true;
-  } catch (e) {
+  // Same base64-or-raw parser as getGa4Stats() so the verdict matches reality.
+  const creds = parseSaCredentials(raw) as { client_email?: string } | null;
+  if (!creds) {
     out.saJsonParses = false;
-    out.saJsonParseError = e instanceof Error ? e.message : String(e);
+    out.saJsonParseError = "not valid JSON nor base64-encoded JSON";
     return NextResponse.json(out); // can't go further without valid creds
   }
+  out.saJsonParses = true;
   out.saClientEmailDomain =
     typeof creds?.client_email === "string" ? (creds.client_email.split("@")[1] ?? null) : null;
 

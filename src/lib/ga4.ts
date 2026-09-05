@@ -42,7 +42,7 @@ const cleanLabel = (v: string) => (!v || v === "(not set)" ? TAK_DIKETAHUI : v);
  * and quotes routinely get mangled, breaking JSON.parse (that's the failure we
  * hit in prod). `GA4_SA_JSON = base64(sa.json)` sidesteps all of it.
  */
-function parseSaCredentials(raw: string): Record<string, unknown> | null {
+export function parseSaCredentials(raw: string): Record<string, unknown> | null {
   const trimmed = raw.trim();
   if (trimmed.startsWith("{")) {
     try {
