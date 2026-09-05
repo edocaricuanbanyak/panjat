@@ -16,10 +16,11 @@ export function middleware(req: NextRequest) {
     "style-src 'self' 'unsafe-inline'", // Tailwind + inline style attributes
     "img-src 'self' data: https:", // OG cards + remote logos
     "font-src 'self' data:",
-    // SSE board stream + Umami + Google Analytics 4 (beacons hit www. + regional
+    // SSE board stream + Umami (script from cloud.umami.is, but event beacons POST
+    // to gateway.umami.is) + Google Analytics 4 (beacons hit www. + regional
     // *.google-analytics.com) + PostHog US (event ingest /i/v0/e/ + remote config;
     // its feature scripts load via strict-dynamic, but XHR/beacon needs connect-src).
-    "connect-src 'self' https://cloud.umami.is https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://us.i.posthog.com https://us-assets.i.posthog.com",
+    "connect-src 'self' https://cloud.umami.is https://gateway.umami.is https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://us.i.posthog.com https://us-assets.i.posthog.com",
     "frame-src https://www.googletagmanager.com", // GTM <noscript>
     "frame-ancestors 'none'", // no clickjacking (papan tak boleh di-iframe)
     "base-uri 'self'",
