@@ -29,7 +29,7 @@ export interface Ga4Stats {
 // All-time: GA4 has no data before it existed, so this start reads from the
 // property's very first day onward (the API just returns what exists).
 const ALL_TIME_START = "2020-01-01";
-const CACHE_KEY = "ga4:stats:v8:alltime"; // bumped to bypass any stale empty cache while diagnosing
+const CACHE_KEY = "ga4:stats:v8:alltime";
 const CACHE_TTL = 3600; // 1h — GA4 numbers aren't real-time anyway.
 
 const TAK_DIKETAHUI = "(tidak diketahui)";
@@ -64,23 +64,14 @@ let client: BetaAnalyticsDataClient | null = null;
 function ga4Client(): BetaAnalyticsDataClient | null {
   if (client) return client;
   const raw = process.env.GA4_SA_JSON;
-  if (!raw) {
-    console.error("[ga4] GA4_SA_JSON is empty/unset at runtime"); // TEMP debug — remove after diagnosing
-    return null;
-  }
+  if (!raw) return null;
   const creds = parseSaCredentials(raw);
-  if (!creds) {
-    // TEMP debug — remove after diagnosing. Set GA4_SA_JSON to the raw one-line
-    // JSON or its base64 (`base64 -i sa.json | tr -d '\n'`).
-    console.error("[ga4] GA4_SA_JSON is not valid JSON nor base64-encoded JSON");
-    return null;
-  }
+  if (!creds) return null;
   try {
     client = new BetaAnalyticsDataClient({ credentials: creds });
     return client;
-  } catch (e) {
-    console.error("[ga4] client init failed:", e instanceof Error ? e.message : e); // TEMP debug
-    return null;
+  } catch {
+    return null; // malformed credentials → treat as unconfigured
   }
 }
 
@@ -89,15 +80,7 @@ const num = (v: string | null | undefined) => Number(v ?? 0) || 0;
 export async function getGa4Stats(): Promise<Ga4Stats | null> {
   const propertyId = process.env.GA4_PROPERTY_ID;
   const c = ga4Client();
-  if (!propertyId || !c) {
-    // TEMP debug — remove after diagnosing. Booleans only (never log the SA/id value).
-    console.error(
-      "[ga4] unconfigured at runtime — propertyIdSet=%s clientReady=%s",
-      Boolean(propertyId),
-      Boolean(c),
-    );
-    return null;
-  }
+  if (!propertyId || !c) return null;
 
   const r = redis();
   if (r) {
@@ -139,10 +122,6 @@ export async function getGa4Stats(): Promise<Ga4Stats | null> {
 
     const stats: Ga4Stats = { lokasi: rows(byCity), perangkat: rows(byOs) };
 
-    // TEMP debug — remove after diagnosing. Distinguishes "API ok but no data"
-    // (both 0 → the block still hides) from a thrown error (logged below).
-    console.error("[ga4] runReport ok — city rows=%d, os rows=%d", stats.lokasi.length, stats.perangkat.length);
-
     if (r) {
       try {
         await r.set(CACHE_KEY, JSON.stringify(stats), "EX", CACHE_TTL);
@@ -151,11 +130,8 @@ export async function getGa4Stats(): Promise<Ga4Stats | null> {
       }
     }
     return stats;
-  } catch (e) {
+  } catch {
     // Quota, auth, or network error — hide the block rather than break the page.
-    // TEMP debug — remove after diagnosing. The GA4 API error message names the
-    // cause (PERMISSION_DENIED = SA not a Viewer; INVALID_ARGUMENT = bad property id).
-    console.error("[ga4] runReport failed:", e instanceof Error ? (e.stack ?? e.message) : e);
     return null;
   }
 }
