@@ -64,12 +64,17 @@ export async function createGratis(db: Database, input: GratisInput): Promise<{ 
       );
     }
 
+    // url_normal is unique, so an existing row blocks a fresh insert. A row that
+    // has already expired (weekly Kaki Tiang reset) is revivable: the same URL
+    // may be posted again for the new period (siapa cepat — no owner lock).
+    // Any other status means it is still live somewhere, so reject.
     const [existing] = await tx
-      .select({ id: listing.id })
+      .select({ id: listing.id, status: listing.status })
       .from(listing)
       .where(eq(listing.urlNormal, urlNormal))
       .limit(1);
-    if (existing) throw new GratisError("URL ini sudah terdaftar.");
+    const reviveId = existing?.status === "kedaluwarsa" ? existing.id : null;
+    if (existing && !reviveId) throw new GratisError("URL ini sudah terdaftar.");
 
     // One advertiser may not flood the free tier with many paths of one host.
     const host = urlNormal.split("/")[0];
@@ -108,32 +113,56 @@ export async function createGratis(db: Database, input: GratisInput): Promise<{ 
       kategoriId = kat?.id ?? null;
     }
 
-    // Insert directly as tayang (grip 0). INSERT bypasses the state-machine
-    // trigger (which only guards UPDATEs), then layer-1 screening may hold/reject.
-    const [row] = await tx
-      .insert(listing)
-      .values({
-        urlNormal,
-        nama: input.nama?.trim() || urlNormal,
-        deskripsi: input.deskripsi,
-        kategoriId,
-        logoPath: imageUrlOrNull(input.logoUrl),
-        status: "tayang",
-        peganganCached: 0,
-        kontakId,
-      })
-      .returning({ id: listing.id });
+    const nama = input.nama?.trim() || urlNormal;
+
+    // Revive the expired row (kedaluwarsa -> tayang) or insert a fresh one.
+    // Reviving reuses the same id (the unique url_normal can't be re-inserted)
+    // and refreshes created_at so it counts against this week's quota and reads
+    // as a fresh entry; the new submitter's details fully replace the old ones.
+    // A fresh INSERT lands as tayang directly (INSERT bypasses the state-machine
+    // trigger, which only guards UPDATEs). Layer-1 screening then may hold/reject.
+    let listingId: string;
+    if (reviveId) {
+      await tx
+        .update(listing)
+        .set({
+          nama,
+          deskripsi: input.deskripsi,
+          kategoriId,
+          logoPath: imageUrlOrNull(input.logoUrl),
+          status: "tayang",
+          kontakId,
+          createdAt: new Date(),
+        })
+        .where(eq(listing.id, reviveId));
+      listingId = reviveId;
+    } else {
+      const [row] = await tx
+        .insert(listing)
+        .values({
+          urlNormal,
+          nama,
+          deskripsi: input.deskripsi,
+          kategoriId,
+          logoPath: imageUrlOrNull(input.logoUrl),
+          status: "tayang",
+          peganganCached: 0,
+          kontakId,
+        })
+        .returning({ id: listing.id });
+      listingId = row.id;
+    }
 
     await screenListing(tx, {
-      listingId: row.id,
-      nama: input.nama?.trim() || urlNormal,
+      listingId,
+      nama,
       deskripsi: input.deskripsi ?? null,
       urlNormal,
       grip: 0,
       baru: false, // grip 0 → not subject to the ≥Rp100k manual-hold rule
-      orderId: `gratis:${row.id}`,
+      orderId: `gratis:${listingId}`,
     });
 
-    return { listingId: row.id };
+    return { listingId };
   });
 }

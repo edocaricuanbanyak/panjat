@@ -304,6 +304,15 @@ export async function createOrTopUp(
         .where(eq(listing.id, listingId));
     } else if (existing.status === "menunggu_bayar" || existing.status === "tayang") {
       listingId = existing.id;
+    } else if (existing.status === "kedaluwarsa") {
+      // An expired Kaki Tiang (grip 0) can be claimed straight into a paid climb:
+      // revive the row (kedaluwarsa -> menunggu_bayar) rather than insert a
+      // duplicate URL. Grip stays 0 until the webhook settles.
+      listingId = existing.id;
+      await tx
+        .update(listing)
+        .set({ status: "menunggu_bayar" })
+        .where(eq(listing.id, listingId));
     } else {
       throw new Error(`Listing berstatus ${existing.status} tidak bisa dimanjat`);
     }
