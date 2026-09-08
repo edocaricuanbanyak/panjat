@@ -5,7 +5,7 @@
  */
 import { and, count, eq, gte, inArray, like, or } from "drizzle-orm";
 import type { Database, DbOrTx } from "@/db";
-import { listing, sponsorKontak } from "@/db/schema";
+import { listing, sorak, sponsorKontak } from "@/db/schema";
 import { loadMaksGratisPerDomain } from "./config";
 import { screenListing } from "./moderasi";
 import { imageUrlOrNull, normalizeUrl } from "./url";
@@ -135,6 +135,10 @@ export async function createGratis(db: Database, input: GratisInput): Promise<{ 
           createdAt: new Date(),
         })
         .where(eq(listing.id, reviveId));
+      // A revived listing starts a fresh weekly contest — its old dukungan
+      // (Sorak) must not carry over, so clear it. The live Kaki Tiang board
+      // counts Sorak all-time per listing, and the row id is reused on revive.
+      await tx.delete(sorak).where(eq(sorak.listingId, reviveId));
       listingId = reviveId;
     } else {
       const [row] = await tx
