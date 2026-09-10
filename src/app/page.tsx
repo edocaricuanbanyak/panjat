@@ -21,7 +21,7 @@ import { db } from "@/db";
 import { type BoardEntry, getBoard } from "@/domain/board";
 import { listCategories } from "@/domain/jelajah";
 import { getHariIni } from "@/domain/papan-hari-ini";
-import { getJuaraKakiTiangArsip, getJuaraTerfavoritArsip } from "@/domain/juara-mingguan";
+import { getJuaraKakiTiangSemua, getJuaraTerfavoritArsip } from "@/domain/juara-mingguan";
 import { getKakiTiang, sorakRemaining } from "@/domain/sorak";
 import { currentAnon } from "@/lib/anon";
 import { favoritBoard, myFavoritToday } from "@/lib/favorit";
@@ -63,7 +63,7 @@ async function HomeBody({
   const { entries, max } = await getBoard(db);
   const [
     kakiTiang,
-    juaraKakiTiang,
+    juaraKakiList,
     juaraTerfavorit,
     sisaSorak,
     kats,
@@ -73,7 +73,7 @@ async function HomeBody({
     hariIni,
   ] = await Promise.all([
     getKakiTiang(db),
-    getJuaraKakiTiangArsip(db),
+    getJuaraKakiTiangSemua(db),
     getJuaraTerfavoritArsip(db),
     sorakRemaining(db, anonId, now),
     listCategories(db),
@@ -88,41 +88,35 @@ async function HomeBody({
   const page = Math.min(Math.max(1, Number(sp.hal) || 1), totalPages);
   const pageEntries = entries.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  // The weekly Kaki Tiang champion (free, Rp0) also earns a shot at "pemanjat
-  // terfavorit" — added to the free vote pool (never touches money/ranking).
+  // Every past Kaki Tiang champion (free, Rp0) also stays in the free vote pool
+  // for "pemanjat terfavorit" (never touches money/ranking).
   const voteEntries = [
     ...entries.map((e) => ({ id: e.id, nama: e.nama, urlNormal: e.urlNormal })),
-    ...(juaraKakiTiang
-      ? [{ id: juaraKakiTiang.id, nama: juaraKakiTiang.nama, urlNormal: juaraKakiTiang.urlNormal }]
-      : []),
+    ...juaraKakiList.map((j) => ({ id: j.id, nama: j.nama, urlNormal: j.urlNormal })),
   ].filter((e, i, a) => a.findIndex((x) => x.id === e.id) === i);
 
-  // The weekly Kaki Tiang champion joins the board as its bottom row at Rp0 — a
-  // free entry (no grip), easily overtaken by any paid listing. Same look as a
-  // rank 4+ row; it rotates each week as a new champion is crowned.
-  const championEntry: BoardEntry | null = juaraKakiTiang
-    ? {
-        rank: entries.length + 1,
-        id: juaraKakiTiang.id,
-        nama: juaraKakiTiang.nama,
-        urlNormal: juaraKakiTiang.urlNormal,
-        deskripsi: juaraKakiTiang.deskripsi,
-        kategoriNama: juaraKakiTiang.kategoriNama,
-        kategoriSlug: juaraKakiTiang.kategoriSlug,
-        pegangan: 0,
-        klikTotal: juaraKakiTiang.klik,
-        rosotPerHari: 0,
-        masihTerjaga: false,
-        screenshotUrl: null,
-        badges: [],
-      }
-    : null;
+  // Permanent Kaki Tiang champions graduate to the board as Rp0 rows that stack
+  // below every paid listing — no grip, easily overtaken by any paid climb. They
+  // accumulate across weeks, newest champion highest (R16: never a paid rank).
+  const championEntries: BoardEntry[] = juaraKakiList.map((j, i) => ({
+    rank: entries.length + 1 + i,
+    id: j.id,
+    nama: j.nama,
+    urlNormal: j.urlNormal,
+    deskripsi: j.deskripsi,
+    kategoriNama: j.kategoriNama,
+    kategoriSlug: j.kategoriSlug,
+    pegangan: 0,
+    klikTotal: j.klik,
+    rosotPerHari: 0,
+    masihTerjaga: false,
+    screenshotUrl: null,
+    badges: [],
+  }));
 
-  // The champion "graduates" to the board row above, so drop it from the Kaki
-  // Tiang list (no empty slot — the rest shift up).
-  const kakiTiangEntries = championEntry
-    ? kakiTiang.filter((e) => e.id !== championEntry.id)
-    : kakiTiang;
+  // Champions graduated to the rows above, so drop them from the Kaki Tiang list.
+  const championIds = new Set(championEntries.map((e) => e.id));
+  const kakiTiangEntries = kakiTiang.filter((e) => !championIds.has(e.id));
 
   return (
     <>
@@ -195,11 +189,14 @@ async function HomeBody({
                     <VoteFavorit entries={voteEntries} leaderboard={favorit} myChoice={choice} />
                   }
                 />
-                {/* Weekly Kaki Tiang champion as the board's bottom row (Rp0, free
-                    — easily overtaken, no grip, never a paid rank / R16). */}
-                {championEntry && (
-                  <div className="mt-2.5">
-                    <ListingCard entry={championEntry} kakiTiangJuara />
+                {/* Permanent Kaki Tiang champions as the board's bottom rows (Rp0,
+                    free — easily overtaken, no grip, never a paid rank / R16).
+                    Stacked newest-first, below every paid listing. */}
+                {championEntries.length > 0 && (
+                  <div className="mt-2.5 flex flex-col gap-2.5">
+                    {championEntries.map((e) => (
+                      <ListingCard key={e.id} entry={e} kakiTiangJuara />
+                    ))}
                   </div>
                 )}
                 {/* Terfavorit showcase (free spectator-vote winner). */}

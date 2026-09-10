@@ -6,7 +6,7 @@
  * from this archive, so nothing "weekly" shows until a week has actually been
  * archived (G).
  */
-import { and, desc, eq, gt, gte, lt, ne, sql } from "drizzle-orm";
+import { and, desc, eq, gt, gte, lt, ne, notInArray, sql } from "drizzle-orm";
 import type { Database } from "@/db";
 import { juaraMingguan, kategori, klikHarian, listing, moderasiLog } from "@/db/schema";
 import { WEEK_MS, favoritBoard, weekStartWIB } from "@/lib/favorit";
@@ -90,11 +90,18 @@ export async function simpanJuaraMingguan(db: Database, now = new Date()) {
 
 /**
  * Weekly Kaki Tiang reset — expire every free (Rp0, `tayang`) listing except the
- * just-crowned champion (`kecualiId`). Runs at the Wed 17:00 cut-off so the free
- * tier empties for a fresh contest; expired listings stop counting toward the
- * per-domain free cap, so owners can post again next week. No grip/ledger touched.
+ * just-crowned champion (`kecualiId`) AND every past champion (they graduate to
+ * permanent Rp0 board rows and are never expired). Runs at the Wed 17:00 cut-off
+ * so the free tier empties for a fresh contest; expired listings stop counting
+ * toward the per-domain free cap, so owners can post again next week. No
+ * grip/ledger touched.
  */
 export async function hanguskanKakiTiang(db: Database, kecualiId: string | null): Promise<number> {
+  // Every listing that has ever won a weekly Kaki Tiang is a permanent champion.
+  const juaraIds = db
+    .select({ id: juaraMingguan.listingId })
+    .from(juaraMingguan)
+    .where(eq(juaraMingguan.jenis, "kaki_tiang"));
   const rows = await db
     .select({ id: listing.id })
     .from(listing)
@@ -102,6 +109,7 @@ export async function hanguskanKakiTiang(db: Database, kecualiId: string | null)
       and(
         eq(listing.status, "tayang"),
         eq(listing.peganganCached, 0),
+        notInArray(listing.id, juaraIds),
         kecualiId ? ne(listing.id, kecualiId) : undefined,
       ),
     );
@@ -240,4 +248,45 @@ export async function getJuaraKakiTiangArsip(
     .where(and(eq(juaraMingguan.jenis, "kaki_tiang"), eq(juaraMingguan.minggu, weekStartWIB(now))))
     .limit(1);
   return row ?? null;
+}
+
+/**
+ * ALL permanent Kaki Tiang champions — graduated Rp0 rows that stack on the board
+ * (below every paid listing) forever, newest week first. Only listings still
+ * `tayang` at grip 0 are returned; a champion later paid up ranks on the paid
+ * board instead, and one taken down drops off. Deduped by listing (a URL that
+ * won more than once keeps its most recent win).
+ */
+export async function getJuaraKakiTiangSemua(db: Database): Promise<JuaraKakiTiangArsip[]> {
+  const rows = await db
+    .select({
+      id: listing.id,
+      nama: listing.nama,
+      urlNormal: listing.urlNormal,
+      deskripsi: listing.deskripsi,
+      kategoriNama: kategori.nama,
+      kategoriSlug: kategori.slug,
+      sorak: juaraMingguan.metrik,
+      klik: sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian" where "klik_harian"."listing_id" = "listing"."id")`,
+    })
+    .from(juaraMingguan)
+    .innerJoin(listing, eq(listing.id, juaraMingguan.listingId))
+    .leftJoin(kategori, eq(kategori.id, listing.kategoriId))
+    .where(
+      and(
+        eq(juaraMingguan.jenis, "kaki_tiang"),
+        eq(listing.status, "tayang"),
+        eq(listing.peganganCached, 0),
+      ),
+    )
+    .orderBy(desc(juaraMingguan.minggu)); // newest champion first (ranks highest among Rp0)
+
+  const seen = new Set<string>();
+  const out: JuaraKakiTiangArsip[] = [];
+  for (const r of rows) {
+    if (seen.has(r.id)) continue;
+    seen.add(r.id);
+    out.push(r);
+  }
+  return out;
 }
