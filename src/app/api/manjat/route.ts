@@ -3,7 +3,7 @@ import { copy } from "@/copy";
 import { db } from "@/db";
 import { createOrTopUp, quote, type Target } from "@/domain/manjat";
 import { clientIp } from "@/lib/ip";
-import { isMock, midtransSnapClient, mockSnapClient } from "@/lib/midtrans";
+import { getCheckoutClient } from "@/lib/gateways";
 import { rateLimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: copy.error.nominalWajib }, { status: 400 });
     }
 
-    const snap = isMock() ? mockSnapClient : midtransSnapClient;
+    const snap = getCheckoutClient();
     const result = await createOrTopUp(db, snap, {
       url: body.url,
       email: typeof body.email === "string" ? body.email : undefined,

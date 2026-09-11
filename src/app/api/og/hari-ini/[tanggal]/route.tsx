@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { getPapanHariIni, wibDayWindow } from "@/domain/papan-hari-ini";
 
@@ -102,11 +103,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ tanggal
       {/* BOTTOM: count + panjat.id */}
       <div style={{ display: "flex", width: "100%", alignItems: "baseline", justifyContent: "space-between" }}>
         <div style={{ display: "flex", fontSize: 29, fontWeight: 700, color: MERAH }}>
-          {entries.length > 0 ? `${entries.length} pemanjat hari itu` : "Uang kemarin tidak berlaku"}
+          {entries.length > 0 ? copy.hariIni.ogPemanjat(entries.length) : copy.hariIni.ogKosong}
         </div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-          <div style={{ display: "flex", fontSize: 20, color: REDUP }}>reset tiap 00:00 WIB</div>
-          <div style={{ display: "flex", fontSize: 28, fontWeight: 800, color: MERAH }}>panjat.id</div>
+          <div style={{ display: "flex", fontSize: 20, color: REDUP }}>{copy.hariIni.ogReset}</div>
+          <div style={{ display: "flex", fontSize: 28, fontWeight: 800, color: MERAH }}>{copy.merek.nama}</div>
         </div>
       </div>
     </div>

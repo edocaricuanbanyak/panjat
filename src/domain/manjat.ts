@@ -11,6 +11,7 @@ import { loadManjatConfig, loadRosotConfig } from "./config";
 import { getRanking } from "./ranking";
 import { dailyRateForRank, estimateDaysToThreshold, type RosotConfig } from "./rosot";
 import { imageUrlOrNull, normalizeUrl } from "./url";
+import { formatMoney } from "@/lib/format";
 import type { SnapClient } from "@/lib/midtrans";
 
 export type Target = "#1" | "top3" | "top10";
@@ -245,7 +246,7 @@ export async function createOrTopUp(
     const minimum = mode === "manjat_lagi" ? cfg.minimumManjatLagi : cfg.minimumNaik;
     if (!Number.isInteger(input.nominal) || input.nominal < minimum) {
       throw new Error(
-        `Nominal minimal untuk ${mode === "manjat_lagi" ? "manjat lagi" : "naik tiang"} adalah Rp${minimum.toLocaleString("id-ID")}`,
+        `Nominal minimal untuk ${mode === "manjat_lagi" ? "manjat lagi" : "naik tiang"} adalah ${formatMoney(minimum)}`,
       );
     }
 

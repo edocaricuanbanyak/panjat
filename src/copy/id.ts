@@ -8,14 +8,22 @@
  * Error messages follow the pattern: what happened → consequence → what to do.
  * Never a bare error code.
  */
-import { formatRupiah } from "@/lib/format";
+import { formatCount, formatRupiah } from "@/lib/format";
 
-export const copy = {
+export const copyId = {
   merek: {
     nama: "Panjat",
     tagline: "Rebut Peringkat Teratas",
     deskripsiSitus:
       "Tempel linkmu, panjat papan, dan salip yang di atas. Makin kuat peganganmu, makin tinggi posisimu.",
+  },
+
+  // Site-level social share card (src/app/opengraph-image.tsx).
+  og: {
+    alt: "Panjat — papan peringkat berbayar. Rebut Peringkat Teratas.",
+    subtitle:
+      "Tempel linkmu, panjat papan, salip yang di atas. Semua melorot tiap jam — puncaknya selalu bisa direbut.",
+    footer: "papan peringkat berbayar · buat produk & UMKM Indonesia",
   },
 
   nav: {
@@ -52,7 +60,7 @@ export const copy = {
     ["1", "Tempel link produkmu", "Judul, deskripsi, dan kategori terisi otomatis."],
     ["2", "Pilih posisi & bayar", "Sistem yang menghitung rupiahnya. Bayar lewat QRIS/e-wallet."],
     ["3", "Naik — lalu merosot", "Tiangnya licin, semua turun pelan. Manjat lagi kalau mau bertahan."],
-  ] as const,
+  ],
 
   listing: {
     pratinjauAlt: (nama: string) => `Pratinjau situs ${nama}`,
@@ -75,14 +83,14 @@ export const copy = {
     bukaTabBaru: "buka di tab baru",
     juaraKakiTiang: "Juara Kaki Tiang minggu ini · gratis",
     juaraTerfavorit: "Pemanjat terfavorit pekan lalu",
-    juaraTerfavoritVote: (n: number) => `${n.toLocaleString("id-ID")} vote`,
+    juaraTerfavoritVote: (n: number) => `${formatCount(n)} vote`,
     terfavoritPekanIni: "Terfavorit pekan ini",
     dukunganTerbanyak: "Dukungan terbanyak",
     salip: (rp: string) => `Salip ${rp}`,
     salipRank: (rank: number, rp: string) => `Salip #${rank} ${rp}`,
     juara: (rank: number) => `Juara ${rank}`,
     salipSingkat: "Salip",
-    klik: (n: number) => `${n.toLocaleString("id-ID")} klik`,
+    klik: (n: number) => `${formatCount(n)} klik`,
     klikProof: "Klik nyata yang sudah dikirim ke situs ini — dihitung di server.",
     // Card rosot status (revealed on hover) — two states + the at-floor case.
     rosotTerjaga: "masih terjaga",
@@ -185,7 +193,7 @@ export const copy = {
     vote: "Vote",
     voteMengirim: "Mengirim…",
     voteGagal: "Gagal menyimpan vote — coba lagi.",
-    vote_n: (n: number) => `${n.toLocaleString("id-ID")} vote`,
+    vote_n: (n: number) => `${formatCount(n)} vote`,
     belumAda: "Jadilah yang pertama menerima suara.",
   },
 
@@ -196,7 +204,7 @@ export const copy = {
       "Listing gratis — dukung yang menurutmu bagus. Tiap Rabu, yang paling banyak didukung jadi Juara Kaki Tiang dan naik tampil di papan.",
     dukung: "Dukung",
     dukungGagal: "Gagal dukung — coba lagi.",
-    dukungan_n: (n: number) => `${n.toLocaleString("id-ID")} dukungan`,
+    dukungan_n: (n: number) => `${formatCount(n)} dukungan`,
     kosong: "Belum ada yang nunggu, kamu gak ada pesaing",
     pasangGratisTaut: "Pasang gratis di Kaki Tiang",
     baruNaik: "Listingmu sudah naik ke Kaki Tiang. Ajak orang buat dukung biar naik!",
@@ -233,7 +241,7 @@ export const copy = {
       ["Yang kami simpan.", " Kontak kamu (email) untuk dasbor dan notifikasi. Untuk klik, kami hanya menyimpan versi teracak dari alamat IP-mu — bukan IP aslinya — jadi tidak bisa dilacak balik ke kamu. Fitur penonton memakai cookie anonim yang tidak menyimpan data pribadi apa pun."],
       ["Berapa lama kami simpan.", " Data klik mentah kami hapus setelah 13 bulan; yang tersimpan permanen hanya rekap hariannya. Catatan notifikasi disimpan 6 bulan. Data transaksi kami simpan selama masih diwajibkan untuk pajak dan audit."],
       ["Hak kamu.", " Kamu bebas berhenti menerima notifikasi kapan saja, dan boleh minta data kontakmu dihapus — tinggal kabari kami."],
-    ] as const,
+    ],
     kontak: "Mau hapus data atau ada pertanyaan soal privasi? Email kami di halo@panjat.id.",
     diperbarui: "Terakhir diperbarui 30 Agustus 2026.",
   },
@@ -250,7 +258,7 @@ export const copy = {
       ["Kepemilikan URL.", " Kalau kamu pemilik sah sebuah URL, kamu berhak mengklaim listing-nya atau minta listing itu diturunkan. Kami perlu verifikasi dulu."],
       ["Tanggung jawab.", " Panjat hanya menampilkan listing — isi dan produk sepenuhnya tanggung jawab masing-masing sponsor."],
       ["Kontak.", " Ada pertanyaan soal ketentuan ini? Email kami di halo@panjat.id."],
-    ] as const,
+    ],
     diperbarui: "Terakhir diperbarui 30 Agustus 2026.",
   },
 
@@ -274,6 +282,9 @@ export const copy = {
     kosong: "Belum ada yang membayar hari ini. Juara hari ini masih terbuka lebar.",
     metaTitle: "Papan Hari Ini — Panjat",
     metaDesc: "Papan yang reset tiap tengah malam WIB. Siapa pun bisa juara hari ini.",
+    ogPemanjat: (n: number) => `${n} pemanjat hari itu`,
+    ogKosong: "Uang kemarin tidak berlaku",
+    ogReset: "reset tiap tengah malam",
   },
 
   statistik: {
@@ -459,7 +470,7 @@ export const copy = {
     ["/statistik", "Statistik"],
     ["/privasi", "Privasi"],
     ["/ketentuan", "Ketentuan"],
-  ] as const,
+  ],
 
   /**
    * Errors: what happened → consequence → what to do. Plain and literal.
@@ -519,4 +530,7 @@ export const copy = {
     cobaLagi: "Coba lagi",
     kePapan: "Ke papan",
   },
-} as const;
+};
+
+/** The full shape every locale deck must satisfy (leaf strings widened). */
+export type CopyDeck = typeof copyId;

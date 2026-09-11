@@ -1,4 +1,5 @@
 import { copy } from "@/copy";
+import { MARKET } from "@/lib/market";
 import { BASE_URL } from "@/lib/site";
 
 /**
@@ -28,7 +29,7 @@ export function websiteJsonLd() {
     name: copy.merek.nama,
     url: BASE_URL,
     description: copy.merek.deskripsiSitus,
-    inLanguage: "id-ID",
+    inLanguage: MARKET.locale,
     publisher: organization,
     potentialAction: {
       "@type": "SearchAction",

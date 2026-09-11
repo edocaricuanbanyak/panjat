@@ -1,6 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
+ * Public production host(s) where /admin must be hidden (admin lives only on the
+ * adm.* subdomain). Defaults to panjat.id so the Indonesian deployment is
+ * unchanged; the global deployment sets PUBLIC_HOSTS to its own domain(s).
+ * Local dev hosts (localhost) are not listed, so /admin stays reachable there.
+ */
+const PUBLIC_HOSTS = (process.env.PUBLIC_HOSTS?.trim() || "www.panjat.id,panjat.id")
+  .split(",")
+  .map((h) => h.trim())
+  .filter(Boolean);
+
+/**
  * Security headers (§18.1, §18.5). Nonce-based CSP so third-party sponsor
  * content on public pages can never run scripts; Next propagates the nonce to
  * its own framework scripts automatically. Dev allows unsafe-eval for HMR.
@@ -51,10 +62,10 @@ export function middleware(req: NextRequest) {
       res = NextResponse.rewrite(url, nextOpts);
     }
   } else if (
-    (host === "www.panjat.id" || host === "panjat.id") &&
+    PUBLIC_HOSTS.includes(host) &&
     (pathname === "/admin" || pathname.startsWith("/admin/") || pathname.startsWith("/api/admin"))
   ) {
-    // Admin lives only on adm.panjat.id — hide it on the public domain.
+    // Admin lives only on the adm.* subdomain — hide it on the public domain(s).
     const url = req.nextUrl.clone();
     url.pathname = "/_admin-hidden-404";
     res = NextResponse.rewrite(url, nextOpts);

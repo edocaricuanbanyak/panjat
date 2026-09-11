@@ -7,7 +7,7 @@ import { StatTile } from "@/components/StatTile";
 import { copy } from "@/copy";
 import { db } from "@/db";
 import { getStatistik } from "@/domain/statistik";
-import { formatRupiah } from "@/lib/format";
+import { formatCount, formatRupiah } from "@/lib/format";
 import { getGa4Stats } from "@/lib/ga4";
 import { pingVisitor, VID_COOKIE } from "@/lib/presence";
 
@@ -55,8 +55,8 @@ export default async function StatistikPage() {
         />
         <StatTile
           label={copy.statistik.klik7}
-          value={s.klik7hari.toLocaleString("id-ID")}
-          sub={copy.statistik.klik7Sub(s.klikPerHari.toLocaleString("id-ID"))}
+          value={formatCount(s.klik7hari)}
+          sub={copy.statistik.klik7Sub(formatCount(s.klikPerHari))}
           metode={copy.statistik.klik7Metode}
         />
         <StatTile
@@ -79,7 +79,7 @@ export default async function StatistikPage() {
         />
         <StatTile
           label={copy.statistik.pengunjung}
-          value={s.totalPengunjung.toLocaleString("id-ID")}
+          value={formatCount(s.totalPengunjung)}
           sub={copy.statistik.pengunjungSub}
           metode={copy.statistik.pengunjungMetode}
         />
@@ -109,7 +109,7 @@ export default async function StatistikPage() {
                       <li key={row.label} className="flex items-center justify-between gap-3 text-sm">
                         <span className="truncate text-tinta">{row.label}</span>
                         <span className="tabular shrink-0 text-tinta-redup">
-                          {row.users.toLocaleString("id-ID")}
+                          {formatCount(row.users)}
                         </span>
                       </li>
                     ))}

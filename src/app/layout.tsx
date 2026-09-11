@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import Script from "next/script";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { copy } from "@/copy";
+import { MARKET } from "@/lib/market";
 import { BASE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: copy.merek.nama,
-    locale: "id_ID",
+    locale: MARKET.locale.replace("-", "_"), // "id-ID" -> "id_ID"
   },
   twitter: {
     card: "summary_large_image",
@@ -67,7 +68,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   return (
     <html
-      lang="id"
+      lang={MARKET.defaultLocale}
       className={`${poppins.variable} ${jakarta.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-kertas text-tinta">

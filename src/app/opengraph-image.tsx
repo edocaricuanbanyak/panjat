@@ -1,7 +1,8 @@
 import { ImageResponse } from "next/og";
+import { copy } from "@/copy";
 
 export const runtime = "nodejs";
-export const alt = "Panjat — papan peringkat berbayar. Rebut Peringkat Teratas.";
+export const alt = copy.og.alt;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -52,21 +53,18 @@ export default function OpengraphImage() {
           {/* biome-ignore lint/performance/noImgElement: satori renders to a raster, not the DOM */}
           <img src={PANJAT_MARK} width={58} height={58} alt="" />
           <div style={{ display: "flex", fontSize: 44, fontWeight: 800, letterSpacing: -1, color: TINTA }}>
-            Panjat
+            {copy.merek.nama}
           </div>
         </div>
 
         {/* Body: headline + mini leaderboard */}
         <div style={{ display: "flex", flex: 1, alignItems: "center", gap: 56 }}>
           <div style={{ display: "flex", flexDirection: "column", flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", fontSize: 74, fontWeight: 800, lineHeight: 1.04, letterSpacing: -2, color: TINTA }}>
-              Rebut Peringkat
-            </div>
             <div style={{ display: "flex", fontSize: 74, fontWeight: 800, lineHeight: 1.04, letterSpacing: -2, color: MERAH }}>
-              Teratas
+              {copy.merek.tagline}
             </div>
             <div style={{ display: "flex", marginTop: 24, fontSize: 31, lineHeight: 1.35, color: REDUP, maxWidth: 600 }}>
-              Tempel linkmu, panjat papan, salip yang di atas. Semua melorot tiap jam — puncaknya selalu bisa direbut.
+              {copy.og.subtitle}
             </div>
           </div>
 
@@ -98,9 +96,9 @@ export default function OpengraphImage() {
         {/* Footer */}
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
           <div style={{ display: "flex", fontSize: 24, color: REDUP }}>
-            papan peringkat berbayar · buat produk & UMKM Indonesia
+            {copy.og.footer}
           </div>
-          <div style={{ display: "flex", fontSize: 30, fontWeight: 800, color: MERAH }}>panjat.id</div>
+          <div style={{ display: "flex", fontSize: 30, fontWeight: 800, color: MERAH }}>{copy.merek.nama}</div>
         </div>
       </div>
     ),

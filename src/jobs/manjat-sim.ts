@@ -129,7 +129,7 @@ async function main() {
   const mlog = await db
     .select({ id: moderasiLog.id })
     .from(moderasiLog)
-    .where(eq(moderasiLog.listingId, l.id));
+    .where(and(eq(moderasiLog.listingId, l.id), eq(moderasiLog.keputusan, "tahan_transaksi")));
   check("moderasi_log recorded", mlog.length === 1);
   check("no grip from mismatch", (await listingByUrl()).grip === 30_000);
 

@@ -17,6 +17,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { VoteFavorit } from "@/components/VoteFavorit";
 import { copy } from "@/copy";
 import { boardItemListJsonLd, websiteJsonLd } from "@/lib/jsonld";
+import { formatCount } from "@/lib/format";
 import { db } from "@/db";
 import { type BoardEntry, getBoard } from "@/domain/board";
 import { listCategories } from "@/domain/jelajah";
@@ -156,14 +157,14 @@ async function HomeBody({
             <span className="inline-flex items-center gap-1.5">
               <span className="blink inline-block size-1.5 rounded-full bg-hidup" aria-hidden />
               <span className="font-semibold tabular text-hidup">
-                {visitor.online.toLocaleString("id-ID")}
+                {formatCount(visitor.online)}
               </span>
               <span className="text-tinta-redup">{copy.beranda.statOnline}</span>
             </span>
             <span className="h-3.5 w-px bg-garis" aria-hidden />
             <span className="inline-flex items-center gap-1.5">
               <span className="font-semibold tabular text-tinta">
-                {visitor.total.toLocaleString("id-ID")}
+                {formatCount(visitor.total)}
               </span>
               <span className="text-tinta-redup">{copy.beranda.statPengunjung}</span>
             </span>

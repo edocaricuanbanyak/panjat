@@ -8,16 +8,17 @@
 import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import type { Database } from "@/db";
 import { kategori, listing, peganganLedger } from "@/db/schema";
+import { MARKET } from "@/lib/market";
+import { zonedDate, zonedDayWindow } from "@/lib/tz";
 
-/** WIB calendar date "YYYY-MM-DD" for an instant. */
+/** Market-timezone calendar date "YYYY-MM-DD" for an instant (WIB by default). */
 export function wibDate(now: Date): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(now);
+  return zonedDate(now);
 }
 
-/** The [start, end) UTC instants of a WIB calendar day. */
+/** The [start, end) UTC instants of a market-timezone calendar day (DST-safe). */
 export function wibDayWindow(tanggal: string): { start: Date; end: Date } {
-  const start = new Date(`${tanggal}T00:00:00+07:00`);
-  return { start, end: new Date(start.getTime() + 24 * 3600_000) };
+  return zonedDayWindow(tanggal);
 }
 
 /**
@@ -26,7 +27,7 @@ export function wibDayWindow(tanggal: string): { start: Date; end: Date } {
  * permanent, deterministically recomputed content (R7) — gets indexed.
  */
 export async function archivedDailyDates(db: Database, now: Date, limit = 180): Promise<string[]> {
-  const d = sql<string>`to_char((${peganganLedger.createdAt} at time zone 'Asia/Jakarta')::date, 'YYYY-MM-DD')`;
+  const d = sql<string>`to_char((${peganganLedger.createdAt} at time zone ${MARKET.timeZone})::date, 'YYYY-MM-DD')`;
   const rows = await db
     .selectDistinct({ d })
     .from(peganganLedger)

@@ -7,6 +7,7 @@ import { copy } from "@/copy";
 import { db } from "@/db";
 import { juaraHarian, listing } from "@/db/schema";
 import { getJuaraMingguanTerbaru, type JuaraArsip } from "@/domain/juara-mingguan";
+import { formatCount } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,7 @@ const ORDER = ["papan1", "terfavorit", "klik_terbanyak", "kaki_tiang"];
 
 /** Non-money headline metric per category (clicks for Juara 1 — no nominal). */
 function metrikLabel(j: JuaraArsip): string {
-  const n = (x: number) => x.toLocaleString("id-ID");
+  const n = formatCount;
   if (j.jenis === "terfavorit") return `${n(j.metrik)} vote`;
   if (j.jenis === "kaki_tiang") return `${n(j.metrik)} dukungan`;
   if (j.jenis === "klik_terbanyak") return `${n(j.metrik)} klik`;

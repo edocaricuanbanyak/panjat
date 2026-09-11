@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { db } from "@/db";
 import { getJuaraMingguanTerbaru, type JuaraJenis } from "@/domain/juara-mingguan";
-import { formatRupiah } from "@/lib/format";
+import { formatCount, formatRupiah } from "@/lib/format";
 
 export const runtime = "nodejs";
 
@@ -129,7 +129,7 @@ export async function GET() {
                 {trim(terfavorit.nama, 18)}
               </div>
               <div style={{ display: "flex", fontSize: 40, fontWeight: 700 }}>
-                {terfavorit.metrik.toLocaleString("id-ID")} vote
+                {formatCount(terfavorit.metrik)} vote
               </div>
             </div>
           </div>
@@ -158,7 +158,7 @@ export async function GET() {
               </div>
             </div>
             <div style={{ display: "flex", fontSize: 36, fontWeight: 700, color: REDUP }}>
-              {kaki.metrik.toLocaleString("id-ID")} dukungan
+              {formatCount(kaki.metrik)} dukungan
             </div>
           </div>
         ) : null}
