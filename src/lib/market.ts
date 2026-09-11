@@ -61,26 +61,37 @@ function decimalsFor(currency: string): number {
   return zero.has(currency) ? 0 : 2;
 }
 
-function resolveFromEnv(): MarketConfig {
-  const base = process.env.MARKET === "global" ? GLOBAL_DEFAULTS : ID_DEFAULTS;
+// Config must be readable in the BROWSER too (client components format money,
+// pick copy, show times). Next only inlines statically-accessed NEXT_PUBLIC_*
+// vars into the client bundle, so those are primary; the non-public names are a
+// fallback for server-only CLI (seed/migrate/jobs run with e.g. MARKET=global).
+// Each access is a static member expression so Next's inliner can replace it.
+const MARKET_ENV = process.env.NEXT_PUBLIC_MARKET ?? process.env.MARKET;
+const CURRENCY_ENV = process.env.NEXT_PUBLIC_CURRENCY ?? process.env.CURRENCY;
+const LOCALE_ENV = process.env.NEXT_PUBLIC_LOCALE ?? process.env.LOCALE;
+const TZ_ENV = process.env.NEXT_PUBLIC_TZ_OVERRIDE ?? process.env.TZ_OVERRIDE;
+const DEFAULT_LOCALE_ENV =
+  process.env.NEXT_PUBLIC_DEFAULT_LOCALE ?? process.env.DEFAULT_LOCALE;
+const WEEK_ANCHOR_ENV =
+  process.env.NEXT_PUBLIC_WEEK_ANCHOR_MS ?? process.env.WEEK_ANCHOR_MS;
+// Gateway selection is server-only, but reading the public name too is harmless.
+const GATEWAY_ENV =
+  process.env.NEXT_PUBLIC_PAYMENT_GATEWAY ?? process.env.PAYMENT_GATEWAY;
 
-  const currency = process.env.CURRENCY?.trim() || base.currency;
-  const defaultLocale =
-    (process.env.DEFAULT_LOCALE?.trim() as "id" | "en") || base.defaultLocale;
+function resolveFromEnv(): MarketConfig {
+  const base = MARKET_ENV === "global" ? GLOBAL_DEFAULTS : ID_DEFAULTS;
+
+  const currency = CURRENCY_ENV?.trim() || base.currency;
+  const defaultLocale = (DEFAULT_LOCALE_ENV?.trim() as "id" | "en") || base.defaultLocale;
   const paymentGateway =
-    (process.env.PAYMENT_GATEWAY?.trim() as "midtrans" | "paddle") ||
-    base.paymentGateway;
+    (GATEWAY_ENV?.trim() as "midtrans" | "paddle") || base.paymentGateway;
 
   return {
     currency,
-    currencyDecimals: process.env.CURRENCY
-      ? decimalsFor(currency)
-      : base.currencyDecimals,
-    locale: process.env.LOCALE?.trim() || base.locale,
-    timeZone: process.env.TZ_OVERRIDE?.trim() || base.timeZone,
-    weekAnchorMs: process.env.WEEK_ANCHOR_MS
-      ? Number(process.env.WEEK_ANCHOR_MS)
-      : base.weekAnchorMs,
+    currencyDecimals: CURRENCY_ENV ? decimalsFor(currency) : base.currencyDecimals,
+    locale: LOCALE_ENV?.trim() || base.locale,
+    timeZone: TZ_ENV?.trim() || base.timeZone,
+    weekAnchorMs: WEEK_ANCHOR_ENV ? Number(WEEK_ANCHOR_ENV) : base.weekAnchorMs,
     defaultLocale: defaultLocale === "en" ? "en" : "id",
     paymentGateway: paymentGateway === "paddle" ? "paddle" : "midtrans",
   };

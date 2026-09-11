@@ -24,9 +24,9 @@ vercel link          # create a new project, e.g. "panjat-global", same repo
 ## 3. Environment variables (Production)
 Generate secrets fresh (`openssl rand -hex 32`) — never reuse panjat.id's.
 ```bash
-# Market
-vercel env add MARKET production                 # "global"  (USD + en + UTC + paddle)
-vercel env add TZ_OVERRIDE production             # e.g. "America/New_York" (or leave UTC)
+# Market (NEXT_PUBLIC_ so the browser gets them too — client formats money/copy/time)
+vercel env add NEXT_PUBLIC_MARKET production      # "global"  (USD + en + UTC + paddle)
+vercel env add NEXT_PUBLIC_TZ_OVERRIDE production # e.g. "America/New_York" (or leave UTC)
 vercel env add PUBLIC_HOSTS production            # e.g. "panjat.global,www.panjat.global"
 vercel env add NEXT_PUBLIC_BASE_URL production    # https://<global-domain>
 # Data
