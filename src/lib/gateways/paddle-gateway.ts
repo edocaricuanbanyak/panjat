@@ -17,7 +17,6 @@
  */
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { MARKET } from "@/lib/market";
-import { BASE_URL } from "@/lib/site";
 import type { SnapClient } from "@/lib/midtrans";
 import type { NormalizedNotification, RawWebhook, WebhookGateway } from "./types";
 
@@ -120,6 +119,9 @@ export const paddleCheckoutClient: SnapClient = {
         ? "https://api.paddle.com"
         : "https://sandbox-api.paddle.com";
 
+    // Create a transaction with a NON-CATALOG custom price (arbitrary amount) and
+    // our order_id in custom_data. The transaction id is then handed to the
+    // client-side Paddle.js overlay (Paddle.Checkout.open({ transactionId })).
     const res = await fetch(`${base}/transactions`, {
       method: "POST",
       headers: {
@@ -139,15 +141,15 @@ export const paddleCheckoutClient: SnapClient = {
         ],
         custom_data: { order_id: orderId },
         ...(email ? { customer: { email } } : {}),
-        checkout: { url: `${BASE_URL}/manjat/selesai?order=${orderId}` },
       }),
     });
     if (!res.ok) {
       throw new Error(`Paddle transaction error ${res.status}: ${await res.text()}`);
     }
-    const json = (await res.json()) as { data?: { id?: string; checkout?: { url?: string } } };
-    const url = json.data?.checkout?.url;
-    if (!url) throw new Error("Paddle: transaction created without a checkout URL");
-    return { token: json.data?.id ?? orderId, redirectUrl: url };
+    const json = (await res.json()) as { data?: { id?: string } };
+    const id = json.data?.id;
+    if (!id) throw new Error("Paddle: transaction created without an id");
+    // Empty redirectUrl signals the client to open the Paddle.js overlay with `token`.
+    return { token: id, redirectUrl: "" };
   },
 };

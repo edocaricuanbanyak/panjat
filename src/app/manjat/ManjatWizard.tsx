@@ -152,7 +152,17 @@ export function ManjatWizard({
         deskripsi: deskripsi || undefined,
         logoUrl: logoUrl || undefined,
       });
-      window.location.href = result.redirectUrl;
+      // A redirect URL (Midtrans Snap / mock-pay) → navigate. An empty redirect
+      // URL means the gateway (Paddle) hands off to a client-side overlay keyed
+      // by the returned transaction id. Grip still activates only via the webhook.
+      if (result.redirectUrl) {
+        window.location.href = result.redirectUrl;
+      } else {
+        const { openPaddleCheckout } = await import("@/lib/paddle-client");
+        await openPaddleCheckout(result.token, {
+          successUrl: `${window.location.origin}/manjat/selesai?order=${result.orderId}`,
+        });
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : copy.error.gagalTagihan);
       setSubmitting(false);

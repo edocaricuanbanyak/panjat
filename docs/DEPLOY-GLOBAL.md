@@ -34,10 +34,12 @@ vercel env add DATABASE_URL production            # the new Postgres
 vercel env add REDIS_URL production               # the new Upstash
 # Payments (Paddle — Merchant of Record)
 vercel env add PAYMENT_GATEWAY production          # "paddle"
-vercel env add PADDLE_API_KEY production
-vercel env add PADDLE_WEBHOOK_SECRET production
-vercel env add PADDLE_PRODUCT_ID production
+vercel env add PADDLE_API_KEY production            # server: create transaction
+vercel env add PADDLE_WEBHOOK_SECRET production     # server: verify webhook HMAC
+vercel env add PADDLE_PRODUCT_ID production         # server: product for custom-price txns
 vercel env add PADDLE_ENV production                # "sandbox" first, then "production"
+vercel env add NEXT_PUBLIC_PADDLE_CLIENT_TOKEN production  # client: Paddle.js overlay
+vercel env add NEXT_PUBLIC_PADDLE_ENV production           # "sandbox" | "production"
 # Fresh copies of every secret panjat.id uses:
 vercel env add SESSION_SECRET production
 vercel env add ANON_SECRET production
@@ -65,14 +67,20 @@ Verify: `konfigurasi.minimum_naik = 500` ($5.00), `kaki_tiang = 100` ($1.00), an
 categories in English.
 
 ## 5. Paddle setup
-- Create a **product** (get `PADDLE_PRODUCT_ID`) and confirm your account can create
-  transactions with a **custom per-order unit price** (grip = board-top + 1 cent).
-  This is the one item to validate against the current Paddle API before launch —
-  the checkout uses an inline price of `unit_price.amount = <cents>` (see
-  `src/lib/gateways/paddle-gateway.ts`). Until keys are set, checkout falls back to
-  the local mock-pay page.
-- Set the webhook destination to `https://<global-domain>/api/webhook/paddle` and
-  copy the signing secret into `PADDLE_WEBHOOK_SECRET`.
+Checkout flow (Paddle Billing): the **server** creates a transaction with a
+non-catalog **custom price** (`unit_price.amount = <minor units>`) + our `order_id`
+in `custom_data` (`src/lib/gateways/paddle-gateway.ts`); the **client** opens the
+Paddle.js overlay for that transaction id (`src/lib/paddle-client.ts`). Grip still
+activates only via the verified webhook.
+- Developer Tools → Authentication: get the **server API key** (`PADDLE_API_KEY`)
+  and the **client-side token** (`NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`).
+- Catalog → create a **product** (get `PADDLE_PRODUCT_ID`); custom per-order price is
+  passed inline, so one product is enough.
+- Notifications → add a destination `https://<global-domain>/api/webhook/paddle`;
+  copy the signing secret into `PADDLE_WEBHOOK_SECRET`. Subscribe to at least
+  `transaction.completed` / `transaction.paid` (+ `payment_failed`/`canceled`).
+- Until server keys are set, checkout falls back to the local mock-pay page, so the
+  flow is exercisable offline.
 
 ## 6. Domain + admin host
 - Attach the global domain to the project.
