@@ -372,6 +372,8 @@ export const copyId = {
   },
 
   pasangGratis: {
+    metaTitle: "Pasang gratis — Panjat",
+    metaDesc: "Pasang listing gratis di Kaki Tiang. Dapat dukungan dari pengunjung.",
     judul: "Pasang gratis",
     subJudul: "Listing gratis di Kaki Tiang, diurut dukungan pengunjung.",
     urlPlaceholder: "produkku.id",
@@ -517,6 +519,21 @@ export const copyId = {
         wa: `${headline} Manjat lagi: ${d.manjatLink}`,
       };
     },
+  },
+
+  /** Dev-only mock payment page (stand-in for the real gateway). */
+  bayarMock: {
+    modeUji: "MODE UJI",
+    berhasilJudul: "Berhasil manjat!",
+    berhasilPesan: (rp: string) =>
+      `Pembayaran ${rp} dikonfirmasi. Listing kamu sudah tayang di papan.`,
+    lihatPosisi: "Lihat posisinya di papan →",
+    judul: "Pembayaran simulasi",
+    total: "Total",
+    gagal: (msg: string) => `Gagal: ${msg}`,
+    bayar: "Bayar sekarang (simulasi)",
+    memproses: "Memproses…",
+    batal: "Batalkan",
   },
 
   /** System pages — 404 / error boundary / loading. Plain and reassuring. */

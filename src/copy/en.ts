@@ -69,7 +69,7 @@ export const copyEn: CopyDeck = {
   papan: {
     aktivitas: "Activity",
     aktivitasVote: "just voted for",
-    aktivitasDukung: "just backed",
+    aktivitasDukung: "just supported",
     aktivitasManjat: "just climbed",
     aktivitasNaik: (rank: number) => `rose to #${rank}`,
     aktivitasKali: (n: number) => ` ${n}x`,
@@ -81,7 +81,7 @@ export const copyEn: CopyDeck = {
     juaraTerfavorit: "Favorite climber last week",
     juaraTerfavoritVote: (n: number) => `${formatCount(n)} votes`,
     terfavoritPekanIni: "Favorite this week",
-    dukunganTerbanyak: "Most backed",
+    dukunganTerbanyak: "Most supported",
     salip: (rp: string) => `Overtake for ${rp}`,
     salipRank: (rank: number, rp: string) => `Overtake #${rank} for ${rp}`,
     juara: (rank: number) => `Champion ${rank}`,
@@ -195,15 +195,15 @@ export const copyEn: CopyDeck = {
 
   kakiTiang: {
     judul: "Base of the Pole",
-    sisaDukungan: (n: number) => `${n} backs left today`,
+    sisaDukungan: (n: number) => `${n} supports left today`,
     ajakan:
-      "Free listings — back the ones you think are good. Each week, the most-backed becomes the Base of the Pole Champion and rises onto the board.",
-    dukung: "Back",
-    dukungGagal: "Couldn't back — try again.",
-    dukungan_n: (n: number) => `${formatCount(n)} backs`,
+      "Free listings — support the ones you think are good. Each week, the most-supported becomes the Base of the Pole Champion and rises onto the board.",
+    dukung: "Support",
+    dukungGagal: "Couldn't support — try again.",
+    dukungan_n: (n: number) => `${formatCount(n)} supporters`,
     kosong: "Nobody's waiting yet, you've got no rivals",
     pasangGratisTaut: "List free at the Base of the Pole",
-    baruNaik: "Your listing has risen to the Base of the Pole. Rally people to back it so it climbs!",
+    baruNaik: "Your listing has risen to the Base of the Pole. Rally people to support it so it climbs!",
     baruTutup: "Close",
   },
 
@@ -368,8 +368,10 @@ export const copyEn: CopyDeck = {
   },
 
   pasangGratis: {
+    metaTitle: "List for free — Panjat",
+    metaDesc: "Post a free listing at the Base of the Pole. Earn support from visitors.",
     judul: "List for free",
-    subJudul: "Free listings at the Base of the Pole, ordered by visitor backing.",
+    subJudul: "Free listings at the Base of the Pole, ordered by visitor support.",
     urlPlaceholder: "myproduct.id",
     judulPlaceholder: "My Product",
     emailHint: "Add it if you want to manage the listing later.",
@@ -513,6 +515,21 @@ export const copyEn: CopyDeck = {
         wa: `${headline} Climb again: ${d.manjatLink}`,
       };
     },
+  },
+
+  /** Dev-only mock payment page (stand-in for the real gateway). */
+  bayarMock: {
+    modeUji: "TEST MODE",
+    berhasilJudul: "You're on the board!",
+    berhasilPesan: (rp: string) =>
+      `Payment ${rp} confirmed. Your listing is now live on the board.`,
+    lihatPosisi: "See your spot on the board →",
+    judul: "Simulated payment",
+    total: "Total",
+    gagal: (msg: string) => `Failed: ${msg}`,
+    bayar: "Pay now (simulated)",
+    memproses: "Processing…",
+    batal: "Cancel",
   },
 
   /** System pages — 404 / error boundary / loading. Plain and reassuring. */

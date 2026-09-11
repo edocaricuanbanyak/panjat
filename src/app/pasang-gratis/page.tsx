@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { asc } from "drizzle-orm";
 import { PageShell } from "@/components/PageShell";
+import { copy } from "@/copy";
 import { db } from "@/db";
 import { kategori } from "@/db/schema";
 import { PasangGratisForm } from "./PasangGratisForm";
@@ -8,8 +9,8 @@ import { PasangGratisForm } from "./PasangGratisForm";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Pasang gratis — Panjat",
-  description: "Pasang listing gratis di Kaki Tiang. Dapat dukungan dari pengunjung.",
+  title: copy.pasangGratis.metaTitle,
+  description: copy.pasangGratis.metaDesc,
 };
 
 export default async function PasangGratisPage() {
