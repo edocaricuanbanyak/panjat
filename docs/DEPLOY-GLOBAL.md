@@ -1,10 +1,16 @@
-# Deploy — global board (English / USD / Paddle)
+# Deploy — global board (English / USD / Paddle **or** Polar)
 
 The global board runs the **same codebase** as panjat.id as a **separate Vercel
 project** with a **separate database**. There is no `board_id` multi-tenancy: each
 deployment is one board, distinguished entirely by environment variables. panjat.id
 is untouched — with none of the market vars set it stays IDR / id / Asia/Jakarta /
 Midtrans exactly as before.
+
+> **Gateway choice.** The global board can be powered by **Paddle** (§5, default of
+> `MARKET=global`) or **Polar** (`PAYMENT_GATEWAY=polar`). Steps 1–4, 6, 7 are
+> identical; only the payments part differs. For Paddle follow Step 5 below; for
+> Polar jump to **"Alternative gateway: Polar"** at the end and skip Step 5 +
+> the Paddle env vars.
 
 > Do Steps 1–7 against **Paddle sandbox** on a Preview deploy first and prove one
 > real end-to-end payment (Step 8) before switching to production keys.
@@ -135,3 +141,120 @@ all of this in the **live** workspace once sandbox is proven.
       (USD tunables verified)
 - [ ] Global domain attached; admin on `adm.<domain>` (`PUBLIC_HOSTS` set)
 - [ ] Cron jobs scheduled on the global Vercel project
+
+---
+
+# Alternative gateway: Polar
+
+Polar is a Merchant-of-Record like Paddle. It differs in one nice way: checkout is
+a **redirect to a hosted page**, so **no client-side SDK ships** and there is no
+"approved domain" gotcha for an overlay. Code lives in
+`src/lib/gateways/polar-gateway.ts` (verify + normalize + checkout) and
+`/api/webhook/polar`. Selected with `PAYMENT_GATEWAY=polar`. Until credentials are
+set, checkout falls back to the local mock-pay page (exercisable offline).
+
+Do everything below in **Polar sandbox first** (a fully separate environment from
+production — separate account, tokens, products, and webhooks), prove one payment,
+then repeat in the live workspace.
+
+## P1. Create the Polar organization
+1. Sandbox: sign up / log in at **sandbox.polar.sh** (production later at
+   **polar.sh** — they are separate accounts, not a mode toggle).
+2. **Create an Organization** (this is your seller identity; its slug appears in
+   checkout URLs). Note the org.
+
+## P2. Organization Access Token (this is `POLAR_ACCESS_TOKEN`)
+Polar's server API is authenticated with an **Organization Access Token** (prefix
+`polar_oat_…`). It is scoped to one organization — exactly what we want.
+1. In the org, open **Settings → (Developers / API — "Organization Access Tokens")**.
+2. **Create Token**. Give it a name (e.g. `panjat-checkout`), an expiration, and
+   the **minimum scopes** the flow needs:
+   - `checkouts:write` — create checkout sessions (required)
+   - `checkouts:read` — optional, for debugging/reads
+   - `products:read` — optional
+   Grant nothing else (least privilege — this token can move money-adjacent
+   resources).
+3. **Copy the token now** — it is shown only once. This is `POLAR_ACCESS_TOKEN`.
+   Store it in Vercel env, never in the repo. Regenerate if it ever leaks.
+4. The token is environment-bound: a **sandbox** token only works against
+   `sandbox-api.polar.sh`, a **production** token only against `api.polar.sh`. The
+   code picks the base URL from `POLAR_ENV`.
+
+## P3. Product with a custom (pay-what-you-want) price
+Grip is an arbitrary per-order amount (board-top + 1 minor unit), so the product's
+price must accept a custom amount.
+1. **Products → New Product**. Name it (e.g. "Panjat — climb").
+2. Set pricing to **"Pay what you want"** (custom amount). Set a sensible
+   **minimum** (≈ the board's `minimum_naik` = $5.00 = `500`). A single product is
+   enough — the exact amount is passed per checkout.
+3. Copy the **product ID** → `POLAR_PRODUCT_ID`.
+
+## P4. Webhook endpoint (this is `POLAR_WEBHOOK_SECRET`)
+1. **Settings → Webhooks → Add Endpoint**.
+2. URL: `https://<global-domain>/api/webhook/polar` (Format: **Raw / Standard
+   Webhooks**).
+3. Subscribe to at least **`order.paid`** (add `order.refunded` later if/when the
+   refund→ledger path is wired).
+4. Copy the endpoint's **signing secret** (`whsec_…`) → `POLAR_WEBHOOK_SECRET`.
+   Our verifier follows the Standard Webhooks spec (HMAC-SHA256 over
+   `id.timestamp.body`, base64).
+
+## P5. Vercel env (Polar variant of Step 3)
+Same as Step 3 but swap the payments block — set **no `PADDLE_*` and no
+`MIDTRANS_*`**:
+```bash
+vercel env add PAYMENT_GATEWAY production      # "polar"
+vercel env add POLAR_ACCESS_TOKEN production   # polar_oat_…  (from P2; server-only)
+vercel env add POLAR_WEBHOOK_SECRET production # whsec_…      (from P4)
+vercel env add POLAR_PRODUCT_ID production     # from P3
+vercel env add POLAR_ENV production            # "sandbox" first, then "production"
+```
+`PAYMENT_GATEWAY` is read server-side only, so the non-public name is enough.
+`NEXT_PUBLIC_BASE_URL` (Step 3) must be correct — it builds the `success_url` Polar
+redirects to after payment (`/manjat/selesai?order=<id>`).
+
+## P6. Prove it end-to-end (sandbox)
+manjat → server creates a Polar checkout (`POST /v1/checkouts/` with our `order_id`
+in `metadata` + custom `amount`) → browser redirects to Polar's hosted checkout →
+pay with a **test card** → Polar posts `order.paid` to `/api/webhook/polar` →
+signature verified → `bayar` appended to `pegangan_ledger` → `pegangan_cached`
+re-derived → rank changes. Confirm a replayed webhook is idempotent (no double grip)
+and a bad signature is rejected (401).
+
+## Polar production go-live
+Live and sandbox are separate Polar accounts with separate credentials.
+- [ ] **Business / payout onboarding** complete in the live org (MoR payout runs via
+      Stripe Connect — start early; can take days).
+- [ ] **Live** organization access token (`polar_oat_…`, `checkouts:write`) captured
+      → `POLAR_ACCESS_TOKEN`; set `POLAR_ENV=production`.
+- [ ] **Live product** (pay-what-you-want) created → `POLAR_PRODUCT_ID`.
+- [ ] **Live webhook** → `https://<domain>/api/webhook/polar`, `order.paid`
+      subscribed; secret → `POLAR_WEBHOOK_SECRET`.
+- [ ] **USD** enabled as the settlement currency; product tax category = digital
+      goods (Polar as MoR computes VAT/sales tax).
+
+## Code validation (do in sandbox first — these are the "validate before go-live"
+notes in `src/lib/gateways/polar-gateway.ts`)
+- [ ] **Webhook secret encoding** — a real Polar `order.paid` verifies with our
+      base64/Standard-Webhooks HMAC. If Polar signs differently, either adjust
+      `signPolar`/`verifyPolarSignature` or swap in `@polar-sh/sdk`'s validator.
+- [ ] **Arbitrary amount** — `POST /v1/checkouts/` accepts our custom `amount`
+      (minor units) for the pay-what-you-want product.
+- [ ] **Create-checkout field names** — `products` / `amount` / `metadata` /
+      `success_url` / `customer_email` match the current Polar API.
+- [ ] **Amount = grip** — the order field we read (`data.amount`) equals what we
+      charged (tax-exclusive), so `settle()`'s amount-match doesn't reject. If Polar
+      reports tax-inclusive totals, read the pre-tax field instead.
+- [ ] **`metadata` propagation** — checkout `metadata.order_id` appears on the
+      `order.paid` payload (it is our idempotency key).
+- [ ] **One real small live payment** (real card): redirect → webhook → `bayar` in
+      `pegangan_ledger` → rank changes. Then refund it in Polar to check the
+      needs-review path.
+
+## Release gates (Polar variant)
+- [ ] `NEXT_PUBLIC_MARKET=global` + `PAYMENT_GATEWAY=polar`; all `MIDTRANS_*` and
+      `PADDLE_*` unset
+- [ ] `POLAR_ACCESS_TOKEN` / `POLAR_WEBHOOK_SECRET` / `POLAR_PRODUCT_ID` set;
+      `POLAR_ENV` correct for the workspace
+- [ ] Sandbox end-to-end proven (P6) incl. idempotent replay + rejected bad signature
+- [ ] Code-validation checklist above cleared against live Polar
