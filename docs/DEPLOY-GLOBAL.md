@@ -258,3 +258,32 @@ notes in `src/lib/gateways/polar-gateway.ts`)
       `POLAR_ENV` correct for the workspace
 - [ ] Sandbox end-to-end proven (P6) incl. idempotent replay + rejected bad signature
 - [ ] Code-validation checklist above cleared against live Polar
+
+---
+
+# Cross-board geo suggestion (optional)
+
+Because IDR and USD are **separate boards on separate domains** (a single-currency
+ledger is a ranking contract — you cannot mix currencies in one board), routing
+visitors is done with a **dismissible suggestion banner**, never a redirect
+(SEO-safe, respects the visitor's choice + VPN/traveller cases). Each deployment
+points at its sibling via env; unset → feature off (panjat.id default).
+
+Set on **each** project (text in the *target* board's language):
+```bash
+# On panjat.id — nudge non-Indonesian visitors to the global board:
+ALT_BOARD_URL=https://<global-domain>
+ALT_BOARD_LABEL=View the global board (USD)
+ALT_BOARD_NOTE=Looks like you're outside Indonesia.
+ALT_BOARD_COUNTRIES=!ID        # show when visitor is NOT in ID
+
+# On the global board — nudge Indonesian visitors home:
+ALT_BOARD_URL=https://panjat.id
+ALT_BOARD_LABEL=Buka Panjat versi Indonesia (Rupiah)
+ALT_BOARD_NOTE=Sepertinya kamu di Indonesia.
+ALT_BOARD_COUNTRIES=ID         # show when visitor IS in ID
+```
+Country comes from Vercel's `x-vercel-ip-country`; the banner drops a 90-day
+`panjat_alt_dismiss` cookie once dismissed/clicked. Locally, set
+`GEO_COUNTRY_OVERRIDE=ID` to preview it (no edge geo off Vercel). Code:
+`src/lib/geo.ts`, `src/components/GeoSuggest.tsx`, wired in `PageShell`.

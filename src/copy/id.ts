@@ -547,6 +547,7 @@ export const copyId = {
     galatPesan: "Maaf, ada gangguan sesaat. Coba lagi sebentar.",
     cobaLagi: "Coba lagi",
     kePapan: "Ke papan",
+    tutup: "Tutup",
   },
 };
 

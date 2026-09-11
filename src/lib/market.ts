@@ -31,6 +31,18 @@ export interface MarketConfig {
   defaultLocale: "id" | "en";
   /** Which payment gateway grants grip on this deployment. */
   paymentGateway: "midtrans" | "paddle" | "polar";
+  /**
+   * Optional sibling-board geo suggestion. When set, a dismissible banner nudges
+   * visitors to the other currency/market (on its own domain) — never a redirect,
+   * so it's SEO-safe and respects the visitor's choice. `showFor` is a country
+   * rule matched against the visitor's ISO country: `"ID"` shows the banner when
+   * the visitor IS in ID (the global board pointing Indonesians home); `"!ID"`
+   * shows it when the visitor is NOT in ID (panjat.id pointing foreigners to the
+   * global board). Unset → feature off (panjat.id default unchanged). Text lives
+   * in env, not the copy deck, because it must be written in the *target* board's
+   * language (the one thing the local single-language deck can't express).
+   */
+  altBoard?: { url: string; label: string; note: string; showFor: string };
 }
 
 /** Today's Indonesian defaults — the exact values previously hardcoded. */
@@ -77,6 +89,11 @@ const WEEK_ANCHOR_ENV =
 // Gateway selection is server-only, but reading the public name too is harmless.
 const GATEWAY_ENV =
   process.env.NEXT_PUBLIC_PAYMENT_GATEWAY ?? process.env.PAYMENT_GATEWAY;
+// Sibling-board geo suggestion — server-only (the banner is server-rendered).
+const ALT_BOARD_URL = process.env.ALT_BOARD_URL?.trim();
+const ALT_BOARD_LABEL = process.env.ALT_BOARD_LABEL?.trim();
+const ALT_BOARD_NOTE = process.env.ALT_BOARD_NOTE?.trim() ?? "";
+const ALT_BOARD_COUNTRIES = process.env.ALT_BOARD_COUNTRIES?.trim();
 
 function resolveFromEnv(): MarketConfig {
   const base = MARKET_ENV === "global" ? GLOBAL_DEFAULTS : ID_DEFAULTS;
@@ -95,6 +112,15 @@ function resolveFromEnv(): MarketConfig {
     defaultLocale: defaultLocale === "en" ? "en" : "id",
     paymentGateway:
       paymentGateway === "paddle" || paymentGateway === "polar" ? paymentGateway : "midtrans",
+    altBoard:
+      ALT_BOARD_URL && ALT_BOARD_LABEL && ALT_BOARD_COUNTRIES
+        ? {
+            url: ALT_BOARD_URL,
+            label: ALT_BOARD_LABEL,
+            note: ALT_BOARD_NOTE,
+            showFor: ALT_BOARD_COUNTRIES,
+          }
+        : undefined,
   };
 }
 

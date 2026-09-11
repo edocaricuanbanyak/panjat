@@ -1,8 +1,11 @@
+import { cookies } from "next/headers";
 import { copy } from "@/copy";
 import { db } from "@/db";
 import { listCategories } from "@/domain/jelajah";
 import { recentAktivitas } from "@/lib/aktivitas";
+import { altBoardSuggestion, visitorCountry } from "@/lib/geo";
 import { Footer } from "./Footer";
+import { GeoSuggest } from "./GeoSuggest";
 import { ManjatProvider } from "./ManjatModal";
 import { SiteHeader } from "./SiteHeader";
 import { Spotlight } from "./Spotlight";
@@ -30,6 +33,10 @@ export async function PageShell({
     manjatKategori ? Promise.resolve(manjatKategori) : listCategories(db),
     recentAktivitas(20),
   ]);
+  // Sibling-board suggestion (e.g. an Indonesian visitor on the global board):
+  // off unless MARKET.altBoard is configured, and skipped once dismissed.
+  const altDismissed = (await cookies()).get("panjat_alt_dismiss");
+  const altBoard = altDismissed ? null : altBoardSuggestion(await visitorCountry());
   const pbMobile = padBottomMobile
     ? "pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:pb-[calc(1rem+env(safe-area-inset-bottom))]"
     : "pb-[calc(1rem+env(safe-area-inset-bottom))]";
@@ -56,6 +63,14 @@ export async function PageShell({
           <SiteHeader />
         </div>
         <div id="isi" tabIndex={-1} className="flex-1 pt-4 focus:outline-none">
+          {altBoard && (
+            <GeoSuggest
+              url={altBoard.url}
+              label={altBoard.label}
+              note={altBoard.note}
+              dismissLabel={copy.sistem.tutup}
+            />
+          )}
           {children}
         </div>
         <Footer />

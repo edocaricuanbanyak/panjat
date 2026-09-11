@@ -543,5 +543,6 @@ export const copyEn: CopyDeck = {
     galatPesan: "Sorry, a brief hiccup. Try again in a moment.",
     cobaLagi: "Try again",
     kePapan: "To the board",
+    tutup: "Close",
   },
 };
