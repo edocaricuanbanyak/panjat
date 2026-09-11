@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { formatCount, formatMoney, formatRupiah, formatWIB, formatWIBTime } from "@/lib/format";
+import {
+  formatCount,
+  formatMoney,
+  formatMoneyInput,
+  formatRupiah,
+  formatWIB,
+  formatWIBTime,
+  moneySymbol,
+} from "@/lib/format";
 
 // These assert BYTE-IDENTICAL output under the default (Indonesian) MARKET
 // config — the guard that internationalization did not change panjat.id money
@@ -21,6 +29,18 @@ describe("formatCount (default MARKET = id-ID grouping)", () => {
   it("groups thousands with a dot", () => {
     expect(formatCount(12_345)).toBe("12.345");
     expect(formatCount(0)).toBe("0");
+  });
+});
+
+describe("formatMoneyInput / moneySymbol (default MARKET = IDR)", () => {
+  it("groups the raw digit string exactly like before (no decimals)", () => {
+    expect(formatMoneyInput("5000")).toBe("5.000");
+    expect(formatMoneyInput("25000")).toBe("25.000");
+    expect(formatMoneyInput("")).toBe("");
+  });
+
+  it("exposes the Rupiah symbol", () => {
+    expect(moneySymbol).toBe("Rp");
   });
 });
 

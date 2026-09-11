@@ -9,7 +9,7 @@ import { KategoriIcon } from "@/components/KategoriIcon";
 import { LogoTile } from "@/components/LogoTile";
 import { copy } from "@/copy";
 import type { Quote } from "@/domain/manjat";
-import { formatRupiah } from "@/lib/format";
+import { formatMoneyInput, formatRupiah, moneySymbol } from "@/lib/format";
 
 type Kategori = { slug: string; nama: string };
 
@@ -418,13 +418,13 @@ export function ManjatWizard({
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 tabular text-xl text-tinta-redup">
-                Rp
+                {moneySymbol}
               </span>
               <input
                 ref={nominalRef}
                 inputMode="numeric"
                 placeholder={copy.manjat.nominalPlaceholder}
-                value={nominalInput ? Number(nominalInput).toLocaleString("id-ID") : ""}
+                value={formatMoneyInput(nominalInput)}
                 onChange={(e) => setNominalInput(e.target.value.replace(/\D/g, ""))}
                 className={`h-14 w-full rounded-xl border bg-kertas-1 pl-12 pr-4 tabular text-2xl font-bold text-tinta shadow-kartu focus-visible:outline-none focus-visible:ring-2 ${
                   nominalDinaikkan

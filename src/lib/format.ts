@@ -46,6 +46,28 @@ export function formatCount(n: number): string {
   return counts.format(n);
 }
 
+/** The currency symbol for this market, e.g. "Rp" / "$". */
+export const moneySymbol =
+  money.formatToParts(0).find((p) => p.type === "currency")?.value ?? "";
+
+/**
+ * Format a raw digit string (minor units) for a money input field.
+ * IDR (0 decimals): "5000" -> "5.000" (grouping only — unchanged behavior).
+ * USD (2 decimals): digits fill from the right past the decimal —
+ * "5" -> "0.05", "500" -> "5.00", "2500" -> "25.00". A natural cents-entry UX.
+ * Empty in -> empty out (lets the placeholder show).
+ */
+export function formatMoneyInput(digits: string): string {
+  if (!digits) return "";
+  const n = Number(digits);
+  if (!Number.isFinite(n)) return "";
+  if (MARKET.currencyDecimals === 0) return formatCount(n);
+  const scale = MINOR_SCALE;
+  const major = Math.floor(n / scale);
+  const minor = String(n % scale).padStart(MARKET.currencyDecimals, "0");
+  return `${formatCount(major)}.${minor}`;
+}
+
 const dateTimeFmt = new Intl.DateTimeFormat(MARKET.locale, {
   timeZone: MARKET.timeZone,
   dateStyle: "medium",
