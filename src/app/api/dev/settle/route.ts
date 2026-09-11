@@ -16,9 +16,9 @@ export const runtime = "nodejs";
 
 /** True when the active gateway is running in mock mode (no real credentials). */
 function checkoutIsMock(): boolean {
-  return MARKET.paymentGateway === "paddle"
-    ? !process.env.PADDLE_API_KEY?.trim() // Paddle falls back to mock without a key
-    : isMock(); // Midtrans mock
+  if (MARKET.paymentGateway === "paddle") return !process.env.PADDLE_API_KEY?.trim();
+  if (MARKET.paymentGateway === "polar") return !process.env.POLAR_ACCESS_TOKEN?.trim();
+  return isMock(); // Midtrans mock
 }
 
 /**
@@ -57,6 +57,16 @@ export async function POST(req: Request) {
       rawStatus: "transaction.completed",
       method: "card",
       raw: { dev: true, event_type: "transaction.completed", order_id: orderId },
+    });
+  } else if (MARKET.paymentGateway === "polar") {
+    // Simulate a verified Polar order.paid → gateway-neutral settle.
+    outcome = await settle(db, {
+      orderId,
+      amountMinor: t.nominal,
+      status: "success",
+      rawStatus: "order.paid",
+      method: "stripe",
+      raw: { dev: true, type: "order.paid", data: { metadata: { order_id: orderId } } },
     });
   } else {
     const { serverKey } = midtransConfig();

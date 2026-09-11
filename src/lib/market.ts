@@ -30,7 +30,7 @@ export interface MarketConfig {
   /** Default UI language for this deployment. */
   defaultLocale: "id" | "en";
   /** Which payment gateway grants grip on this deployment. */
-  paymentGateway: "midtrans" | "paddle";
+  paymentGateway: "midtrans" | "paddle" | "polar";
 }
 
 /** Today's Indonesian defaults — the exact values previously hardcoded. */
@@ -84,7 +84,7 @@ function resolveFromEnv(): MarketConfig {
   const currency = CURRENCY_ENV?.trim() || base.currency;
   const defaultLocale = (DEFAULT_LOCALE_ENV?.trim() as "id" | "en") || base.defaultLocale;
   const paymentGateway =
-    (GATEWAY_ENV?.trim() as "midtrans" | "paddle") || base.paymentGateway;
+    (GATEWAY_ENV?.trim() as MarketConfig["paymentGateway"]) || base.paymentGateway;
 
   return {
     currency,
@@ -93,7 +93,8 @@ function resolveFromEnv(): MarketConfig {
     timeZone: TZ_ENV?.trim() || base.timeZone,
     weekAnchorMs: WEEK_ANCHOR_ENV ? Number(WEEK_ANCHOR_ENV) : base.weekAnchorMs,
     defaultLocale: defaultLocale === "en" ? "en" : "id",
-    paymentGateway: paymentGateway === "paddle" ? "paddle" : "midtrans",
+    paymentGateway:
+      paymentGateway === "paddle" || paymentGateway === "polar" ? paymentGateway : "midtrans",
   };
 }
 

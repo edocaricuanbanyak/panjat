@@ -6,11 +6,13 @@
 import { MARKET } from "@/lib/market";
 import { isMock, midtransSnapClient, mockSnapClient, type SnapClient } from "@/lib/midtrans";
 import { paddleCheckoutClient, paddleWebhookGateway } from "./paddle-gateway";
+import { polarCheckoutClient, polarWebhookGateway } from "./polar-gateway";
 import type { WebhookGateway } from "./types";
 
 /** The checkout client for creating a payment (invoice/hosted checkout). */
 export function getCheckoutClient(): SnapClient {
   if (MARKET.paymentGateway === "paddle") return paddleCheckoutClient;
+  if (MARKET.paymentGateway === "polar") return polarCheckoutClient;
   return isMock() ? mockSnapClient : midtransSnapClient;
 }
 
@@ -20,6 +22,7 @@ export function getCheckoutClient(): SnapClient {
  */
 export function getWebhookGateway(): WebhookGateway | null {
   if (MARKET.paymentGateway === "paddle") return paddleWebhookGateway;
+  if (MARKET.paymentGateway === "polar") return polarWebhookGateway;
   return null;
 }
 
