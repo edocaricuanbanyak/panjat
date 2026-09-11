@@ -97,9 +97,41 @@ One small real payment: create checkout → pay in Paddle sandbox → Paddle pos
 → `pegangan_cached` re-derived → rank changes on the board. Confirm a replayed
 webhook is idempotent (no double grip) and an amount mismatch is held for review.
 
-## Release gates
-- [ ] `MARKET=global` + `PAYMENT_GATEWAY=paddle` set; all `MIDTRANS_*` unset
+## Paddle production go-live (operational — mostly in the Paddle dashboard)
+Sandbox and production are separate Paddle accounts with separate credentials. Do
+all of this in the **live** workspace once sandbox is proven.
+- [ ] **Business verification** approved (Paddle reviews your business; can take
+      days — start early). Live checkout won't accept payments until verified.
+- [ ] **Payout details** added (bank account) so Paddle can settle funds to you.
+- [ ] **Website/domain approved** in Paddle → Checkout settings. Live Paddle.js
+      overlay only opens on an approved domain — this is the #1 prod gotcha.
+- [ ] **Default payment link** set (Checkout settings) to your domain.
+- [ ] **Product tax category** set to digital goods so Paddle (as MoR) computes
+      the right VAT/sales tax.
+- [ ] **USD** enabled as a presentment/settlement currency.
+- [ ] **Live credentials** captured (from the live workspace):
+      `PADDLE_API_KEY` (`pdl_live_apikey_…`), `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`
+      (`live_…`), `PADDLE_WEBHOOK_SECRET`, `PADDLE_PRODUCT_ID`, and set
+      `PADDLE_ENV=production` + `NEXT_PUBLIC_PADDLE_ENV=production`.
+- [ ] **Live webhook destination** → `https://<domain>/api/webhook/paddle`,
+      subscribed to `transaction.completed`, `transaction.paid`,
+      `transaction.payment_failed`, `transaction.canceled`.
+
+## Code validation (do in sandbox first)
+- [ ] **Arbitrary-amount custom-price** transaction confirmed against the Paddle
+      API (grip = board-top + 1¢ → inline `unit_price.amount`; see
+      `src/lib/gateways/paddle-gateway.ts`).
+- [ ] Overlay opens in `production` mode on the approved domain (client token +
+      `NEXT_PUBLIC_PADDLE_ENV=production`).
+- [ ] **One real small live payment** end-to-end (real card): overlay → webhook →
+      `bayar` in `pegangan_ledger` → rank changes. Then **refund it** in Paddle to
+      confirm the refund/needs-review path.
+- [ ] Replayed webhook is idempotent (no double grip); amount mismatch is held.
+
+## Release gates (global deploy)
+- [ ] `NEXT_PUBLIC_MARKET=global` set; all `MIDTRANS_*` unset
 - [ ] `ADMIN_TOTP_SECRET`, `CRON_SECRET`, all `*_SECRET` fresh (not panjat.id's)
-- [ ] Migrate + seed run on the global DB (USD tunables verified)
-- [ ] Paddle webhook wired + one sandbox payment settled end-to-end
-- [ ] Arbitrary-amount Paddle checkout confirmed against the live API
+- [ ] Separate Neon + Upstash provisioned; migrate + seed run on the global DB
+      (USD tunables verified)
+- [ ] Global domain attached; admin on `adm.<domain>` (`PUBLIC_HOSTS` set)
+- [ ] Cron jobs scheduled on the global Vercel project
