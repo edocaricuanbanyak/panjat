@@ -7,6 +7,7 @@ import { Dropdown } from "@/components/Dropdown";
 import { fieldClasses, Input, textareaClasses } from "@/components/Input";
 import { KategoriIcon } from "@/components/KategoriIcon";
 import { copy } from "@/copy";
+import { isEmailish } from "@/lib/validate";
 
 type Kategori = { slug: string; nama: string };
 
@@ -38,6 +39,9 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
       .catch(() => {});
   }, []);
   const penuh = kuota?.sisa === 0;
+  // Email is optional, but if the visitor typed one, flag an obvious bad format
+  // before the round-trip. Never blocks an empty field.
+  const emailError = email.trim() !== "" && !isEmailish(email) ? copy.error.emailTidakValid : undefined;
 
   // Grow the description box to fit its content (≤160 chars) so it never scrolls.
   useEffect(() => {
@@ -246,11 +250,12 @@ export function PasangGratisForm({ kategori }: { kategori: Kategori[] }) {
         type="email"
         placeholder={copy.manjat.emailPlaceholder}
         hint={copy.pasangGratis.emailHint}
+        error={emailError}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <Button disabled={!url.trim() || submitting || penuh} onClick={submit}>
+      <Button disabled={!url.trim() || submitting || penuh || !!emailError} onClick={submit}>
         {submitting ? copy.manjat.memproses : copy.pasangGratis.tombol}
       </Button>
     </div>

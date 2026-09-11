@@ -2,7 +2,7 @@
 
 import { Check, ChevronDown } from "lucide-react";
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";
-import { fieldClasses } from "./Input";
+import { fieldClass } from "./Input";
 
 export type DropdownOption = { value: string; label: string; icon?: ReactNode };
 
@@ -15,6 +15,7 @@ export type DropdownOption = { value: string; label: string; icon?: ReactNode };
 export function Dropdown({
   label,
   hint,
+  error,
   options,
   value,
   onChange,
@@ -23,6 +24,7 @@ export function Dropdown({
 }: {
   label?: string;
   hint?: string;
+  error?: string;
   options: DropdownOption[];
   value: string;
   onChange: (value: string) => void;
@@ -112,9 +114,10 @@ export function Dropdown({
           aria-expanded={open}
           aria-controls={listId}
           aria-activedescendant={open ? optId(active) : undefined}
+          aria-invalid={error ? true : undefined}
           onClick={() => (open ? setOpen(false) : openMenu())}
           onKeyDown={onKey}
-          className={`${fieldClasses} flex cursor-pointer items-center justify-between gap-2 text-left`}
+          className={`${fieldClass(!!error)} flex cursor-pointer items-center justify-between gap-2 text-left`}
         >
           <span className={`flex min-w-0 items-center gap-2 truncate ${selected ? "text-tinta" : "text-tinta-redup/55"}`}>
             {selected?.icon}
@@ -158,7 +161,13 @@ export function Dropdown({
           </ul>
         )}
       </div>
-      {hint && <span className="mt-1 block text-xs text-tinta-redup">{hint}</span>}
+      {error ? (
+        <span role="alert" className="mt-1 block text-xs text-galat">
+          {error}
+        </span>
+      ) : hint ? (
+        <span className="mt-1 block text-xs text-tinta-redup">{hint}</span>
+      ) : null}
     </div>
   );
 }

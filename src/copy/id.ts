@@ -482,6 +482,7 @@ export const copyId = {
     bodyTidakValid: "Data yang dikirim tidak terbaca. Coba ulangi dari awal.",
     listingTidakDitemukan: "Listing ini tidak ada atau sudah tidak tayang. Segarkan papan lalu coba lagi.",
     nominalWajib: "Nominal belum diisi. Masukkan jumlah rupiah yang mau kamu bayar.",
+    emailTidakValid: "Format email belum benar. Contoh: kamu@email.com",
     gagalProses: "Gagal memproses. Coba lagi sebentar lagi.",
     gagalHitung: "Gagal menghitung posisi. Cek koneksi lalu coba lagi.",
     gagalTagihan: "Gagal membuat tagihan. Pembayaran belum berjalan — coba lagi sebentar lagi.",

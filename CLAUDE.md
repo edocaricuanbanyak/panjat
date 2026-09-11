@@ -45,7 +45,7 @@ These are invariants ("kontrak produk"), not preferences. The PRD marks them non
 - **Jelajah (discovery) and the board are strictly separated.** Board is ordered by money; Jelajah/search by relevance and explicit visitor-chosen sort. No money buys Jelajah position; no relevance moves the board (R22).
 - **Third-party content is untrusted.** Listing name/description render as plain text only — no HTML/markdown. Strict CSP, sanitized/rasterized SVG logos, http/https URLs only. Scraped page content must not influence AI classification (prompt-injection) (§18.1, R8).
 - **SSRF guarding on any URL fetch.** `/api/preview` and the screenshot worker resolve DNS then reject private/link-local/metadata IPs (`169.254.169.254`), cap response size, reject internal redirects; the screenshot worker additionally runs sandboxed because it executes target-page JS (R2, R21, §18.4).
-- **Design tokens are the only source of truth.** No raw hex/px/durations in feature code (lint should reject). The flag color `merah` (`#C93A2E`) appears *only* in the summit zone (#1–3) and primary actions — anywhere else is a bug (§9.5, §9.6.2).
+- **Design tokens are the only source of truth.** No raw hex/px/durations in feature code (lint should reject). The flag color `merah` (`#da2e20`) appears *only* in the summit zone (#1–3) and primary actions — anywhere else is a bug (§9.5, §9.6.2).
 - **Time & money formatting:** store all timestamps in UTC (`timestamptz`), display WIB. Money is integer rupiah (`BIGINT`) — no floats. Exactly one rupiah formatter and one WIB time formatter across the app (§17.2, R13).
 
 ## Data model (Postgres via Drizzle, first-party)

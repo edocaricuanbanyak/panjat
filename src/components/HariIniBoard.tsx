@@ -1,7 +1,9 @@
 import { copy } from "@/copy";
 import type { BoardEntry } from "@/domain/board";
 import type { HariIniEntry } from "@/domain/papan-hari-ini";
+import { EmptyState } from "./EmptyState";
 import { ListingCard } from "./ListingCard";
+import { TiangRail } from "./TiangRail";
 
 /**
  * Papan Hari Ini standings — same money-ranked shape as the main board, 24h
@@ -29,7 +31,7 @@ function toBoardEntry(e: HariIniEntry): BoardEntry {
 
 export function HariIniBoard({ entries }: { entries: HariIniEntry[] }) {
   if (entries.length === 0) {
-    return <p className="mt-6 text-sm text-tinta-redup">{copy.hariIni.kosong}</p>;
+    return <EmptyState compact message={copy.hariIni.kosong} />;
   }
 
   const rows = entries.map(toBoardEntry);
@@ -39,21 +41,25 @@ export function HariIniBoard({ entries }: { entries: HariIniEntry[] }) {
   return (
     // Same structure + spacing as BoardLive so both boards read identically.
     <div className="mt-6">
-      {/* Summit zone — top 3 in rank-tinted cards, matching the main board. */}
-      <section className="grid grid-cols-1 auto-rows-fr gap-3">
-        {puncak.map((e) => (
-          <div
-            key={e.id}
-            className={`h-full rounded-2xl border shadow-baris ${
-              e.rank === 1 ? "podium-1" : e.rank === 2 ? "podium-2" : "podium-3"
-            }`}
-          >
-            <ListingCard entry={e} density="puncak" showRosot={false} />
-          </div>
-        ))}
+      {/* Summit zone — top 3 in rank-tinted cards, matching the main board:
+          the pole rises in a left gutter with the prize + flag at #1. */}
+      <section className="relative flex gap-2.5 sm:gap-3">
+        <TiangRail className="w-5 shrink-0 sm:w-6" />
+        <div className="grid flex-1 auto-rows-fr grid-cols-1 gap-3">
+          {puncak.map((e) => (
+            <div
+              key={e.id}
+              className={`h-full rounded-2xl border shadow-baris ${
+                e.rank === 1 ? "podium-1" : e.rank === 2 ? "podium-2" : "podium-3"
+              }`}
+            >
+              <ListingCard entry={e} density="puncak" showRosot={false} />
+            </div>
+          ))}
+        </div>
       </section>
       {sisa.length > 0 && (
-        <section className="mt-5 flex flex-col gap-2.5">
+        <section className="mt-5 flex flex-col gap-baris">
           {sisa.map((e) => (
             <ListingCard key={e.id} entry={e} showRosot={false} />
           ))}

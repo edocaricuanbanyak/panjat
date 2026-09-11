@@ -142,12 +142,7 @@ async function HomeBody({
 
       {/* HERO — value + the one action */}
       <section className="pt-1 pb-5">
-        <h1
-          className="font-display text-4xl font-bold leading-[0.95] text-tinta sm:text-5xl md:text-6xl"
-          style={{ fontStretch: "130%" }}
-        >
-          {copy.beranda.heroJudul}
-        </h1>
+        <h1 className="display-xl text-tinta">{copy.beranda.heroJudul}</h1>
         {/* Live social proof — the USP as one soft chip linking to full stats. */}
         <div className="mt-6">
           <a
@@ -207,7 +202,7 @@ async function HomeBody({
                 {juaraTerfavorit && <JuaraTerfavorit entry={juaraTerfavorit} />}
               </>
             ) : (
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-baris">
                 {pageEntries.map((e) => (
                   <ListingCard key={e.id} entry={e} />
                 ))}
@@ -220,7 +215,7 @@ async function HomeBody({
       />
 
       {/* KAKI TIANG (gratis) — below both boards (All time + Hari Ini). */}
-      <div className="mt-12">
+      <div className="mt-seksi">
         <KakiTiang entries={kakiTiangEntries} remaining={sisaSorak} baruId={sp.baru ?? null} />
         <div className="mt-3 text-xs text-tinta-redup">
           {copy.beranda.punyaProduk}{" "}
@@ -229,9 +224,9 @@ async function HomeBody({
       </div>
 
       {/* CARA MAIN */}
-      <section className="mt-14">
-        <h2 className="mb-6 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
-          {copy.beranda.caraMainJudul}
+      <section className="mt-seksi">
+        <h2 className="masthead mb-6">
+          <span>{copy.beranda.caraMainJudul}</span>
         </h2>
         <CaraMain />
       </section>

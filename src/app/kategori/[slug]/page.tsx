@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
+import { EmptyState } from "@/components/EmptyState";
 import { JelajahCard } from "@/components/JelajahCard";
 import { JsonLd } from "@/components/JsonLd";
 import { KategoriIcon } from "@/components/KategoriIcon";
@@ -74,10 +75,7 @@ export default async function KategoriPage({
       >
         {copy.jelajah.kembali}
       </a>
-      <h1
-        className="flex items-center gap-2.5 font-display text-3xl font-bold text-tinta sm:text-4xl"
-        style={{ fontStretch: "125%" }}
-      >
+      <h1 className="display-lg flex items-center gap-2.5">
         <KategoriIcon slug={slug} className="size-7 shrink-0 text-merah-teks sm:size-8" />
         {dir.kategori.nama}
       </h1>
@@ -119,7 +117,7 @@ export default async function KategoriPage({
       </div>
 
       {dir.items.length === 0 ? (
-        <p className="mt-6 text-sm text-tinta-redup">Belum ada listing di kategori ini.</p>
+        <EmptyState compact message="Belum ada listing di kategori ini." />
       ) : (
         <div className="mt-4 flex flex-col gap-2">
           {dir.items.map((c) => (

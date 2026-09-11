@@ -478,6 +478,7 @@ export const copyEn: CopyDeck = {
     bodyTidakValid: "The submitted data couldn't be read. Try again from the start.",
     listingTidakDitemukan: "This listing doesn't exist or is no longer live. Refresh the board and try again.",
     nominalWajib: "The amount is empty. Enter how much you want to pay.",
+    emailTidakValid: "That email doesn't look right. Example: you@email.com",
     gagalProses: "Processing failed. Try again in a moment.",
     gagalHitung: "Couldn't calculate the position. Check your connection and try again.",
     gagalTagihan: "Couldn't create the invoice. Payment hasn't started — try again in a moment.",
