@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { matchesShowFor } from "@/lib/board-routing";
 import { MARKET } from "@/lib/market";
 
 /**
@@ -55,6 +56,38 @@ export function middleware(req: NextRequest) {
   // old /admin path is hidden (404) on the public production domain.
   const host = req.headers.get("host") ?? "";
   const { pathname } = req.nextUrl;
+
+  // Sibling-board geo routing (MARKET.altBoard, e.g. IDR panjat.id <-> USD global).
+  // Auto-redirect a wrong-country HUMAN to the other currency board. Kept safe:
+  // bots are excluded (crawlers index each domain), `?stay=1` + a board_pref
+  // cookie let a visitor override and pin the current board (the footer switcher
+  // links with ?stay=1), and only real page navigations are considered — never
+  // /api, assets, POSTs, or the admin host. Currencies never mix in one ledger,
+  // so the split is at the domain, not the gateway.
+  const stayParam = req.nextUrl.searchParams.get("stay") === "1";
+  const alt = MARKET.altBoard;
+  if (alt && !host.startsWith("adm.")) {
+    const isPageNav =
+      req.method === "GET" &&
+      (req.headers.get("accept") ?? "").includes("text/html") &&
+      !pathname.startsWith("/api") &&
+      !pathname.startsWith("/_next");
+    const staying = stayParam || req.cookies.get("board_pref")?.value === "stay";
+    const ua = req.headers.get("user-agent") ?? "";
+    const isBot =
+      /bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora|pinterest|whatsapp|telegram|slack|discord|bingpreview|duckduckbot|baiduspider|yandex|applebot|petalbot|semrush|ahrefs|headless/i.test(
+        ua,
+      );
+    const country = (
+      req.headers.get("x-vercel-ip-country") ||
+      process.env.GEO_COUNTRY_OVERRIDE ||
+      ""
+    ).toUpperCase();
+    if (isPageNav && !staying && !isBot && matchesShowFor(country, alt.showFor)) {
+      return NextResponse.redirect(new URL(alt.url), 307);
+    }
+  }
+
   let res: NextResponse;
 
   if (host.startsWith("adm.")) {
@@ -85,6 +118,17 @@ export function middleware(req: NextRequest) {
   if (!req.cookies.get("panjat_vid")) {
     res.cookies.set("panjat_vid", crypto.randomUUID(), {
       httpOnly: true,
+      sameSite: "lax",
+      secure: !dev,
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+  }
+
+  // A visitor who arrived via the footer switcher (?stay=1) has explicitly chosen
+  // this board — remember it so geo routing never bounces them away again.
+  if (stayParam) {
+    res.cookies.set("board_pref", "stay", {
       sameSite: "lax",
       secure: !dev,
       path: "/",

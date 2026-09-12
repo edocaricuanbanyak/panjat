@@ -32,17 +32,17 @@ export interface MarketConfig {
   /** Which payment gateway grants grip on this deployment. */
   paymentGateway: "midtrans" | "paddle" | "polar";
   /**
-   * Optional sibling-board geo suggestion. When set, a dismissible banner nudges
-   * visitors to the other currency/market (on its own domain) — never a redirect,
-   * so it's SEO-safe and respects the visitor's choice. `showFor` is a country
-   * rule matched against the visitor's ISO country: `"ID"` shows the banner when
-   * the visitor IS in ID (the global board pointing Indonesians home); `"!ID"`
-   * shows it when the visitor is NOT in ID (panjat.id pointing foreigners to the
-   * global board). Unset → feature off (panjat.id default unchanged). Text lives
-   * in env, not the copy deck, because it must be written in the *target* board's
-   * language (the one thing the local single-language deck can't express).
+   * Optional sibling board (the other currency/market on its own domain). When
+   * set, the middleware auto-redirects wrong-country human visitors there (bots
+   * excluded, remembered via cookie, overridable), and a persistent footer
+   * switcher links to it. `showFor` is a country rule matched against the
+   * visitor's ISO country: `"ID"` redirects when the visitor IS in ID (the
+   * global board sending Indonesians home); `"!ID"` redirects when the visitor
+   * is NOT in ID (panjat.id sending foreigners to the global board). `label` is
+   * the switcher text, written in the *target* board's language. Unset → feature
+   * off (panjat.id default unchanged).
    */
-  altBoard?: { url: string; label: string; note: string; showFor: string };
+  altBoard?: { url: string; label: string; showFor: string };
 }
 
 /** Today's Indonesian defaults — the exact values previously hardcoded. */
@@ -89,10 +89,9 @@ const WEEK_ANCHOR_ENV =
 // Gateway selection is server-only, but reading the public name too is harmless.
 const GATEWAY_ENV =
   process.env.NEXT_PUBLIC_PAYMENT_GATEWAY ?? process.env.PAYMENT_GATEWAY;
-// Sibling-board geo suggestion — server-only (the banner is server-rendered).
+// Sibling-board routing — server/edge only (middleware redirect + footer switcher).
 const ALT_BOARD_URL = process.env.ALT_BOARD_URL?.trim();
 const ALT_BOARD_LABEL = process.env.ALT_BOARD_LABEL?.trim();
-const ALT_BOARD_NOTE = process.env.ALT_BOARD_NOTE?.trim() ?? "";
 const ALT_BOARD_COUNTRIES = process.env.ALT_BOARD_COUNTRIES?.trim();
 
 function resolveFromEnv(): MarketConfig {
@@ -114,12 +113,7 @@ function resolveFromEnv(): MarketConfig {
       paymentGateway === "paddle" || paymentGateway === "polar" ? paymentGateway : "midtrans",
     altBoard:
       ALT_BOARD_URL && ALT_BOARD_LABEL && ALT_BOARD_COUNTRIES
-        ? {
-            url: ALT_BOARD_URL,
-            label: ALT_BOARD_LABEL,
-            note: ALT_BOARD_NOTE,
-            showFor: ALT_BOARD_COUNTRIES,
-          }
+        ? { url: ALT_BOARD_URL, label: ALT_BOARD_LABEL, showFor: ALT_BOARD_COUNTRIES }
         : undefined,
   };
 }

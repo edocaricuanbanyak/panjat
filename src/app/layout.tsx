@@ -19,11 +19,28 @@ const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
+// hreflang: when a sibling board is configured, tell search engines the two
+// domains are locale/region variants of each other (so geo routing doesn't read
+// as cloaking and each board indexes cleanly). Sibling locale is the opposite of
+// this deployment's (id <-> en).
+const siblingLocale = MARKET.defaultLocale === "id" ? "en-US" : "id-ID";
+
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: `${copy.merek.nama} — ${copy.merek.tagline}`,
   description: copy.merek.deskripsiSitus,
   applicationName: copy.merek.nama,
+  ...(MARKET.altBoard
+    ? {
+        alternates: {
+          languages: {
+            [MARKET.locale]: BASE_URL,
+            [siblingLocale]: MARKET.altBoard.url,
+            "x-default": BASE_URL,
+          },
+        },
+      }
+    : {}),
   appleWebApp: {
     capable: true,
     title: copy.merek.nama,

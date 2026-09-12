@@ -261,29 +261,37 @@ notes in `src/lib/gateways/polar-gateway.ts`)
 
 ---
 
-# Cross-board geo suggestion (optional)
+# Cross-board geo routing (optional)
 
 Because IDR and USD are **separate boards on separate domains** (a single-currency
-ledger is a ranking contract — you cannot mix currencies in one board), routing
-visitors is done with a **dismissible suggestion banner**, never a redirect
-(SEO-safe, respects the visitor's choice + VPN/traveller cases). Each deployment
-points at its sibling via env; unset → feature off (panjat.id default).
+ledger is a ranking contract — you cannot mix currencies in one board), visitors
+are routed by an **auto-redirect** in `middleware.ts`, kept SEO-safe:
 
-Set on **each** project (text in the *target* board's language):
+- **Bots are excluded** (crawlers index each domain normally — no cloaking).
+- **Remembered:** arriving via the footer switcher (`?stay=1`) sets a `board_pref`
+  cookie so the visitor is never bounced away again.
+- **Override:** a persistent **footer switcher** links to the sibling board with
+  `?stay=1`, so anyone (VPN users, travellers) can pin the other board.
+- **hreflang:** the two domains declare each other as locale variants (layout
+  metadata), so the redirect reads as regionalisation, not cloaking.
+- Only real page navigations redirect — never `/api`, assets, POSTs, or `adm.*`.
+
+The two boards' rules are complementary, so they never loop (each only redirects
+the *wrong* country away, and the target board treats that country as correct).
+
+Set on **each** project (switcher label in the *target* board's language):
 ```bash
-# On panjat.id — nudge non-Indonesian visitors to the global board:
+# On panjat.id — send non-Indonesian visitors to the global board:
 ALT_BOARD_URL=https://<global-domain>
 ALT_BOARD_LABEL=View the global board (USD)
-ALT_BOARD_NOTE=Looks like you're outside Indonesia.
-ALT_BOARD_COUNTRIES=!ID        # show when visitor is NOT in ID
+ALT_BOARD_COUNTRIES=!ID        # redirect when visitor is NOT in ID
 
-# On the global board — nudge Indonesian visitors home:
+# On the global board — send Indonesian visitors home:
 ALT_BOARD_URL=https://panjat.id
 ALT_BOARD_LABEL=Buka Panjat versi Indonesia (Rupiah)
-ALT_BOARD_NOTE=Sepertinya kamu di Indonesia.
-ALT_BOARD_COUNTRIES=ID         # show when visitor IS in ID
+ALT_BOARD_COUNTRIES=ID         # redirect when visitor IS in ID
 ```
-Country comes from Vercel's `x-vercel-ip-country`; the banner drops a 90-day
-`panjat_alt_dismiss` cookie once dismissed/clicked. Locally, set
-`GEO_COUNTRY_OVERRIDE=ID` to preview it (no edge geo off Vercel). Code:
-`src/lib/geo.ts`, `src/components/GeoSuggest.tsx`, wired in `PageShell`.
+Country comes from Vercel's `x-vercel-ip-country`. Locally, set
+`GEO_COUNTRY_OVERRIDE=ID` (or spoof the header) to test — no edge geo off Vercel.
+Code: `src/lib/board-routing.ts` (rule), `middleware.ts` (redirect + `board_pref`),
+`Footer.tsx` (switcher), `layout.tsx` (hreflang).
