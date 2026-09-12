@@ -44,6 +44,7 @@ export const copyId = {
     heroJudul: "Panjat. Salip. Jadi #1.",
     statOnline: "online",
     statPengunjung: "pengunjung",
+    statListing: "di papan",
     lihatStatistik: "Lihat statistik →",
     tabSepanjang: "All time",
     papanKosongJudul: "Belum ada yang manjat.",

@@ -40,6 +40,7 @@ export const copyEn: CopyDeck = {
     heroJudul: "Climb. Overtake. Be #1.",
     statOnline: "online",
     statPengunjung: "visitors",
+    statListing: "on the board",
     lihatStatistik: "See stats →",
     tabSepanjang: "All time",
     papanKosongJudul: "Nobody's climbed yet.",
