@@ -5,6 +5,10 @@
  * (polarWebhookGateway.verifyAndParse -> settle) and asserts DB effects. Run
  * after `pnpm db:seed`.
  *
+ * Writes test data to the dev DB (a `polarsim.id` listing + its ledger/transaksi
+ * rows), so it errors if that listing already exists — re-run `pnpm db:seed` to
+ * reset the dev DB before running again (and to clean up afterward).
+ *
  * Scope: this proves OUR verify+normalize+settle logic (signature check, order_id
  * idempotency, amount-match, grip grant). It does NOT prove Polar's real signature
  * matches — it signs with the same key it verifies. That last mile is validated by
