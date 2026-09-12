@@ -75,4 +75,23 @@ describe("paddleWebhookGateway.verifyAndParse", () => {
     const body = JSON.stringify(event());
     expect(paddleWebhookGateway.verifyAndParse(raw(body))).toBeNull();
   });
+
+  it("matches on the tax-exclusive subtotal, not grand_total", () => {
+    // MoR adds tax on top: grand_total 605 = subtotal 500 (the grip we set) + 105 tax.
+    const body = JSON.stringify(
+      event({ details: { totals: { subtotal: "500", grand_total: "605", currency_code: "USD" } } }),
+    );
+    const n = paddleWebhookGateway.verifyAndParse(raw(body));
+    expect(n!.amountMinor).toBe(500);
+  });
+
+  it("accepts during secret rotation (multiple h1, ours not last)", () => {
+    const body = JSON.stringify(event());
+    const good = signPaddle("1700000000", body, SECRET);
+    const req: RawWebhook = {
+      body,
+      headers: new Headers({ "Paddle-Signature": `ts=1700000000;h1=${good};h1=deadbeef` }),
+    };
+    expect(paddleWebhookGateway.verifyAndParse(req)).not.toBeNull();
+  });
 });

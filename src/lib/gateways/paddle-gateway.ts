@@ -29,22 +29,9 @@ interface PaddleEvent {
     id?: string;
     status?: string;
     custom_data?: { order_id?: string } | null;
-    details?: { totals?: { grand_total?: string; currency_code?: string } };
+    details?: { totals?: { subtotal?: string; grand_total?: string; currency_code?: string } };
     payments?: Array<{ method_details?: { type?: string } }>;
   };
-}
-
-/** Parse the `Paddle-Signature` header into { ts, h1 }. */
-function parseSignatureHeader(header: string | null): { ts: string; h1: string } | null {
-  if (!header) return null;
-  const parts = Object.fromEntries(
-    header.split(";").map((kv) => {
-      const i = kv.indexOf("=");
-      return [kv.slice(0, i).trim(), kv.slice(i + 1).trim()];
-    }),
-  );
-  if (!parts.ts || !parts.h1) return null;
-  return { ts: parts.ts, h1: parts.h1 };
 }
 
 /** Compute Paddle's HMAC-SHA256 over `${ts}:${body}` (also used by tests). */
@@ -52,14 +39,31 @@ export function signPaddle(ts: string, body: string, secret: string): string {
   return createHmac("sha256", secret).update(`${ts}:${body}`).digest("hex");
 }
 
+/**
+ * Verify the `Paddle-Signature` header (`ts=<unix>;h1=<hex>[;h1=<hex>…]`).
+ * During a webhook-secret rotation Paddle sends MULTIPLE `h1` values (one per
+ * active secret), so accept if ANY matches our secret (constant-time per
+ * candidate) — checking only the last would reject every webhook mid-rotation.
+ */
 function verifyPaddleSignature(raw: RawWebhook, secret: string): boolean {
-  const sig = parseSignatureHeader(raw.headers.get("paddle-signature"));
-  if (!sig) return false;
-  const expected = signPaddle(sig.ts, raw.body, secret);
-  const a = Buffer.from(expected, "utf8");
-  const b = Buffer.from(sig.h1, "utf8");
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(a, b);
+  const header = raw.headers.get("paddle-signature");
+  if (!header) return false;
+  let ts = "";
+  const h1s: string[] = [];
+  for (const part of header.split(";")) {
+    const i = part.indexOf("=");
+    if (i < 0) continue;
+    const k = part.slice(0, i).trim();
+    const v = part.slice(i + 1).trim();
+    if (k === "ts") ts = v;
+    else if (k === "h1") h1s.push(v);
+  }
+  if (!ts || h1s.length === 0) return false;
+  const expected = Buffer.from(signPaddle(ts, raw.body, secret), "utf8");
+  return h1s.some((h1) => {
+    const b = Buffer.from(h1, "utf8");
+    return b.length === expected.length && timingSafeEqual(expected, b);
+  });
 }
 
 export const paddleWebhookGateway: WebhookGateway = {
@@ -83,9 +87,14 @@ export const paddleWebhookGateway: WebhookGateway = {
         ? "failure"
         : "pending";
 
-    // Paddle amounts are already integer minor-unit strings (e.g. "500" = $5.00).
-    const grand = evt.data?.details?.totals?.grand_total ?? "";
-    const amountMinor = Math.round(Number(grand) || 0);
+    // Match on the TAX-EXCLUSIVE subtotal — that's the unit price we set at
+    // checkout (= transaksi.nominal). Paddle is a Merchant-of-Record, so
+    // grand_total adds VAT/sales tax on top and would make settle()'s exact
+    // amount-match reject every taxed payment. Fall back to grand_total only if
+    // subtotal is absent. Amounts are integer minor-unit strings ("500" = $5.00).
+    const totals = evt.data?.details?.totals;
+    const amountStr = totals?.subtotal ?? totals?.grand_total ?? "";
+    const amountMinor = Math.round(Number(amountStr) || 0);
 
     return {
       orderId,

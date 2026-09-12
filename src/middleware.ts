@@ -13,6 +13,24 @@ const PUBLIC_HOSTS = (process.env.PUBLIC_HOSTS?.trim() || "www.panjat.id,panjat.
   .map((h) => h.trim())
   .filter(Boolean);
 
+// Crawler/bot UAs excluded from geo redirect so each board indexes cleanly.
+// Module constant — compiled once, not per request (middleware runs on all traffic).
+const BOT_UA =
+  /bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora|pinterest|whatsapp|telegram|slack|discord|bingpreview|duckduckbot|baiduspider|yandex|applebot|petalbot|semrush|ahrefs|headless/i;
+
+/** Apply the standard security headers to any response (pages AND redirects). */
+function withSecurityHeaders(res: NextResponse, csp: string, dev: boolean): NextResponse {
+  res.headers.set("content-security-policy", csp);
+  res.headers.set("x-content-type-options", "nosniff");
+  res.headers.set("x-frame-options", "DENY");
+  res.headers.set("referrer-policy", "strict-origin-when-cross-origin");
+  res.headers.set("permissions-policy", "camera=(), microphone=(), geolocation=()");
+  if (!dev) {
+    res.headers.set("strict-transport-security", "max-age=31536000; includeSubDomains; preload");
+  }
+  return res;
+}
+
 /**
  * Security headers (§18.1, §18.5). Nonce-based CSP so third-party sponsor
  * content on public pages can never run scripts; Next propagates the nonce to
@@ -66,25 +84,25 @@ export function middleware(req: NextRequest) {
   // so the split is at the domain, not the gateway.
   const stayParam = req.nextUrl.searchParams.get("stay") === "1";
   const alt = MARKET.altBoard;
-  if (alt && !host.startsWith("adm.")) {
-    const isPageNav =
-      req.method === "GET" &&
-      (req.headers.get("accept") ?? "").includes("text/html") &&
-      !pathname.startsWith("/api") &&
-      !pathname.startsWith("/_next");
+  // Cheapest gate first — only a real page navigation can ever redirect, so
+  // assets / API / POST / HEAD / the admin host bail here before any header
+  // reads or the bot-UA test (this block runs on 100% of traffic).
+  const isPageNav =
+    req.method === "GET" &&
+    (req.headers.get("accept") ?? "").includes("text/html") &&
+    !host.startsWith("adm.") &&
+    !pathname.startsWith("/api") &&
+    !pathname.startsWith("/_next");
+  if (alt && isPageNav) {
     const staying = stayParam || req.cookies.get("board_pref")?.value === "stay";
-    const ua = req.headers.get("user-agent") ?? "";
-    const isBot =
-      /bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora|pinterest|whatsapp|telegram|slack|discord|bingpreview|duckduckbot|baiduspider|yandex|applebot|petalbot|semrush|ahrefs|headless/i.test(
-        ua,
-      );
     const country = (
       req.headers.get("x-vercel-ip-country") ||
       process.env.GEO_COUNTRY_OVERRIDE ||
       ""
     ).toUpperCase();
-    if (isPageNav && !staying && !isBot && matchesShowFor(country, alt.showFor)) {
-      return NextResponse.redirect(new URL(alt.url), 307);
+    if (!staying && matchesShowFor(country, alt.showFor) && !BOT_UA.test(req.headers.get("user-agent") ?? "")) {
+      // Redirects get the same security headers as every other response.
+      return withSecurityHeaders(NextResponse.redirect(new URL(alt.url), 307), csp, dev);
     }
   }
 
@@ -136,15 +154,7 @@ export function middleware(req: NextRequest) {
     });
   }
 
-  res.headers.set("content-security-policy", csp);
-  res.headers.set("x-content-type-options", "nosniff");
-  res.headers.set("x-frame-options", "DENY");
-  res.headers.set("referrer-policy", "strict-origin-when-cross-origin");
-  res.headers.set("permissions-policy", "camera=(), microphone=(), geolocation=()");
-  if (!dev) {
-    res.headers.set("strict-transport-security", "max-age=31536000; includeSubDomains; preload");
-  }
-  return res;
+  return withSecurityHeaders(res, csp, dev);
 }
 
 export const config = {

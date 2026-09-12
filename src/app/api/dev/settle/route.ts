@@ -14,10 +14,18 @@ import {
 
 export const runtime = "nodejs";
 
-/** True when the active gateway is running in mock mode (no real credentials). */
+/**
+ * True when the active gateway is running in mock mode (no real credentials).
+ * A configured WEBHOOK SECRET also disables this endpoint: once real webhook
+ * verification exists, grip must come only from the verified webhook — never
+ * from this dev shortcut — even if the checkout API key isn't set yet
+ * (piecemeal provisioning must not leave a free-grip hole in production).
+ */
 function checkoutIsMock(): boolean {
-  if (MARKET.paymentGateway === "paddle") return !process.env.PADDLE_API_KEY?.trim();
-  if (MARKET.paymentGateway === "polar") return !process.env.POLAR_ACCESS_TOKEN?.trim();
+  if (MARKET.paymentGateway === "paddle")
+    return !process.env.PADDLE_API_KEY?.trim() && !process.env.PADDLE_WEBHOOK_SECRET?.trim();
+  if (MARKET.paymentGateway === "polar")
+    return !process.env.POLAR_ACCESS_TOKEN?.trim() && !process.env.POLAR_WEBHOOK_SECRET?.trim();
   return isMock(); // Midtrans mock
 }
 
