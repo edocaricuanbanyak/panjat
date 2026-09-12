@@ -22,8 +22,6 @@ export const runtime = "nodejs";
  * (piecemeal provisioning must not leave a free-grip hole in production).
  */
 function checkoutIsMock(): boolean {
-  if (MARKET.paymentGateway === "paddle")
-    return !process.env.PADDLE_API_KEY?.trim() && !process.env.PADDLE_WEBHOOK_SECRET?.trim();
   if (MARKET.paymentGateway === "polar")
     return !process.env.POLAR_ACCESS_TOKEN?.trim() && !process.env.POLAR_WEBHOOK_SECRET?.trim();
   return isMock(); // Midtrans mock
@@ -56,17 +54,7 @@ export async function POST(req: Request) {
   if (!t) return NextResponse.json({ error: "order tidak ditemukan" }, { status: 404 });
 
   let outcome: WebhookOutcome;
-  if (MARKET.paymentGateway === "paddle") {
-    // Simulate a verified Paddle transaction.completed → gateway-neutral settle.
-    outcome = await settle(db, {
-      orderId,
-      amountMinor: t.nominal,
-      status: "success",
-      rawStatus: "transaction.completed",
-      method: "card",
-      raw: { dev: true, event_type: "transaction.completed", order_id: orderId },
-    });
-  } else if (MARKET.paymentGateway === "polar") {
+  if (MARKET.paymentGateway === "polar") {
     // Simulate a verified Polar order.paid → gateway-neutral settle.
     outcome = await settle(db, {
       orderId,

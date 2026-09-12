@@ -6,7 +6,7 @@
  * Every field DEFAULTS to today's hardcoded Indonesian value, so a deployment
  * with none of these env vars set (panjat.id) behaves byte-for-byte as before.
  * A global deployment sets `MARKET=global` (or the granular vars) to flip to
- * USD / English / Paddle without any code change.
+ * USD / English / Polar without any code change.
  *
  * Never read these env vars at a callsite — import `MARKET` and thread it, so
  * the defaulting logic lives in exactly one place.
@@ -30,7 +30,7 @@ export interface MarketConfig {
   /** Default UI language for this deployment. */
   defaultLocale: "id" | "en";
   /** Which payment gateway grants grip on this deployment. */
-  paymentGateway: "midtrans" | "paddle" | "polar";
+  paymentGateway: "midtrans" | "polar";
   /**
    * Optional sibling board (the other currency/market on its own domain). When
    * set, the middleware auto-redirects wrong-country human visitors there (bots
@@ -64,7 +64,7 @@ const GLOBAL_DEFAULTS: MarketConfig = {
   timeZone: "UTC",
   weekAnchorMs: Date.UTC(1970, 0, 4, 0, 0, 0), // a Sunday 00:00 UTC
   defaultLocale: "en",
-  paymentGateway: "paddle",
+  paymentGateway: "polar",
 };
 
 /** Minor-unit decimals per known currency; falls back to 2 for unknowns. */
@@ -109,8 +109,7 @@ function resolveFromEnv(): MarketConfig {
     timeZone: TZ_ENV?.trim() || base.timeZone,
     weekAnchorMs: WEEK_ANCHOR_ENV ? Number(WEEK_ANCHOR_ENV) : base.weekAnchorMs,
     defaultLocale: defaultLocale === "en" ? "en" : "id",
-    paymentGateway:
-      paymentGateway === "paddle" || paymentGateway === "polar" ? paymentGateway : "midtrans",
+    paymentGateway: paymentGateway === "polar" ? "polar" : "midtrans",
     altBoard:
       ALT_BOARD_URL && ALT_BOARD_LABEL && ALT_BOARD_COUNTRIES
         ? { url: ALT_BOARD_URL, label: ALT_BOARD_LABEL, showFor: ALT_BOARD_COUNTRIES }

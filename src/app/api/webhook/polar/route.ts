@@ -11,7 +11,7 @@ export const runtime = "nodejs";
  * POST /api/webhook/polar — Polar (Merchant-of-Record) webhook. Polar signs the
  * RAW body (Standard Webhooks), so we must read text() before verifying (never
  * req.json()). Grip is granted only via settle(), same contracts as the
- * Midtrans/Paddle paths.
+ * Midtrans path.
  */
 export async function POST(req: Request) {
   const gateway = getWebhookGateway();

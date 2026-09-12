@@ -1,6 +1,6 @@
 /**
- * Polar (Merchant-of-Record) gateway — an alternative to Paddle for the
- * global/USD deployment. Selected with PAYMENT_GATEWAY=polar.
+ * Polar (Merchant-of-Record) gateway — the global/USD deployment's payment
+ * gateway (the default when MARKET=global). Selected with PAYMENT_GATEWAY=polar.
  *
  * Webhook: Polar follows the Standard Webhooks spec (svix-style). Three headers
  * carry the proof — `webhook-id`, `webhook-timestamp`, `webhook-signature` —
@@ -13,13 +13,12 @@
  * settlement stays idempotent per order_id — Polar's own order id is recorded
  * in the raw payload but is never the idempotency key. We do NOT range-check the
  * timestamp: a replayed webhook maps to the same order_id and settle() is
- * idempotent (same contract the Midtrans/Paddle paths rely on).
+ * idempotent (same contract the Midtrans path relies on).
  *
- * Unlike Paddle's overlay, Polar returns a HOSTED checkout URL — we surface it
- * as `redirectUrl`, so the wizard just navigates (the Midtrans-style branch); no
- * client-side JS SDK ships.
+ * Polar returns a HOSTED checkout URL — we surface it as `redirectUrl`, so the
+ * wizard just navigates (the same branch Midtrans uses); no client-side JS SDK ships.
  *
- * NOTE (validate before go-live, same rigor as the Paddle file):
+ * NOTE (validate before go-live):
  *  - Secret encoding: this decodes the base64 secret per the Standard Webhooks
  *    spec (stripping a `whsec_` prefix). Confirm against Polar's live signature.
  *  - Arbitrary amount: grip = board-top + 1 minor unit, so the Polar product
@@ -30,7 +29,7 @@
  *    which order field equals the grip we set (`data.amount`, tax-exclusive),
  *    and that checkout `metadata` propagates onto the order — all to be verified.
  *  Until POLAR_ACCESS_TOKEN + POLAR_PRODUCT_ID are set, checkout falls back to a
- *  local mock page, so the flow is exercisable offline exactly like Midtrans/Paddle.
+ *  local mock page, so the flow is exercisable offline exactly like Midtrans.
  */
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { SnapClient } from "@/lib/midtrans";

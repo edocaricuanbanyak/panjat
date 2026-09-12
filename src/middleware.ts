@@ -40,16 +40,12 @@ export function middleware(req: NextRequest) {
   const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
   const dev = process.env.NODE_ENV !== "production";
   const scriptExtra = dev ? " 'unsafe-eval' 'unsafe-inline'" : "";
-  // Paddle.js + its overlay-checkout iframe (global board only). Kept off the
-  // Indonesian/Midtrans CSP so panjat.id stays tight.
-  const paddle = MARKET.paymentGateway === "paddle";
-  const paddleScript = paddle ? " https://cdn.paddle.com" : "";
-  const paddleConnect = paddle ? " https://*.paddle.com" : "";
-  const paddleFrame = paddle ? " https://*.paddle.com" : "";
+  // Polar (the global gateway) uses a hosted-checkout redirect — no client SDK or
+  // iframe — so no extra CSP origins are needed beyond panjat.id's tight policy.
 
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://cloud.umami.is https://www.googletagmanager.com${paddleScript}${scriptExtra}`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://cloud.umami.is https://www.googletagmanager.com${scriptExtra}`,
     "style-src 'self' 'unsafe-inline'", // Tailwind + inline style attributes
     "img-src 'self' data: https:", // OG cards + remote logos
     "font-src 'self' data:",
@@ -57,8 +53,8 @@ export function middleware(req: NextRequest) {
     // to gateway.umami.is) + Google Analytics 4 (beacons hit www. + regional
     // *.google-analytics.com) + PostHog US (event ingest /i/v0/e/ + remote config;
     // its feature scripts load via strict-dynamic, but XHR/beacon needs connect-src).
-    `connect-src 'self' https://cloud.umami.is https://gateway.umami.is https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://us.i.posthog.com https://us-assets.i.posthog.com${paddleConnect}`,
-    `frame-src https://www.googletagmanager.com${paddleFrame}`, // GTM <noscript> (+ Paddle overlay)
+    `connect-src 'self' https://cloud.umami.is https://gateway.umami.is https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://us.i.posthog.com https://us-assets.i.posthog.com`,
+    `frame-src https://www.googletagmanager.com`, // GTM <noscript>
     "frame-ancestors 'none'", // no clickjacking (papan tak boleh di-iframe)
     "base-uri 'self'",
     "form-action 'self'",
