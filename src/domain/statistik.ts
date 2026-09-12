@@ -5,7 +5,7 @@
  * and how contestable is the board. All deterministic from the ledger/snapshots
  * (no AI, no estimates on money paths).
  */
-import { count, desc, eq, gte, sql } from "drizzle-orm";
+import { count, desc, eq, sql } from "drizzle-orm";
 import type { Database } from "@/db";
 import { klikHarian, listing, peganganLedger } from "@/db/schema";
 import { visitorStats } from "@/lib/presence";
@@ -15,10 +15,8 @@ export interface Statistik {
   hargaPuncak: number;
   /** Grip at rank 20 — cost to enter the top-20 board; 0 if fewer than 20 tayang. */
   hargaMasuk20: number;
-  /** Valid clicks delivered in the last 7 days. */
-  klik7hari: number;
-  /** Average clicks/day over that window (rounded). */
-  klikPerHari: number;
+  /** Valid clicks delivered all-time (Σ klik_harian.jumlah_valid). */
+  klikTotal: number;
   /** Rupiah paid per valid click, all-time (Σbayar / Σklik). */
   cpc: number;
   /** Listings currently tayang. */
@@ -52,11 +50,6 @@ export async function getStatistik(db: Database): Promise<Statistik> {
     .offset(19)
     .limit(1);
 
-  const [klik7] = await db
-    .select({ n: sql<number>`coalesce(sum(${klikHarian.jumlahValid}), 0)::int` })
-    .from(klikHarian)
-    .where(gte(klikHarian.tanggal, sql`current_date - 7`));
-
   const [klikTotal] = await db
     .select({ n: sql<number>`coalesce(sum(${klikHarian.jumlahValid}), 0)::int` })
     .from(klikHarian);
@@ -75,7 +68,6 @@ export async function getStatistik(db: Database): Promise<Statistik> {
     select count(*)::int as n from r1 where prev is not null and listing_id <> prev
   `);
 
-  const klik7hari = Number(klik7.n);
   const totalKlik = Number(klikTotal.n);
   const totalBayar = Number(bayar.n);
   const visitor = await visitorStats();
@@ -83,8 +75,7 @@ export async function getStatistik(db: Database): Promise<Statistik> {
   return {
     hargaPuncak: Number(puncak?.p ?? 0),
     hargaMasuk20: Number(rank20[0]?.p ?? 0),
-    klik7hari,
-    klikPerHari: Math.round(klik7hari / 7),
+    klikTotal: totalKlik,
     cpc: totalKlik > 0 ? Math.round(totalBayar / totalKlik) : 0,
     sponsor: sponsor.n,
     puncakBerganti: Number(berganti.rows?.[0]?.n ?? 0),

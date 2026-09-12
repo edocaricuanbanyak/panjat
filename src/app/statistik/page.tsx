@@ -32,12 +32,7 @@ export default async function StatistikPage() {
         <ArrowLeft className="size-4" aria-hidden />
         {copy.nav.sepanjangMasa}
       </a>
-      <h1
-        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
-        style={{ fontStretch: "125%" }}
-      >
-        {copy.statistik.judul}
-      </h1>
+      <h1 className="display-lg">{copy.statistik.judul}</h1>
       <InfoBox className="mt-3">{copy.statistik.sub}</InfoBox>
 
       <div className="mt-6 grid grid-cols-2 gap-3">
@@ -54,10 +49,9 @@ export default async function StatistikPage() {
           metode={copy.statistik.hargaMasuk20Metode}
         />
         <StatTile
-          label={copy.statistik.klik7}
-          value={formatCount(s.klik7hari)}
-          sub={copy.statistik.klik7Sub(formatCount(s.klikPerHari))}
-          metode={copy.statistik.klik7Metode}
+          label={copy.statistik.klikTotal}
+          value={formatCount(s.klikTotal)}
+          metode={copy.statistik.klikTotalMetode}
         />
         <StatTile
           label={copy.statistik.cpc}
