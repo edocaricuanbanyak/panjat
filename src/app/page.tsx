@@ -147,7 +147,7 @@ async function HomeBody({
         <div className="mt-6">
           <a
             href="/statistik"
-            className="group inline-flex max-w-full flex-wrap items-center justify-center gap-x-2.5 gap-y-1 rounded-full bg-kertas-2 px-4 py-2 text-sm"
+            className="group inline-flex max-w-full items-center justify-center gap-x-2 whitespace-nowrap rounded-full bg-kertas-2 px-3.5 py-2 text-sm sm:flex-wrap sm:gap-x-2.5 sm:px-4"
           >
             <span className="inline-flex items-center gap-1.5">
               <span className="blink inline-block size-1.5 rounded-full bg-hidup" aria-hidden />
@@ -171,7 +171,9 @@ async function HomeBody({
               </span>
               <span className="text-tinta-redup">{copy.beranda.statPengunjung}</span>
             </span>
-            <span className="text-merah-teks group-hover:underline">
+            {/* Whole chip already links to /statistik — drop the redundant CTA on
+                mobile so the three stats stay on one line. */}
+            <span className="hidden text-merah-teks group-hover:underline sm:inline">
               {copy.beranda.lihatStatistik}
             </span>
           </a>
