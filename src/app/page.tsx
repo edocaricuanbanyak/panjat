@@ -186,9 +186,11 @@ async function HomeBody({
         <HeroManjat kategori={kats} />
       </section>
 
-      {/* PAPAN — three in-place tabs (no page navigation) */}
+      {/* PAPAN — three in-place tabs (no page navigation). A ?hal param means the
+          visitor is paginating the all-time board, so open that tab (not the
+          Hari Ini default) — otherwise moving pages would snap back to Hari Ini. */}
       <HomeTabs
-        defaultTab={hariIni.length > 0 ? "hari-ini" : "sekarang"}
+        defaultTab={sp.hal != null ? "sekarang" : hariIni.length > 0 ? "hari-ini" : "sekarang"}
         sekarang={
           <>
             {entries.length === 0 ? (
