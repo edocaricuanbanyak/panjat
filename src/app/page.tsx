@@ -147,6 +147,7 @@ async function HomeBody({
         <div className="mt-6">
           <a
             href="/statistik"
+            aria-label={copy.nav.statistik}
             className="group inline-flex max-w-full items-center justify-center gap-x-2 whitespace-nowrap rounded-full bg-kertas-2 px-3.5 py-2 text-sm sm:flex-wrap sm:gap-x-2.5 sm:px-4"
           >
             <span className="inline-flex items-center gap-1.5">
@@ -171,8 +172,12 @@ async function HomeBody({
               </span>
               <span className="text-tinta-redup">{copy.beranda.statPengunjung}</span>
             </span>
-            {/* Whole chip already links to /statistik — drop the redundant CTA on
-                mobile so the three stats stay on one line. */}
+            {/* Whole chip links to /statistik (aria-label on the <a>). On mobile the
+                full CTA won't fit on one line, so show a compact arrow cue instead;
+                the full label returns at sm+. */}
+            <span className="text-merah-teks group-hover:underline sm:hidden" aria-hidden>
+              →
+            </span>
             <span className="hidden text-merah-teks group-hover:underline sm:inline">
               {copy.beranda.lihatStatistik}
             </span>
