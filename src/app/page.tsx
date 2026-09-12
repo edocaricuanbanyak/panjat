@@ -156,13 +156,6 @@ async function HomeBody({
               </span>
               <span className="text-tinta-redup">{copy.beranda.statOnline}</span>
             </span>
-            <span className="h-3.5 w-px bg-garis" aria-hidden />
-            <span className="inline-flex items-center gap-1.5">
-              <span className="font-semibold tabular text-tinta">
-                {formatCount(visitor.total)}
-              </span>
-              <span className="text-tinta-redup">{copy.beranda.statPengunjung}</span>
-            </span>
             {/* Paid listings currently on the money board (excludes free Kaki Tiang). */}
             <span className="h-3.5 w-px bg-garis" aria-hidden />
             <span className="inline-flex items-center gap-1.5">
@@ -170,6 +163,13 @@ async function HomeBody({
                 {formatCount(entries.length)}
               </span>
               <span className="text-tinta-redup">{copy.beranda.statListing}</span>
+            </span>
+            <span className="h-3.5 w-px bg-garis" aria-hidden />
+            <span className="inline-flex items-center gap-1.5">
+              <span className="font-semibold tabular text-tinta">
+                {formatCount(visitor.total)}
+              </span>
+              <span className="text-tinta-redup">{copy.beranda.statPengunjung}</span>
             </span>
             <span className="text-merah-teks group-hover:underline">
               {copy.beranda.lihatStatistik}
