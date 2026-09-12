@@ -16,6 +16,7 @@
     "ditahan": "tsx src/jobs/ditahan.ts",
     "rosot:run": "tsx src/jobs/rosot.ts",
     "manjat:sim": "tsx src/jobs/manjat-sim.ts",
+    "polar:sim": "tsx src/jobs/polar-sim.ts",
     "klik:sim": "tsx src/jobs/klik-sim.ts",
     "moderate:run": "tsx src/jobs/moderate.ts",
     "moderasi:sim": "tsx src/jobs/moderasi-sim.ts",
