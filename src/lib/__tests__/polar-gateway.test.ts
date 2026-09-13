@@ -19,7 +19,13 @@ function event(over: Record<string, unknown> = {}) {
   };
 }
 
-function raw(body: string, secret = SECRET, id = "msg_1", ts = "1700000000"): RawWebhook {
+// Current timestamp: the SDK validator (Standard Webhooks) enforces a ±5-min window.
+function raw(
+  body: string,
+  secret = SECRET,
+  id = "msg_1",
+  ts = String(Math.floor(Date.now() / 1000)),
+): RawWebhook {
   const sig = signPolar(id, ts, body, secret);
   return {
     body,
@@ -55,12 +61,13 @@ describe("polarWebhookGateway.verifyAndParse", () => {
 
   it("accepts a signature header carrying multiple space-delimited versions", () => {
     const body = JSON.stringify(event());
-    const sig = signPolar("msg_1", "1700000000", body, SECRET);
+    const ts = String(Math.floor(Date.now() / 1000));
+    const sig = signPolar("msg_1", ts, body, SECRET);
     const req: RawWebhook = {
       body,
       headers: new Headers({
         "webhook-id": "msg_1",
-        "webhook-timestamp": "1700000000",
+        "webhook-timestamp": ts,
         "webhook-signature": `v1,bogus v1,${sig}`,
       }),
     };

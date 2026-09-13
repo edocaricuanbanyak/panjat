@@ -2,37 +2,34 @@
  * Polar (Merchant-of-Record) gateway — the global/USD deployment's payment
  * gateway (the default when MARKET=global). Selected with PAYMENT_GATEWAY=polar.
  *
- * Webhook: Polar follows the Standard Webhooks spec (svix-style). Three headers
- * carry the proof — `webhook-id`, `webhook-timestamp`, `webhook-signature` —
- * and the signed content is `${id}.${timestamp}.${rawBody}`. The secret is a
- * base64 value (usually `whsec_…`); the signature is base64(HMAC-SHA256) and the
- * header holds a space-delimited list of `v1,<sig>` entries. `verifyAndParse`
- * checks that (constant-time) then normalizes the event.
+ * Webhook: verified with Polar's OFFICIAL validator, `validateEvent` from
+ * `@polar-sh/sdk/webhooks` (Standard Webhooks / svix) — so the signature +
+ * timestamp check is Polar's own reference implementation, not a hand-rolled one.
+ * It throws `WebhookVerificationError` on a bad/forged/stale signature and returns
+ * the parsed event otherwise. Note: Standard Webhooks enforces a ±5-min timestamp
+ * tolerance; a retry delivered long after the original send (same signed payload)
+ * is rejected — settle()'s per-order idempotency remains the replay guard.
  *
  * Our order id (mnjt_<uuid>) is round-tripped through Polar `metadata` so
- * settlement stays idempotent per order_id — Polar's own order id is recorded
- * in the raw payload but is never the idempotency key. We do NOT range-check the
- * timestamp: a replayed webhook maps to the same order_id and settle() is
- * idempotent (same contract the Midtrans path relies on).
+ * settlement stays idempotent per order_id — Polar's own order id is recorded in
+ * the raw payload but is never the idempotency key.
  *
  * Polar returns a HOSTED checkout URL — we surface it as `redirectUrl`, so the
  * wizard just navigates (the same branch Midtrans uses); no client-side JS SDK ships.
  *
  * NOTE (validate before go-live):
- *  - Secret encoding: this decodes the base64 secret per the Standard Webhooks
- *    spec (stripping a `whsec_` prefix). Confirm against Polar's live signature.
  *  - Arbitrary amount: grip = board-top + 1 minor unit, so the Polar product
  *    must allow a custom / "pay what you want" price passed as `amount` at
  *    checkout creation. Confirm against the current Polar API.
  *  - Field names: `POST /v1/checkouts/` body (`products`/`amount`/`metadata`/
- *    `success_url`/`customer_email`), the success event name (`order.paid`),
- *    which order field equals the grip we set (`data.amount`, tax-exclusive),
- *    and that checkout `metadata` propagates onto the order — all to be verified.
+ *    `success_url`/`customer_email`), which order field equals the grip we set
+ *    (`data.amount`, tax-exclusive), and that checkout `metadata` propagates onto
+ *    the order — all to be verified.
  *  Until POLAR_ACCESS_TOKEN + POLAR_PRODUCT_ID are set, checkout falls back to a
  *  local mock page, so the flow is exercisable offline exactly like Midtrans.
  */
 import { createHmac } from "node:crypto";
-import { timingSafeEqualStr } from "@/lib/hmac";
+import { validateEvent, WebhookVerificationError } from "@polar-sh/sdk/webhooks";
 import type { SnapClient } from "@/lib/midtrans";
 import { BASE_URL } from "@/lib/site";
 import type { RawWebhook, VerifyResult, WebhookGateway } from "./types";
@@ -55,33 +52,39 @@ interface PolarEvent {
   };
 }
 
-/** Compute the Standard Webhooks base64(HMAC-SHA256) over `${id}.${ts}.${body}`
- *  (also used by tests). The secret is base64 (with an optional `whsec_` prefix). */
+/** Sign a payload the way `@polar-sh/sdk`'s `validateEvent` verifies it — base64
+ *  HMAC-SHA256 over `${id}.${ts}.${body}` with the key = the UTF-8 bytes of the
+ *  raw secret string (the SDK does `Webhook(base64(utf8(secret)))`). Used only by
+ *  tests / `polar:sim` to produce signatures the SDK accepts — never on the
+ *  receive path (Polar signs live webhooks). */
 export function signPolar(msgId: string, ts: string, body: string, secret: string): string {
-  const key = Buffer.from(secret.replace(/^whsec_/, ""), "base64");
+  const key = Buffer.from(secret, "utf8");
   return createHmac("sha256", key).update(`${msgId}.${ts}.${body}`).digest("base64");
 }
 
-function verifyPolarSignature(raw: RawWebhook, secret: string): boolean {
-  const id = raw.headers.get("webhook-id");
-  const ts = raw.headers.get("webhook-timestamp");
-  const header = raw.headers.get("webhook-signature");
-  if (!id || !ts || !header) return false;
-
-  const expected = signPolar(id, ts, raw.body, secret);
-  // The header is a space-delimited list of `v<version>,<base64sig>` entries;
-  // accept if ANY entry matches (constant-time per candidate).
-  return header.split(" ").some((part) => {
-    const comma = part.indexOf(",");
-    const sig = comma >= 0 ? part.slice(comma + 1) : part;
-    return timingSafeEqualStr(expected, sig);
+/** Incoming request headers as a plain record for the SDK validator. */
+function headersRecord(h: Headers): Record<string, string> {
+  const out: Record<string, string> = {};
+  h.forEach((value, key) => {
+    out[key] = value;
   });
+  return out;
 }
 
 export const polarWebhookGateway: WebhookGateway = {
   verifyAndParse(raw: RawWebhook): VerifyResult {
     const secret = process.env.POLAR_WEBHOOK_SECRET?.trim() ?? "";
-    if (!secret || !verifyPolarSignature(raw, secret)) return { status: "invalid" };
+    if (!secret) return { status: "invalid" };
+
+    // Verify with Polar's official validator (authoritative signature + timestamp).
+    try {
+      validateEvent(raw.body, headersRecord(raw.headers), secret);
+    } catch (e) {
+      if (e instanceof WebhookVerificationError) return { status: "invalid" };
+      // Signature verified, but the SDK's strict schema parse failed (a future
+      // payload shape or a non-order event). The webhook is authentic — extract
+      // what we need from the raw JSON below rather than dropping it.
+    }
 
     let evt: PolarEvent;
     try {
