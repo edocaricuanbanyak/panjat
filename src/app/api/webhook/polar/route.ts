@@ -21,12 +21,17 @@ export async function POST(req: Request) {
   }
 
   const body = await req.text();
-  const n = gateway.verifyAndParse({ body, headers: req.headers });
-  if (!n) {
+  const result = gateway.verifyAndParse({ body, headers: req.headers });
+  if (result.status === "invalid") {
     return NextResponse.json({ status: "rejected", reason: "bad_signature" }, { status: 401 });
   }
+  if (result.status === "ignored") {
+    // Authentic webhook we don't act on (no order_id / non-settlement event) — ACK
+    // 200 so Polar doesn't retry it or mark the endpoint unhealthy.
+    return NextResponse.json({ status: "ignored" }, { status: 200 });
+  }
 
-  const outcome = await settle(db, n);
+  const outcome = await settle(db, result.notification);
 
   if (outcome.status === "rejected") {
     // settle only returns rejected for an unknown order (signature already ok).

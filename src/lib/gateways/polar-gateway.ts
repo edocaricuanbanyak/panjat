@@ -31,10 +31,11 @@
  *  Until POLAR_ACCESS_TOKEN + POLAR_PRODUCT_ID are set, checkout falls back to a
  *  local mock page, so the flow is exercisable offline exactly like Midtrans.
  */
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac } from "node:crypto";
+import { timingSafeEqualStr } from "@/lib/hmac";
 import type { SnapClient } from "@/lib/midtrans";
 import { BASE_URL } from "@/lib/site";
-import type { NormalizedNotification, RawWebhook, WebhookGateway } from "./types";
+import type { RawWebhook, VerifyResult, WebhookGateway } from "./types";
 
 // Only a paid order confirms money. Everything else normalizes to "pending"
 // (Polar has no distinct "payment failed" order event — failed checkouts simply
@@ -67,30 +68,28 @@ function verifyPolarSignature(raw: RawWebhook, secret: string): boolean {
   if (!id || !ts || !header) return false;
 
   const expected = signPolar(id, ts, raw.body, secret);
-  const expBuf = Buffer.from(expected, "utf8");
   // The header is a space-delimited list of `v<version>,<base64sig>` entries;
   // accept if ANY entry matches (constant-time per candidate).
   return header.split(" ").some((part) => {
     const comma = part.indexOf(",");
     const sig = comma >= 0 ? part.slice(comma + 1) : part;
-    const sigBuf = Buffer.from(sig, "utf8");
-    return sigBuf.length === expBuf.length && timingSafeEqual(sigBuf, expBuf);
+    return timingSafeEqualStr(expected, sig);
   });
 }
 
 export const polarWebhookGateway: WebhookGateway = {
-  verifyAndParse(raw: RawWebhook): NormalizedNotification | null {
+  verifyAndParse(raw: RawWebhook): VerifyResult {
     const secret = process.env.POLAR_WEBHOOK_SECRET?.trim() ?? "";
-    if (!secret || !verifyPolarSignature(raw, secret)) return null;
+    if (!secret || !verifyPolarSignature(raw, secret)) return { status: "invalid" };
 
     let evt: PolarEvent;
     try {
       evt = JSON.parse(raw.body) as PolarEvent;
     } catch {
-      return null;
+      return { status: "ignored" }; // authentic but unusable payload
     }
     const orderId = evt.data?.metadata?.order_id;
-    if (!orderId) return null; // no idempotency key → cannot settle safely
+    if (!orderId) return { status: "ignored" }; // no idempotency key → nothing to settle
 
     const type = evt.type ?? "";
     const status = SUCCESS_EVENTS.has(type) ? "success" : "pending";
@@ -99,12 +98,15 @@ export const polarWebhookGateway: WebhookGateway = {
     const amountMinor = Math.round(Number(evt.data?.amount) || 0);
 
     return {
-      orderId,
-      amountMinor,
-      status,
-      rawStatus: type,
-      method: evt.data?.payment_processor,
-      raw: evt,
+      status: "ok",
+      notification: {
+        orderId,
+        amountMinor,
+        status,
+        rawStatus: type,
+        method: evt.data?.payment_processor,
+        raw: evt,
+      },
     };
   },
 };

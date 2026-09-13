@@ -32,7 +32,20 @@ export interface RawWebhook {
   headers: Headers;
 }
 
-/** Verifies + normalizes a webhook. Returns null on a bad/forged signature. */
+/**
+ * Outcome of verifying + parsing a raw webhook:
+ *  - `ok`      → authentic and actionable; settle the notification.
+ *  - `invalid` → bad/forged/absent signature → reject (HTTP 401).
+ *  - `ignored` → authentic but nothing to settle (no order_id, unparseable, a
+ *    non-settlement event) → ACK with HTTP 200 so the provider doesn't retry or
+ *    flag the endpoint unhealthy.
+ */
+export type VerifyResult =
+  | { status: "ok"; notification: NormalizedNotification }
+  | { status: "invalid" }
+  | { status: "ignored" };
+
+/** Verifies + normalizes a webhook. */
 export interface WebhookGateway {
-  verifyAndParse(raw: RawWebhook): NormalizedNotification | null;
+  verifyAndParse(raw: RawWebhook): VerifyResult;
 }

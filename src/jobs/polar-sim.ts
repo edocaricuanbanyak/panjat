@@ -76,9 +76,9 @@ function sign(body: string): RawWebhook {
 async function deliver(body: string, opts: { tamper?: boolean } = {}): Promise<WebhookOutcome> {
   const raw = sign(body);
   const finalRaw = opts.tamper ? { body: `${raw.body} `, headers: raw.headers } : raw;
-  const n = polarWebhookGateway.verifyAndParse(finalRaw);
-  if (!n) return { status: "rejected", reason: "bad_signature" };
-  return settle(db, n);
+  const r = polarWebhookGateway.verifyAndParse(finalRaw);
+  if (r.status !== "ok") return { status: "rejected", reason: "bad_signature" };
+  return settle(db, r.notification);
 }
 
 let passed = 0;
