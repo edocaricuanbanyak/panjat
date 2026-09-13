@@ -93,6 +93,14 @@ describe("polarWebhookGateway.verifyAndParse", () => {
     expect(n.status).toBe("pending");
   });
 
+  it("maps order.refunded to a refunded notification", () => {
+    const evt = event();
+    evt.type = "order.refunded";
+    const n = ok(polarWebhookGateway.verifyAndParse(raw(JSON.stringify(evt))));
+    expect(n.status).toBe("refunded");
+    expect(n.orderId).toBe("mnjt_abc");
+  });
+
   it("rejects when required headers are absent", () => {
     const body = JSON.stringify(event());
     expect(polarWebhookGateway.verifyAndParse({ body, headers: new Headers() }).status).toBe(

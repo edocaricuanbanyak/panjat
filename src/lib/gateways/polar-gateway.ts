@@ -37,10 +37,11 @@ import type { SnapClient } from "@/lib/midtrans";
 import { BASE_URL } from "@/lib/site";
 import type { RawWebhook, VerifyResult, WebhookGateway } from "./types";
 
-// Only a paid order confirms money. Everything else normalizes to "pending"
-// (Polar has no distinct "payment failed" order event — failed checkouts simply
-// never produce a paid order). Kept as a set so more success aliases can be added.
+// Only a paid order confirms money. `order.refunded` reverses grip (settle handles
+// it). Everything else normalizes to "pending" (Polar has no distinct "payment
+// failed" order event — failed checkouts simply never produce a paid order).
 const SUCCESS_EVENTS = new Set(["order.paid"]);
+const REFUND_EVENTS = new Set(["order.refunded"]);
 
 interface PolarEvent {
   type?: string;
@@ -92,7 +93,11 @@ export const polarWebhookGateway: WebhookGateway = {
     if (!orderId) return { status: "ignored" }; // no idempotency key → nothing to settle
 
     const type = evt.type ?? "";
-    const status = SUCCESS_EVENTS.has(type) ? "success" : "pending";
+    const status = SUCCESS_EVENTS.has(type)
+      ? "success"
+      : REFUND_EVENTS.has(type)
+        ? "refunded"
+        : "pending";
 
     // Polar amounts are integer minor units (e.g. 500 = $5.00).
     const amountMinor = Math.round(Number(evt.data?.amount) || 0);

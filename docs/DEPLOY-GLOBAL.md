@@ -102,8 +102,8 @@ accept a custom amount.
 ### 5.4 Webhook endpoint → `POLAR_WEBHOOK_SECRET`
 1. **Settings → Webhooks → Add Endpoint.**
 2. URL: `https://<global-domain>/api/webhook/polar`, Format **Raw / Standard Webhooks**.
-3. Subscribe to at least **`order.paid`** (add `order.refunded` later if/when the
-   refund→ledger path is wired).
+3. Subscribe to **`order.paid`** (grants grip) and **`order.refunded`** (reverses
+   grip via an append-only refund ledger row; idempotent).
 4. Copy the **signing secret** (`whsec_…`) → `POLAR_WEBHOOK_SECRET`. Our verifier
    follows the Standard Webhooks spec (HMAC-SHA256 over `id.timestamp.body`, base64).
 

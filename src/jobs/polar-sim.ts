@@ -97,13 +97,15 @@ async function listingByUrl() {
   return l;
 }
 
-async function bayarRowCount(listingId: string) {
+async function ledgerRowCount(listingId: string, jenis: "bayar" | "refund") {
   const rows = await db
     .select({ id: peganganLedger.id })
     .from(peganganLedger)
-    .where(and(eq(peganganLedger.listingId, listingId), eq(peganganLedger.jenis, "bayar")));
+    .where(and(eq(peganganLedger.listingId, listingId), eq(peganganLedger.jenis, jenis)));
   return rows.length;
 }
+const bayarRowCount = (id: string) => ledgerRowCount(id, "bayar");
+const refundRowCount = (id: string) => ledgerRowCount(id, "refund");
 
 async function trxStatus(orderId: string) {
   const [t] = await db
@@ -185,6 +187,21 @@ async function main() {
   check("pegangan_cached = 35000", l.grip === 35_000);
   check("two bayar rows", (await bayarRowCount(l.id)) === 2);
   check("listing still tayang", l.status === "tayang");
+
+  console.log("H. order.refunded reverses grip");
+  // Refund order A (30000). Grip was 35000 (A 30000 + F 5000) → 5000.
+  const refund = await deliver(eventBody(a.orderId, 30_000, "order.refunded"));
+  check("outcome refunded", refund.status === "refunded");
+  l = await listingByUrl();
+  check("grip reduced to 5000", l.grip === 5000);
+  check("one refund ledger row", (await refundRowCount(l.id)) === 1);
+  check("transaksi A now refund", (await trxStatus(a.orderId)) === "refund");
+
+  console.log("I. refund replay is idempotent");
+  const refund2 = await deliver(eventBody(a.orderId, 30_000, "order.refunded"));
+  check("refund replay ignored", refund2.status === "ignored");
+  check("still one refund row", (await refundRowCount(l.id)) === 1);
+  check("grip unchanged after replay", (await listingByUrl()).grip === 5000);
 
   console.log("G. ledger integrity");
   const mismatches = await reconcileGrips(db);

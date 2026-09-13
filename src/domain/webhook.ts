@@ -25,6 +25,7 @@ export type WebhookOutcome =
   | { status: "ignored"; reason: "replay" | "pending" }
   | { status: "held"; reason: "amount_mismatch" }
   | { status: "settled"; drops: Drop[]; listingId: string; nama: string | null; rank: number | null }
+  | { status: "refunded"; listingId: string; amount: number }
   | { status: "failed"; transactionStatus: string };
 
 const FAILURE_STATUSES = new Set(["expire", "cancel", "deny", "failure"]);
@@ -88,6 +89,43 @@ export async function settle(
       .limit(1);
 
     if (!trx) return { status: "rejected", reason: "unknown_order" };
+
+    // Refund reverses a settled order's grip via an append-only `refund` row.
+    // Handled BEFORE the replay + amount-match gates: a refund's precondition IS
+    // that the order is settled, and it carries a different amount than the grant.
+    // Idempotent — a replay sees status "refund" (no longer "settlement").
+    if (n.status === "refunded") {
+      if (trx.status !== "settlement") return { status: "ignored", reason: "replay" };
+      const grip = await gripFromLedger(tx, trx.listingId);
+      // Clamp so grip never goes negative (cache must equal the ledger sum).
+      const refundAmt = Math.min(trx.nominal, grip);
+      if (refundAmt > 0) {
+        await appendLedger(tx, {
+          listingId: trx.listingId,
+          jenis: "refund",
+          nominalSigned: -refundAmt,
+          ref: n.orderId,
+        });
+      }
+      const newGrip = await gripFromLedger(tx, trx.listingId);
+      await tx
+        .update(listing)
+        .set({ peganganCached: newGrip })
+        .where(eq(listing.id, trx.listingId));
+      await tx
+        .update(transaksi)
+        .set({ status: "refund", webhookAt: sql`now()`, rawPayload: n.raw })
+        .where(eq(transaksi.orderId, n.orderId));
+      await tx.insert(moderasiLog).values({
+        listingId: trx.listingId,
+        aktor: "sistem",
+        keputusan: "refund_gateway",
+        alasan: `gateway refund order ${n.orderId}: grip ${grip} − ${refundAmt} → ${newGrip}`,
+        sebelum: "settlement",
+        sesudah: "refund",
+      });
+      return { status: "refunded", listingId: trx.listingId, amount: refundAmt };
+    }
 
     // Replay window: a settled invoice is never reprocessed (§18.3).
     if (trx.status === "settlement") return { status: "ignored", reason: "replay" };

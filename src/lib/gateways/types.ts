@@ -8,7 +8,7 @@
  */
 
 /** Provider-neutral outcome of a payment event. */
-export type GatewayStatus = "success" | "failure" | "pending" | "unknown";
+export type GatewayStatus = "success" | "failure" | "pending" | "unknown" | "refunded";
 
 /** A webhook normalized to the fields the domain needs. */
 export interface NormalizedNotification {
