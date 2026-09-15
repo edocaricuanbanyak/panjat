@@ -12,21 +12,17 @@ import type { Database } from "@/db";
 import { juaraHarian, listing, pengunjungAnon, tebakan } from "@/db/schema";
 import { getHariIni, papanHariIniChampion, wibDayWindow } from "./papan-hari-ini";
 import { getRanking } from "./ranking";
+import { zonedDate, zonedHour } from "@/lib/tz";
 
 // --- Pure time/streak helpers -----------------------------------------------
 
-/** WIB calendar date "YYYY-MM-DD" — the reset boundary. */
+/** Market-timezone calendar date "YYYY-MM-DD" — the reset boundary. */
 export function todayWIB(now: Date): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(now);
+  return zonedDate(now);
 }
 
 function wibHour(now: Date): number {
-  const h = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Jakarta",
-    hour: "2-digit",
-    hour12: false,
-  }).format(now);
-  return Number(h) % 24;
+  return zonedHour(now);
 }
 
 /** Guessing closes 3h before the 00:00 WIB reset — i.e. from 21:00 WIB (R15). */

@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { listing, sorak } from "@/db/schema";
 import { assertCron } from "@/lib/cron";
 import { weekStartWIB } from "@/lib/favorit";
+import { zonedDayWindow } from "@/lib/tz";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,7 +42,10 @@ export async function GET(req: Request) {
   type Tally = { listingId: string; nama: string; urlNormal: string; pegangan: number; status: string; sorak: number };
   const weeks = new Map<string, Map<string, Tally>>();
   for (const r of rows) {
-    const week = weekStartWIB(new Date(`${r.tanggal}T10:00:00Z`));
+    // Use a mid-day instant of that market-tz day so bucketing never lands on
+    // the weekly cut-off boundary.
+    const midday = new Date(zonedDayWindow(r.tanggal).start.getTime() + 12 * 3600_000);
+    const week = weekStartWIB(midday);
     let byListing = weeks.get(week);
     if (!byListing) weeks.set(week, (byListing = new Map()));
     const t = byListing.get(r.listingId);

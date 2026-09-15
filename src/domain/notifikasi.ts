@@ -9,6 +9,7 @@ import { copy } from "@/copy";
 import type { Database } from "@/db";
 import { listing, notifikasiLog, sponsorKontak } from "@/db/schema";
 import { defaultSenders, signUnsub, type Senders } from "@/lib/notify";
+import { zonedHour } from "@/lib/tz";
 
 export interface Ambang {
   top1: number;
@@ -44,14 +45,9 @@ export function detectDrops(
   return drops;
 }
 
-/** True during the WIB night pause 22:00–07:00 (§6.5). Pure. */
+/** True during the market-timezone night pause 22:00–07:00 (§6.5). Pure. */
 export function isNightWIB(now: Date): boolean {
-  const hourStr = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Jakarta",
-    hour: "2-digit",
-    hour12: false,
-  }).format(now);
-  const hour = Number(hourStr) % 24; // "24" → 0 on some ICU builds
+  const hour = zonedHour(now);
   return hour >= 22 || hour < 7;
 }
 

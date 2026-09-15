@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { EmptyState } from "@/components/EmptyState";
 import { JelajahCard } from "@/components/JelajahCard";
 import { JelajahSearch } from "@/components/JelajahSearch";
 import { KategoriIcon } from "@/components/KategoriIcon";
@@ -65,9 +66,7 @@ export default async function JelajahPage({
       </p>
 
       {results.length === 0 ? (
-        <p className="mt-6 text-sm text-tinta-redup">
-          {query ? copy.jelajah.kosongCari(query) : copy.jelajah.kosong}
-        </p>
+        <EmptyState compact message={query ? copy.jelajah.kosongCari(query) : copy.jelajah.kosong} />
       ) : (
         <div className="mt-3 flex flex-col gap-2">
           {results.map((c) => (

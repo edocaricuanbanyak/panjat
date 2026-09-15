@@ -14,6 +14,9 @@ importers:
       '@google-analytics/data':
         specifier: ^7.0.0
         version: 7.0.0(supports-color@7.2.0)
+      '@polar-sh/sdk':
+        specifier: ^0.49.0
+        version: 0.49.0
       '@vercel/blob':
         specifier: ^2.8.0
         version: 2.8.0
@@ -989,6 +992,9 @@ packages:
 
   '@oxc-project/types@0.146.0':
     resolution: {integrity: sha512-XC0QsnnhVe7sLIWmYmdPw7x5P0h4W8vUU3Nv1ySgWXtvCz8NizoAEpGXA0sOYoJQV2Rl13LgURAHQ5cI5ILCSA==}
+
+  '@polar-sh/sdk@0.49.0':
+    resolution: {integrity: sha512-9UYb70iKjJCtWYlu0OF5HLYBLmkxHwqr2RlXwuxXQgRGqq56IQWlVG+NO7e1YJ7I5GW0CBHhGIjRbQ9hYM6ycQ==}
 
   '@posthog/browser-common@0.6.0':
     resolution: {integrity: sha512-d6yBE7VeoU3JTpaab3CaCoDCseh0Ytx7sTe0v2ZxhtHNxoKk7rdqr92+bUz9F1T2CuJO5/OTkes4HWT2VHNrTA==}
@@ -4147,6 +4153,11 @@ snapshots:
   '@opentelemetry/api@1.9.1': {}
 
   '@oxc-project/types@0.146.0': {}
+
+  '@polar-sh/sdk@0.49.0':
+    dependencies:
+      standardwebhooks: 1.0.0
+      zod: 4.4.3
 
   '@posthog/browser-common@0.6.0':
     dependencies:

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { copy } from "@/copy";
 import type { KakiTiangEntry } from "@/domain/sorak";
 import { StatusText, useTransientStatus } from "@/lib/use-status";
+import { EmptyState } from "./EmptyState";
 import { KategoriIcon } from "./KategoriIcon";
 import { KlikChip } from "./KlikChip";
 import { SiteLogo } from "./SiteLogo";
@@ -169,7 +170,7 @@ export function KakiTiang({
       )}
 
       {entries.length === 0 ? (
-        <p className="mt-3 text-sm text-tinta-redup">{copy.kakiTiang.kosong}</p>
+        <EmptyState compact message={copy.kakiTiang.kosong} />
       ) : (
         <div className="mt-3 flex flex-col gap-2">
           {ordered.map((e) => (

@@ -3,7 +3,8 @@
  * are pure and unit-tested; the HTTP call is isolated behind SnapClient so the
  * manjat flow can be exercised offline with a fake.
  */
-import { createHash, timingSafeEqual } from "node:crypto";
+import { createHash } from "node:crypto";
+import { timingSafeEqualStr } from "./hmac";
 import { BASE_URL } from "./site";
 
 /** Fields of a Midtrans HTTP notification we rely on. */
@@ -42,10 +43,7 @@ export function verifySignature(notif: MidtransNotification, serverKey: string):
   const expected = createHash("sha512")
     .update(notif.order_id + notif.status_code + notif.gross_amount + serverKey)
     .digest("hex");
-  const a = Buffer.from(expected, "utf8");
-  const b = Buffer.from(notif.signature_key ?? "", "utf8");
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(a, b);
+  return timingSafeEqualStr(expected, notif.signature_key ?? "");
 }
 
 /** Compute the signature for a notification (used by tests and the offline sim). */

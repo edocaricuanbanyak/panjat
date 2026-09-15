@@ -20,12 +20,7 @@ export default async function LaporPage({ searchParams }: { searchParams: Promis
 
   return (
     <PageShell>
-      <h1
-        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
-        style={{ fontStretch: "125%" }}
-      >
-        {copy.lapor.judul}
-      </h1>
+      <h1 className="display-md">{copy.lapor.judul}</h1>
       <p className="mt-2 mb-6 max-w-md text-tinta-redup">{copy.lapor.intro(l.nama)}</p>
       <div className="max-w-md">
         <LaporForm listingId={id} />

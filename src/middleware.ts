@@ -1,4 +1,35 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { matchesShowFor } from "@/lib/board-routing";
+import { MARKET } from "@/lib/market";
+
+/**
+ * Public production host(s) where /admin must be hidden (admin lives only on the
+ * adm.* subdomain). Defaults to panjat.id so the Indonesian deployment is
+ * unchanged; the global deployment sets PUBLIC_HOSTS to its own domain(s).
+ * Local dev hosts (localhost) are not listed, so /admin stays reachable there.
+ */
+const PUBLIC_HOSTS = (process.env.PUBLIC_HOSTS?.trim() || "www.panjat.id,panjat.id")
+  .split(",")
+  .map((h) => h.trim())
+  .filter(Boolean);
+
+// Crawler/bot UAs excluded from geo redirect so each board indexes cleanly.
+// Module constant — compiled once, not per request (middleware runs on all traffic).
+const BOT_UA =
+  /bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora|pinterest|whatsapp|telegram|slack|discord|bingpreview|duckduckbot|baiduspider|yandex|applebot|petalbot|semrush|ahrefs|headless/i;
+
+/** Apply the standard security headers to any response (pages AND redirects). */
+function withSecurityHeaders(res: NextResponse, csp: string, dev: boolean): NextResponse {
+  res.headers.set("content-security-policy", csp);
+  res.headers.set("x-content-type-options", "nosniff");
+  res.headers.set("x-frame-options", "DENY");
+  res.headers.set("referrer-policy", "strict-origin-when-cross-origin");
+  res.headers.set("permissions-policy", "camera=(), microphone=(), geolocation=()");
+  if (!dev) {
+    res.headers.set("strict-transport-security", "max-age=31536000; includeSubDomains; preload");
+  }
+  return res;
+}
 
 /**
  * Security headers (§18.1, §18.5). Nonce-based CSP so third-party sponsor
@@ -9,6 +40,8 @@ export function middleware(req: NextRequest) {
   const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
   const dev = process.env.NODE_ENV !== "production";
   const scriptExtra = dev ? " 'unsafe-eval' 'unsafe-inline'" : "";
+  // Polar (the global gateway) uses a hosted-checkout redirect — no client SDK or
+  // iframe — so no extra CSP origins are needed beyond panjat.id's tight policy.
 
   const csp = [
     "default-src 'self'",
@@ -20,8 +53,8 @@ export function middleware(req: NextRequest) {
     // to gateway.umami.is) + Google Analytics 4 (beacons hit www. + regional
     // *.google-analytics.com) + PostHog US (event ingest /i/v0/e/ + remote config;
     // its feature scripts load via strict-dynamic, but XHR/beacon needs connect-src).
-    "connect-src 'self' https://cloud.umami.is https://gateway.umami.is https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://us.i.posthog.com https://us-assets.i.posthog.com",
-    "frame-src https://www.googletagmanager.com", // GTM <noscript>
+    `connect-src 'self' https://cloud.umami.is https://gateway.umami.is https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://us.i.posthog.com https://us-assets.i.posthog.com`,
+    `frame-src https://www.googletagmanager.com`, // GTM <noscript>
     "frame-ancestors 'none'", // no clickjacking (papan tak boleh di-iframe)
     "base-uri 'self'",
     "form-action 'self'",
@@ -37,6 +70,38 @@ export function middleware(req: NextRequest) {
   // old /admin path is hidden (404) on the public production domain.
   const host = req.headers.get("host") ?? "";
   const { pathname } = req.nextUrl;
+
+  // Sibling-board geo routing (MARKET.altBoard, e.g. IDR panjat.id <-> USD global).
+  // Auto-redirect a wrong-country HUMAN to the other currency board. Kept safe:
+  // bots are excluded (crawlers index each domain), `?stay=1` + a board_pref
+  // cookie let a visitor override and pin the current board (the footer switcher
+  // links with ?stay=1), and only real page navigations are considered — never
+  // /api, assets, POSTs, or the admin host. Currencies never mix in one ledger,
+  // so the split is at the domain, not the gateway.
+  const stayParam = req.nextUrl.searchParams.get("stay") === "1";
+  const alt = MARKET.altBoard;
+  // Cheapest gate first — only a real page navigation can ever redirect, so
+  // assets / API / POST / HEAD / the admin host bail here before any header
+  // reads or the bot-UA test (this block runs on 100% of traffic).
+  const isPageNav =
+    req.method === "GET" &&
+    (req.headers.get("accept") ?? "").includes("text/html") &&
+    !host.startsWith("adm.") &&
+    !pathname.startsWith("/api") &&
+    !pathname.startsWith("/_next");
+  if (alt && isPageNav) {
+    const staying = stayParam || req.cookies.get("board_pref")?.value === "stay";
+    const country = (
+      req.headers.get("x-vercel-ip-country") ||
+      process.env.GEO_COUNTRY_OVERRIDE ||
+      ""
+    ).toUpperCase();
+    if (!staying && matchesShowFor(country, alt.showFor) && !BOT_UA.test(req.headers.get("user-agent") ?? "")) {
+      // Redirects get the same security headers as every other response.
+      return withSecurityHeaders(NextResponse.redirect(new URL(alt.url), 307), csp, dev);
+    }
+  }
+
   let res: NextResponse;
 
   if (host.startsWith("adm.")) {
@@ -51,10 +116,10 @@ export function middleware(req: NextRequest) {
       res = NextResponse.rewrite(url, nextOpts);
     }
   } else if (
-    (host === "www.panjat.id" || host === "panjat.id") &&
+    PUBLIC_HOSTS.includes(host) &&
     (pathname === "/admin" || pathname.startsWith("/admin/") || pathname.startsWith("/api/admin"))
   ) {
-    // Admin lives only on adm.panjat.id — hide it on the public domain.
+    // Admin lives only on the adm.* subdomain — hide it on the public domain(s).
     const url = req.nextUrl.clone();
     url.pathname = "/_admin-hidden-404";
     res = NextResponse.rewrite(url, nextOpts);
@@ -74,15 +139,18 @@ export function middleware(req: NextRequest) {
     });
   }
 
-  res.headers.set("content-security-policy", csp);
-  res.headers.set("x-content-type-options", "nosniff");
-  res.headers.set("x-frame-options", "DENY");
-  res.headers.set("referrer-policy", "strict-origin-when-cross-origin");
-  res.headers.set("permissions-policy", "camera=(), microphone=(), geolocation=()");
-  if (!dev) {
-    res.headers.set("strict-transport-security", "max-age=31536000; includeSubDomains; preload");
+  // A visitor who arrived via the footer switcher (?stay=1) has explicitly chosen
+  // this board — remember it so geo routing never bounces them away again.
+  if (stayParam) {
+    res.cookies.set("board_pref", "stay", {
+      sameSite: "lax",
+      secure: !dev,
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+    });
   }
-  return res;
+
+  return withSecurityHeaders(res, csp, dev);
 }
 
 export const config = {

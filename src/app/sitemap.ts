@@ -4,6 +4,7 @@ import { listCategories } from "@/domain/jelajah";
 import { allTayangIds } from "@/domain/listing-publik";
 import { archivedDailyDates } from "@/domain/papan-hari-ini";
 import { BASE_URL } from "@/lib/site";
+import { zonedDayWindow } from "@/lib/tz";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...dailyDates.map(
       (d): Entry => ({
         url: `${BASE_URL}/hari-ini/${d}`,
-        lastModified: new Date(`${d}T23:59:59+07:00`),
+        // End of that market-tz day (window end minus 1s).
+        lastModified: new Date(zonedDayWindow(d).end.getTime() - 1000),
         changeFrequency: "yearly",
         priority: 0.4,
       }),

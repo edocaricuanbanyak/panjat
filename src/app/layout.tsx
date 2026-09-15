@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import { Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import Script from "next/script";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { copy } from "@/copy";
+import { MARKET } from "@/lib/market";
 import { BASE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -18,11 +20,28 @@ const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
+// hreflang: when a sibling board is configured, tell search engines the two
+// domains are locale/region variants of each other (so geo routing doesn't read
+// as cloaking and each board indexes cleanly). Sibling locale is the opposite of
+// this deployment's (id <-> en).
+const siblingLocale = MARKET.defaultLocale === "id" ? "en-US" : "id-ID";
+
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: `${copy.merek.nama} — ${copy.merek.tagline}`,
   description: copy.merek.deskripsiSitus,
   applicationName: copy.merek.nama,
+  ...(MARKET.altBoard
+    ? {
+        alternates: {
+          languages: {
+            [MARKET.locale]: BASE_URL,
+            [siblingLocale]: MARKET.altBoard.url,
+            "x-default": BASE_URL,
+          },
+        },
+      }
+    : {}),
   appleWebApp: {
     capable: true,
     title: copy.merek.nama,
@@ -36,7 +55,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: copy.merek.nama,
-    locale: "id_ID",
+    locale: MARKET.locale.replace("-", "_"), // "id-ID" -> "id_ID"
   },
   twitter: {
     card: "summary_large_image",
@@ -63,11 +82,11 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   return (
     <html
-      lang="id"
+      lang={MARKET.defaultLocale}
       className={`${poppins.variable} ${jakarta.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-kertas text-tinta">

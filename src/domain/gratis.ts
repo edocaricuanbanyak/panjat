@@ -9,18 +9,18 @@ import { listing, sorak, sponsorKontak } from "@/db/schema";
 import { loadMaksGratisPerDomain } from "./config";
 import { screenListing } from "./moderasi";
 import { imageUrlOrNull, normalizeUrl } from "./url";
+import { zonedDate, zonedDayWindow } from "@/lib/tz";
 
 export class GratisError extends Error {}
 
 // Kaki Tiang is first-come-first-served: at most 10 free slots open per WIB week.
 export const GRATIS_PER_MINGGU = 10;
 
-/** Start of the current WIB week (Monday 00:00 WIB) as a UTC instant. */
+/** Start of the current market-tz week (Monday 00:00 local) as a UTC instant. */
 function mingguStart(now: Date): Date {
-  const wib = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(now);
-  const d = new Date(`${wib}T00:00:00Z`);
+  const d = new Date(`${zonedDate(now)}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); // back to Monday
-  return new Date(`${d.toISOString().slice(0, 10)}T00:00:00+07:00`);
+  return zonedDayWindow(d.toISOString().slice(0, 10)).start;
 }
 
 /** Free slots taken this week — accepted (tayang/ditahan) grip-0 listings. */

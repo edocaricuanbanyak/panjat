@@ -16,6 +16,7 @@
     "ditahan": "tsx src/jobs/ditahan.ts",
     "rosot:run": "tsx src/jobs/rosot.ts",
     "manjat:sim": "tsx src/jobs/manjat-sim.ts",
+    "polar:sim": "tsx src/jobs/polar-sim.ts",
     "klik:sim": "tsx src/jobs/klik-sim.ts",
     "moderate:run": "tsx src/jobs/moderate.ts",
     "moderasi:sim": "tsx src/jobs/moderasi-sim.ts",
@@ -34,6 +35,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",
     "@google-analytics/data": "^7.0.0",
+    "@polar-sh/sdk": "^0.49.0",
     "@vercel/blob": "^2.8.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",

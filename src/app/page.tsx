@@ -17,6 +17,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { VoteFavorit } from "@/components/VoteFavorit";
 import { copy } from "@/copy";
 import { boardItemListJsonLd, websiteJsonLd } from "@/lib/jsonld";
+import { formatCount } from "@/lib/format";
 import { db } from "@/db";
 import { type BoardEntry, getBoard } from "@/domain/board";
 import { listCategories } from "@/domain/jelajah";
@@ -135,33 +136,43 @@ async function HomeBody({
 
       {/* HERO — value + the one action */}
       <section className="pt-1 pb-5">
-        <h1
-          className="font-display text-4xl font-bold leading-[0.95] text-tinta sm:text-5xl md:text-6xl"
-          style={{ fontStretch: "130%" }}
-        >
-          {copy.beranda.heroJudul}
-        </h1>
+        <h1 className="display-xl text-tinta">{copy.beranda.heroJudul}</h1>
         {/* Live social proof — the USP as one soft chip linking to full stats. */}
         <div className="mt-6">
           <a
             href="/statistik"
-            className="group inline-flex max-w-full flex-wrap items-center justify-center gap-x-2.5 gap-y-1 rounded-full bg-kertas-2 px-4 py-2 text-sm"
+            aria-label={copy.nav.statistik}
+            className="group inline-flex max-w-full items-center justify-center gap-x-2 whitespace-nowrap rounded-full bg-kertas-2 px-3.5 py-2 text-sm sm:flex-wrap sm:gap-x-2.5 sm:px-4"
           >
             <span className="inline-flex items-center gap-1.5">
               <span className="blink inline-block size-1.5 rounded-full bg-hidup" aria-hidden />
               <span className="font-semibold tabular text-hidup">
-                {visitor.online.toLocaleString("id-ID")}
+                {formatCount(visitor.online)}
               </span>
               <span className="text-tinta-redup">{copy.beranda.statOnline}</span>
+            </span>
+            {/* Paid listings currently on the money board (excludes free Kaki Tiang). */}
+            <span className="h-3.5 w-px bg-garis" aria-hidden />
+            <span className="inline-flex items-center gap-1.5">
+              <span className="font-semibold tabular text-tinta">
+                {formatCount(entries.length)}
+              </span>
+              <span className="text-tinta-redup">{copy.beranda.statListing}</span>
             </span>
             <span className="h-3.5 w-px bg-garis" aria-hidden />
             <span className="inline-flex items-center gap-1.5">
               <span className="font-semibold tabular text-tinta">
-                {visitor.total.toLocaleString("id-ID")}
+                {formatCount(visitor.total)}
               </span>
               <span className="text-tinta-redup">{copy.beranda.statPengunjung}</span>
             </span>
-            <span className="text-merah-teks group-hover:underline">
+            {/* Whole chip links to /statistik (aria-label on the <a>). On mobile the
+                full CTA won't fit on one line, so show a compact arrow cue instead;
+                the full label returns at sm+. */}
+            <span className="text-merah-teks group-hover:underline sm:hidden" aria-hidden>
+              →
+            </span>
+            <span className="hidden text-merah-teks group-hover:underline sm:inline">
               {copy.beranda.lihatStatistik}
             </span>
           </a>
@@ -169,9 +180,11 @@ async function HomeBody({
         <HeroManjat kategori={kats} />
       </section>
 
-      {/* PAPAN — three in-place tabs (no page navigation) */}
+      {/* PAPAN — three in-place tabs (no page navigation). A ?hal param means the
+          visitor is paginating the all-time board, so open that tab (not the
+          Hari Ini default) — otherwise moving pages would snap back to Hari Ini. */}
       <HomeTabs
-        defaultTab={hariIni.length > 0 ? "hari-ini" : "sekarang"}
+        defaultTab={sp.hal != null ? "sekarang" : hariIni.length > 0 ? "hari-ini" : "sekarang"}
         sekarang={
           <>
             {entries.length === 0 ? (
@@ -203,7 +216,7 @@ async function HomeBody({
                 {juaraTerfavorit && <JuaraTerfavorit entry={juaraTerfavorit} />}
               </>
             ) : (
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-baris">
                 {pageEntries.map((e) => (
                   <ListingCard key={e.id} entry={e} />
                 ))}
@@ -216,7 +229,7 @@ async function HomeBody({
       />
 
       {/* KAKI TIANG (gratis) — below both boards (All time + Hari Ini). */}
-      <div className="mt-12">
+      <div className="mt-seksi">
         <KakiTiang entries={kakiTiangEntries} remaining={sisaSorak} baruId={sp.baru ?? null} />
         <div className="mt-3 text-xs text-tinta-redup">
           {copy.beranda.punyaProduk}{" "}
@@ -225,9 +238,9 @@ async function HomeBody({
       </div>
 
       {/* CARA MAIN */}
-      <section className="mt-14">
-        <h2 className="mb-6 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
-          {copy.beranda.caraMainJudul}
+      <section className="mt-seksi">
+        <h2 className="masthead mb-6">
+          <span>{copy.beranda.caraMainJudul}</span>
         </h2>
         <CaraMain />
       </section>

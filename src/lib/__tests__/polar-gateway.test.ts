@@ -1,0 +1,122 @@
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { polarWebhookGateway, signPolar } from "@/lib/gateways/polar-gateway";
+import type { NormalizedNotification, RawWebhook } from "@/lib/gateways/types";
+
+// A Standard-Webhooks secret: `whsec_` + base64 key material.
+const SECRET = `whsec_${Buffer.from("polar-test-secret").toString("base64")}`;
+
+function event(over: Record<string, unknown> = {}) {
+  return {
+    type: "order.paid",
+    data: {
+      id: "ord_123",
+      status: "paid",
+      amount: 500,
+      metadata: { order_id: "mnjt_abc" },
+      payment_processor: "stripe",
+      ...over,
+    },
+  };
+}
+
+// Current timestamp: the SDK validator (Standard Webhooks) enforces a ±5-min window.
+function raw(
+  body: string,
+  secret = SECRET,
+  id = "msg_1",
+  ts = String(Math.floor(Date.now() / 1000)),
+): RawWebhook {
+  const sig = signPolar(id, ts, body, secret);
+  return {
+    body,
+    headers: new Headers({
+      "webhook-id": id,
+      "webhook-timestamp": ts,
+      "webhook-signature": `v1,${sig}`,
+    }),
+  };
+}
+
+/** Assert the result is `ok` and return its notification (narrows the union). */
+function ok(r: ReturnType<typeof polarWebhookGateway.verifyAndParse>): NormalizedNotification {
+  if (r.status !== "ok") throw new Error(`expected ok, got ${r.status}`);
+  return r.notification;
+}
+
+beforeEach(() => {
+  process.env.POLAR_WEBHOOK_SECRET = SECRET;
+});
+afterEach(() => {
+  delete process.env.POLAR_WEBHOOK_SECRET;
+});
+
+describe("polarWebhookGateway.verifyAndParse", () => {
+  it("accepts a correctly signed order.paid and normalizes it", () => {
+    const n = ok(polarWebhookGateway.verifyAndParse(raw(JSON.stringify(event()))));
+    expect(n.orderId).toBe("mnjt_abc");
+    expect(n.amountMinor).toBe(500); // $5.00 in cents, already minor units
+    expect(n.status).toBe("success");
+    expect(n.method).toBe("stripe");
+  });
+
+  it("accepts a signature header carrying multiple space-delimited versions", () => {
+    const body = JSON.stringify(event());
+    const ts = String(Math.floor(Date.now() / 1000));
+    const sig = signPolar("msg_1", ts, body, SECRET);
+    const req: RawWebhook = {
+      body,
+      headers: new Headers({
+        "webhook-id": "msg_1",
+        "webhook-timestamp": ts,
+        "webhook-signature": `v1,bogus v1,${sig}`,
+      }),
+    };
+    expect(polarWebhookGateway.verifyAndParse(req).status).toBe("ok");
+  });
+
+  it("rejects a tampered body (signature no longer matches)", () => {
+    const good = raw(JSON.stringify(event()));
+    const tampered: RawWebhook = { body: `${good.body} `, headers: good.headers };
+    expect(polarWebhookGateway.verifyAndParse(tampered).status).toBe("invalid");
+  });
+
+  it("rejects the wrong secret", () => {
+    const other = `whsec_${Buffer.from("other-secret").toString("base64")}`;
+    expect(polarWebhookGateway.verifyAndParse(raw(JSON.stringify(event()), other)).status).toBe(
+      "invalid",
+    );
+  });
+
+  it("ignores a verified event missing our order_id (no idempotency key)", () => {
+    // Authentic (valid signature) but not actionable → ignored (ACK 200), not invalid.
+    const body = JSON.stringify(event({ metadata: {} }));
+    expect(polarWebhookGateway.verifyAndParse(raw(body)).status).toBe("ignored");
+  });
+
+  it("maps a non-paid event to pending", () => {
+    const evt = event();
+    evt.type = "checkout.updated";
+    const n = ok(polarWebhookGateway.verifyAndParse(raw(JSON.stringify(evt))));
+    expect(n.status).toBe("pending");
+  });
+
+  it("maps order.refunded to a refunded notification", () => {
+    const evt = event();
+    evt.type = "order.refunded";
+    const n = ok(polarWebhookGateway.verifyAndParse(raw(JSON.stringify(evt))));
+    expect(n.status).toBe("refunded");
+    expect(n.orderId).toBe("mnjt_abc");
+  });
+
+  it("rejects when required headers are absent", () => {
+    const body = JSON.stringify(event());
+    expect(polarWebhookGateway.verifyAndParse({ body, headers: new Headers() }).status).toBe(
+      "invalid",
+    );
+  });
+
+  it("rejects when no secret is configured", () => {
+    delete process.env.POLAR_WEBHOOK_SECRET;
+    expect(polarWebhookGateway.verifyAndParse(raw(JSON.stringify(event()))).status).toBe("invalid");
+  });
+});

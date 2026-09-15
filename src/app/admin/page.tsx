@@ -29,12 +29,7 @@ export default async function AdminPage() {
   return (
     <PageShell>
       <div className="flex items-end justify-between">
-        <h1
-          className="font-display text-3xl font-bold text-tinta sm:text-4xl"
-          style={{ fontStretch: "125%" }}
-        >
-          {copy.admin.judulAntrean}
-        </h1>
+        <h1 className="display-lg">{copy.admin.judulAntrean}</h1>
         <form action="/api/admin/keluar" method="post">
           <button className="text-sm text-tinta-redup hover:text-tinta">{copy.admin.keluar}</button>
         </form>
@@ -75,7 +70,7 @@ export default async function AdminPage() {
         </ul>
       )}
 
-      <h2 className="mt-10 font-display text-lg font-semibold text-tinta">
+      <h2 className="masthead mt-10">
         {copy.admin.laporanJudul(laporan.length)}
       </h2>
       {laporan.length === 0 ? (

@@ -65,6 +65,13 @@ export function HomeTabs({
       <div
         role="tablist"
         aria-label={copy.nav.papanRingkas}
+        // The fixed mobile navbar is persistent chrome. Give it a stable
+        // view-transition-name so live board reorders (BoardLive fires
+        // document.startViewTransition on the all-time tab) don't capture it
+        // into the root snapshot and cross-fade it — that read as a blink where
+        // the floating bar vanished and reappeared on every SSE update. Named,
+        // it stays in place across transitions.
+        style={{ viewTransitionName: "papan-tabs" } as React.CSSProperties}
         className="relative mb-5 inline-grid grid-cols-2 rounded-full p-1 sm:bg-kertas-2 max-sm:fixed max-sm:bottom-[calc(1rem+env(safe-area-inset-bottom))] max-sm:left-1/2 max-sm:z-40 max-sm:-translate-x-1/2 max-sm:bg-kertas-1 max-sm:shadow-naik max-sm:ring-1 max-sm:ring-garis/60"
       >
         {/* Sliding thumb — transform only (compositor-friendly), brand easing. */}

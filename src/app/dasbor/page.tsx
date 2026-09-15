@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { PageShell } from "@/components/PageShell";
+import { DasborListSkeleton } from "@/components/Skeleton";
 import { copy } from "@/copy";
 import { db } from "@/db";
 import { listMyListings } from "@/domain/dashboard";
@@ -12,22 +14,28 @@ export default async function DasborIndex() {
   const kontakId = await currentKontak();
   if (!kontakId) redirect("/dasbor/masuk");
 
-  const listings = await listMyListings(db, kontakId);
-
   return (
     <PageShell>
       <div className="flex items-end justify-between">
-        <h1
-          className="font-display text-3xl font-bold text-tinta sm:text-4xl"
-          style={{ fontStretch: "125%" }}
-        >
-          {copy.dasbor.judul}
-        </h1>
+        <h1 className="display-lg">{copy.dasbor.judul}</h1>
         <form action="/api/dasbor/keluar" method="post">
           <button className="text-sm text-tinta-redup hover:text-tinta">{copy.dasbor.keluar}</button>
         </form>
       </div>
 
+      {/* Auth is resolved above (redirect fires before any streaming); the
+          listing query then streams in behind a skeleton. */}
+      <Suspense fallback={<DasborListSkeleton />}>
+        <MyListings kontakId={kontakId} />
+      </Suspense>
+    </PageShell>
+  );
+}
+
+async function MyListings({ kontakId }: { kontakId: string }) {
+  const listings = await listMyListings(db, kontakId);
+  return (
+    <>
       {listings.length === 0 ? (
         <p className="mt-6 text-tinta-redup">
           {copy.dasbor.belumAdaListing}{" "}
@@ -58,6 +66,6 @@ export default async function DasborIndex() {
           ))}
         </ul>
       )}
-    </PageShell>
+    </>
   );
 }

@@ -5,7 +5,7 @@ import { Button } from "@/components/Button";
 import { Dropdown } from "@/components/Dropdown";
 import { Input } from "@/components/Input";
 import { copy } from "@/copy";
-import { formatRupiah } from "@/lib/format";
+import { formatMoneyInput, formatRupiah } from "@/lib/format";
 import { StatusText, useTransientStatus } from "@/lib/use-status";
 
 type Jaga = { target: string; budgetSisa: number; aktif: boolean } | null;
@@ -56,7 +56,7 @@ export function JagaPosisiPanel({ listingId, jaga }: { listingId: string; jaga: 
           label={copy.dasbor.jagaBudget}
           inputMode="numeric"
           placeholder="100.000"
-          value={tambah ? Number(tambah).toLocaleString("id-ID") : ""}
+          value={formatMoneyInput(tambah)}
           onChange={(e) => setTambah(e.target.value.replace(/\D/g, ""))}
         />
         <label className="flex h-11 items-center gap-2 text-sm text-tinta">

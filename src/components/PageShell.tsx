@@ -44,7 +44,14 @@ export async function PageShell({
         >
           {copy.sistem.lompatKeIsi}
         </a>
-        <div className="sticky top-0 z-30 -mx-4 border-b border-garis/70 bg-kertas px-4 pt-[env(safe-area-inset-top)] sm:-mx-5 sm:px-5">
+        {/* Persistent sticky chrome (live ticker + header). Named for view
+            transitions so BoardLive's reorder snapshots don't capture it into
+            the root group and cross-fade it — same blink fix as the board
+            tabs. */}
+        <div
+          style={{ viewTransitionName: "app-header" } as React.CSSProperties}
+          className="sticky top-0 z-30 -mx-4 border-b border-garis/70 bg-kertas px-4 pt-[env(safe-area-inset-top)] sm:-mx-5 sm:px-5"
+        >
           <Spotlight initialItems={aktivitas} />
           <SiteHeader />
         </div>

@@ -7,30 +7,33 @@
 import { desc, eq, inArray } from "drizzle-orm";
 import type { Database } from "@/db";
 import { listing } from "@/db/schema";
+import { MARKET } from "./market";
+import { zonedDate } from "./tz";
 import { redis } from "./redis";
 
-/** YYYY-MM-DD in WIB — the daily vote bucket. */
+/** YYYY-MM-DD in the market timezone — the daily vote bucket. */
 function wibDate(now: Date): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(now);
+  return zonedDate(now);
 }
 
 /**
- * The weekly competition resets at the Wednesday 17:00 WIB cut-off — champions
- * are *determined* then, and posted to Threads/TikTok the following Friday. WIB
- * has no DST, so the cut-off is a fixed weekly UTC instant (Wed 10:00 UTC).
+ * The weekly competition resets at a fixed weekly cut-off — champions are
+ * *determined* then. On the Indonesian board this is the Wednesday 17:00 WIB
+ * cut-off (WEEK_ANCHOR_MS default = Wed 10:00 UTC); other markets set their own
+ * anchor via MARKET.weekAnchorMs. Bucketing is anchor-relative.
  */
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-export const WEEK_ANCHOR_MS = Date.UTC(1970, 0, 7, 10, 0, 0); // a Wednesday 17:00 WIB
+export const WEEK_ANCHOR_MS = MARKET.weekAnchorMs;
 
-/** Stable weekly bucket id, incrementing at each Wednesday 17:00 WIB cut-off. */
+/** Stable weekly bucket id, incrementing at each weekly cut-off. */
 export function weekBucket(now: Date): number {
   return Math.floor((now.getTime() - WEEK_ANCHOR_MS) / WEEK_MS);
 }
 
-/** The WIB date "YYYY-MM-DD" of the Wednesday 17:00 cut-off that OPENED the week `now` falls in. */
+/** The market-tz date "YYYY-MM-DD" of the cut-off that OPENED the week `now` falls in. */
 export function weekStartWIB(now: Date): string {
   const cutoff = new Date(WEEK_ANCHOR_MS + weekBucket(now) * WEEK_MS);
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(cutoff);
+  return zonedDate(cutoff);
 }
 
 const tallyKey = (now: Date) => `favorit:tally:w${weekBucket(now)}`;

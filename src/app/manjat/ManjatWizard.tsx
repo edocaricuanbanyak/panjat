@@ -9,7 +9,8 @@ import { KategoriIcon } from "@/components/KategoriIcon";
 import { LogoTile } from "@/components/LogoTile";
 import { copy } from "@/copy";
 import type { Quote } from "@/domain/manjat";
-import { formatRupiah } from "@/lib/format";
+import { formatMoneyInput, formatRupiah, moneySymbol } from "@/lib/format";
+import { isEmailish } from "@/lib/validate";
 
 type Kategori = { slug: string; nama: string };
 
@@ -152,7 +153,13 @@ export function ManjatWizard({
         deskripsi: deskripsi || undefined,
         logoUrl: logoUrl || undefined,
       });
-      window.location.href = result.redirectUrl;
+      // Every gateway (Midtrans Snap, Polar hosted checkout, mock-pay) returns a
+      // redirect URL → navigate. Grip still activates only via the verified webhook.
+      if (result.redirectUrl) {
+        window.location.href = result.redirectUrl;
+      } else {
+        throw new Error(copy.error.gagalTagihan);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : copy.error.gagalTagihan);
       setSubmitting(false);
@@ -213,8 +220,11 @@ export function ManjatWizard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Email is optional, but if typed it must look valid — surfaced inline on the
+  // field and gating both the step-1 continue and the final pay button.
+  const emailError = email.trim() !== "" && !isEmailish(email) ? copy.error.emailTidakValid : undefined;
   // Only the URL is required; the rest is auto-filled and editable.
-  const canStep1 = url.trim() !== "";
+  const canStep1 = url.trim() !== "" && !emailError;
   const host = url.trim().replace(/^https?:\/\//, "").replace(/\/+$/, "");
   // The server clamps below-minimum amounts up; surface that instead of silently
   // showing a different position than the number you typed.
@@ -230,10 +240,7 @@ export function ManjatWizard({
           <a href="/" className="text-sm text-tinta-redup hover:text-tinta">
             {copy.manjat.kembaliPapan}
           </a>
-          <h1
-            className="mt-2 font-display text-2xl font-bold text-tinta"
-            style={{ fontStretch: "120%" }}
-          >
+          <h1 className="display-md mt-2">
             {copy.manjat.judul}
           </h1>
         </>
@@ -367,6 +374,7 @@ export function ManjatWizard({
             type="email"
             placeholder={copy.manjat.emailPlaceholder}
             hint={copy.manjat.emailHint}
+            error={emailError}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -418,13 +426,13 @@ export function ManjatWizard({
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 tabular text-xl text-tinta-redup">
-                Rp
+                {moneySymbol}
               </span>
               <input
                 ref={nominalRef}
                 inputMode="numeric"
                 placeholder={copy.manjat.nominalPlaceholder}
-                value={nominalInput ? Number(nominalInput).toLocaleString("id-ID") : ""}
+                value={formatMoneyInput(nominalInput)}
                 onChange={(e) => setNominalInput(e.target.value.replace(/\D/g, ""))}
                 className={`h-14 w-full rounded-xl border bg-kertas-1 pl-12 pr-4 tabular text-2xl font-bold text-tinta shadow-kartu focus-visible:outline-none focus-visible:ring-2 ${
                   nominalDinaikkan
@@ -535,7 +543,7 @@ export function ManjatWizard({
           </label>
 
           {/* Single CTA — pay goes straight to the payment gateway. */}
-          <Button className="w-full" disabled={!quote || submitting || !consent} onClick={onPay}>
+          <Button className="w-full" disabled={!quote || submitting || !consent || !!emailError} onClick={onPay}>
             {submitting
               ? copy.manjat.memproses
               : nominalDinaikkan && quote

@@ -2,6 +2,7 @@
 import { db, pool } from "@/db";
 import { notifyDrops } from "@/domain/notifikasi";
 import { applyHourlyRosot } from "@/domain/rosot-run";
+import { formatMoney } from "@/lib/format";
 
 async function main() {
   const now = new Date();
@@ -10,7 +11,7 @@ async function main() {
     console.log(`rosot: skipped, already ran for ${res.ref}`);
   } else {
     console.log(
-      `rosot ${res.ref}: ${res.listings} listing(s), total decayed Rp${res.totalDecayed.toLocaleString("id-ID")}`,
+      `rosot ${res.ref}: ${res.listings} listing(s), total decayed ${formatMoney(res.totalDecayed)}`,
     );
     // Send "kamu disalip" notifications outside the board transaction (R3).
     if (res.drops.length > 0) {

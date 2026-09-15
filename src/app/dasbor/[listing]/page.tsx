@@ -1,8 +1,10 @@
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
+import { Suspense } from "react";
 import { buttonClasses } from "@/components/Button";
 import { LencanaRow } from "@/components/LencanaRow";
 import { PageShell } from "@/components/PageShell";
+import { DasborListingSkeleton } from "@/components/Skeleton";
 import { Sparkline } from "@/components/Sparkline";
 import { StatTile } from "@/components/StatTile";
 import { copy } from "@/copy";
@@ -26,8 +28,24 @@ export default async function DasborListing({
   if (!kontakId) redirect("/dasbor/masuk");
 
   const { listing: listingId } = await params;
+  // Ownership is the real 404 gate (unowned / nonexistent) and is resolved here,
+  // before any streaming, so it stays a hard 404.
   if (!(await ownsListing(db, listingId, kontakId))) notFound();
 
+  return (
+    <PageShell>
+      <a href="/dasbor" className="text-sm text-tinta-redup hover:text-tinta">
+        ← Dasbor
+      </a>
+      {/* The heavy dashboard aggregate streams in behind a skeleton. */}
+      <Suspense fallback={<DasborListingSkeleton />}>
+        <DashboardBody listingId={listingId} />
+      </Suspense>
+    </PageShell>
+  );
+}
+
+async function DashboardBody({ listingId }: { listingId: string }) {
   const d = await getDashboard(db, listingId);
   if (!d) notFound();
 
@@ -38,13 +56,8 @@ export default async function DasborListing({
     .limit(1);
 
   return (
-    <PageShell>
-      <a href="/dasbor" className="text-sm text-tinta-redup hover:text-tinta">
-        ← Dasbor
-      </a>
-      <h1 className="mt-2 font-display text-3xl font-bold text-tinta sm:text-4xl" style={{ fontStretch: "125%" }}>
-        {d.nama}
-      </h1>
+    <>
+      <h1 className="display-lg mt-2">{d.nama}</h1>
       <p className="mt-1 tabular text-xs text-tinta-redup">
         {d.urlNormal} · {d.status}
       </p>
@@ -78,7 +91,7 @@ export default async function DasborListing({
       </div>
 
       <section className="mt-6">
-        <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+        <h2 className="masthead mb-2">
           {copy.dasbor.posisi7}
         </h2>
         <div className="rounded-xl border border-garis bg-kertas-1 p-4 shadow-kartu">
@@ -93,28 +106,28 @@ export default async function DasborListing({
       </section>
 
       <section className="mt-6">
-        <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+        <h2 className="masthead mb-2">
           {copy.dasbor.jagaJudul}
         </h2>
         <JagaPosisiPanel listingId={d.listingId} jaga={jaga ?? null} />
       </section>
 
       <section className="mt-6">
-        <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+        <h2 className="masthead mb-2">
           {copy.dasbor.pratinjauSitus}
         </h2>
         <ScreenshotPanel listingId={d.listingId} screenshotUrl={d.screenshotUrl} nama={d.nama} />
       </section>
 
       <section className="mt-6">
-        <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+        <h2 className="masthead mb-2">
           {copy.dasbor.deskripsi}
         </h2>
         <DescEdit listingId={d.listingId} initial={d.deskripsi ?? ""} />
       </section>
 
       <section className="mt-6">
-        <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+        <h2 className="masthead mb-2">
           {copy.dasbor.riwayat}
         </h2>
         {d.riwayat.length === 0 ? (
@@ -137,6 +150,6 @@ export default async function DasborListing({
           </ul>
         )}
       </section>
-    </PageShell>
+    </>
   );
 }

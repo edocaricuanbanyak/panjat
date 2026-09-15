@@ -602,7 +602,7 @@ Anti-slop karena strukturnya **informasional**: posisi vertikal pada rel = perin
 | `garis` | `#D8D2C4` | Border 1px |
 | `tiang` | `#8A5A32` | Rel tiang, marker, tekstur kayu pinang |
 | `licin` | `#B9C4C9` | Kilap gemuk di rel — abu kebiruan dingin, satu-satunya nada dingin di halaman |
-| `merah` | `#C93A2E` | **Hanya** zona puncak (#1–3), bendera kecil di ujung tiang, dan aksi utama. Merah bendera yang diredupkan satu tingkat agar tidak menyala |
+| `merah` | `#da2e20` | **Hanya** zona puncak (#1–3), bendera kecil di ujung tiang, dan aksi utama. Merah bendera (merah-putih); teks putih di atasnya lolos WCAG AA. Untuk merah sebagai teks kecil pakai `merah-teks` (`#be2414`) |
 
 Aturan: `merah` adalah kelangkaan yang dijaga. Ia menandai puncak dan ajakan manjat — muncul di tempat lain berarti bug desain. Logo sponsor duduk di `LogoTile` netral, tidak pernah diwarnai identitas: brand sponsor bukan pembawa data.
 

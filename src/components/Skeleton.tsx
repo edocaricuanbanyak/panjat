@@ -151,6 +151,46 @@ export function JelajahSkeleton() {
   );
 }
 
+/** Dasbor index — the "my listings" list (logo · name/status · grip rows). */
+export function DasborListSkeleton({ n = 4 }: { n?: number }) {
+  return (
+    <div className="mt-6 flex flex-col gap-2.5">
+      {Array.from({ length: n }, (_, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-between rounded-xl border border-garis bg-kertas-1 p-4 shadow-baris"
+        >
+          <div className="min-w-0">
+            <Skeleton className="h-4 w-40 rounded" />
+            <Skeleton className="mt-1.5 h-3 w-20 rounded" />
+          </div>
+          <Skeleton className="h-4 w-24 rounded" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Dasbor detail — the 6 stat tiles + chart + a couple of section blocks. */
+export function DasborListingSkeleton() {
+  return (
+    <>
+      <Skeleton className="h-8 w-56 rounded-lg" />
+      <Skeleton className="mt-2 h-3 w-40 rounded" />
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {Array.from({ length: 6 }, (_, i) => (
+          <div key={i} className="rounded-xl border border-garis bg-kertas-1 p-3.5 shadow-kartu">
+            <Skeleton className="h-3 w-20 rounded" />
+            <Skeleton className="mt-2 h-5 w-16 rounded" />
+          </div>
+        ))}
+      </div>
+      <Skeleton className="mt-6 h-32 w-full rounded-xl" />
+      <Skeleton className="mt-6 h-24 w-full rounded-xl" />
+    </>
+  );
+}
+
 export function ArsipSkeleton() {
   return (
     <>

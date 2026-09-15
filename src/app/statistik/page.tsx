@@ -7,7 +7,7 @@ import { StatTile } from "@/components/StatTile";
 import { copy } from "@/copy";
 import { db } from "@/db";
 import { getStatistik } from "@/domain/statistik";
-import { formatRupiah } from "@/lib/format";
+import { formatCount, formatRupiah } from "@/lib/format";
 import { getGa4Stats } from "@/lib/ga4";
 import { pingVisitor, VID_COOKIE } from "@/lib/presence";
 
@@ -32,12 +32,7 @@ export default async function StatistikPage() {
         <ArrowLeft className="size-4" aria-hidden />
         {copy.nav.sepanjangMasa}
       </a>
-      <h1
-        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
-        style={{ fontStretch: "125%" }}
-      >
-        {copy.statistik.judul}
-      </h1>
+      <h1 className="display-lg">{copy.statistik.judul}</h1>
       <InfoBox className="mt-3">{copy.statistik.sub}</InfoBox>
 
       <div className="mt-6 grid grid-cols-2 gap-3">
@@ -54,10 +49,9 @@ export default async function StatistikPage() {
           metode={copy.statistik.hargaMasuk20Metode}
         />
         <StatTile
-          label={copy.statistik.klik7}
-          value={s.klik7hari.toLocaleString("id-ID")}
-          sub={copy.statistik.klik7Sub(s.klikPerHari.toLocaleString("id-ID"))}
-          metode={copy.statistik.klik7Metode}
+          label={copy.statistik.klikTotal}
+          value={formatCount(s.klikTotal)}
+          metode={copy.statistik.klikTotalMetode}
         />
         <StatTile
           label={copy.statistik.cpc}
@@ -79,7 +73,7 @@ export default async function StatistikPage() {
         />
         <StatTile
           label={copy.statistik.pengunjung}
-          value={s.totalPengunjung.toLocaleString("id-ID")}
+          value={formatCount(s.totalPengunjung)}
           sub={copy.statistik.pengunjungSub}
           metode={copy.statistik.pengunjungMetode}
         />
@@ -109,7 +103,7 @@ export default async function StatistikPage() {
                       <li key={row.label} className="flex items-center justify-between gap-3 text-sm">
                         <span className="truncate text-tinta">{row.label}</span>
                         <span className="tabular shrink-0 text-tinta-redup">
-                          {row.users.toLocaleString("id-ID")}
+                          {formatCount(row.users)}
                         </span>
                       </li>
                     ))}
