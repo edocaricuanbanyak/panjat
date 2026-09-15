@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import { Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import Script from "next/script";
 import { PostHogProvider } from "@/components/PostHogProvider";
@@ -81,7 +82,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   return (
     <html
