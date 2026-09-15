@@ -37,7 +37,7 @@ export function MockPay({ orderId, nominal }: { orderId: string; nominal: number
 
       {status === "done" ? (
         <>
-          <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+          <h1 className="display-md">
             {copy.bayarMock.berhasilJudul}
           </h1>
           <p className="mt-2 text-sm text-tinta-redup">
@@ -49,7 +49,7 @@ export function MockPay({ orderId, nominal }: { orderId: string; nominal: number
         </>
       ) : (
         <>
-          <h1 className="font-display text-2xl font-bold text-tinta" style={{ fontStretch: "120%" }}>
+          <h1 className="display-md">
             {copy.bayarMock.judul}
           </h1>
           <p className="mt-1 tabular text-xs text-tinta-redup">{orderId}</p>

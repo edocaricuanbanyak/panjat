@@ -25,16 +25,11 @@ export default async function AturanPage() {
 
   return (
     <PageShell>
-      <h1
-        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
-        style={{ fontStretch: "125%" }}
-      >
-        {copy.aturan.judul}
-      </h1>
+      <h1 className="display-lg">{copy.aturan.judul}</h1>
       <p className="mt-2 max-w-xl text-tinta-redup">{copy.aturan.intro}</p>
 
       <section className="mt-6">
-        <h2 className="mb-2 text-sm font-semibold text-tinta">{copy.aturan.tabelJudul}</h2>
+        <h2 className="masthead mb-2">{copy.aturan.tabelJudul}</h2>
         <div className="overflow-hidden rounded-lg border border-garis">
           <table className="w-full text-sm">
             <thead className="bg-kertas-2 text-tinta-redup">

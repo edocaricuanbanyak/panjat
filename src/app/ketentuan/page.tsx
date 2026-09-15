@@ -10,12 +10,7 @@ export const dynamic = "force-dynamic";
 export default function KetentuanPage() {
   return (
     <PageShell>
-      <h1
-        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
-        style={{ fontStretch: "125%" }}
-      >
-        {copy.ketentuan.judul}
-      </h1>
+      <h1 className="display-lg">{copy.ketentuan.judul}</h1>
       <div className="mt-4 flex max-w-xl flex-col gap-3 text-sm text-tinta-redup">
         <p>
           <span className="text-tinta">{copy.ketentuan.peganganTebal}</span>

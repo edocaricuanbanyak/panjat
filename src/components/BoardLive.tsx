@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { copy } from "@/copy";
 import type { Board } from "@/domain/board";
 import { ListingCard } from "./ListingCard";
+import { TiangRail } from "./TiangRail";
 
 /**
  * Live board island (R1). Subscribes to the SSE stream and swaps in new
@@ -101,20 +102,23 @@ export function BoardLive({
       )}
       {/* Board updates must not be read row-by-row (R20-e). */}
       <div aria-live="off">
-        {/* Summit zone — the top three each get their own rank-tinted card;
-            auto-rows-fr keeps all three the same height regardless of content. */}
-        <section className="grid grid-cols-1 auto-rows-fr gap-3">
-          {puncak.map((e) => (
-            <div
-              key={e.id}
-              style={{ viewTransitionName: `vt-${e.id}` } as React.CSSProperties}
-              className={`h-full rounded-2xl border shadow-baris ${
-                e.rank === 1 ? "podium-1" : e.rank === 2 ? "podium-2" : "podium-3"
-              }`}
-            >
-              <ListingCard entry={e} max={board.max} density="puncak" terfavoritId={terfavoritId} />
-            </div>
-          ))}
+        {/* Summit zone — the pole rises in a left gutter through the top three,
+            prize + flag at #1. auto-rows-fr keeps all three the same height. */}
+        <section className="relative flex gap-2.5 sm:gap-3">
+          <TiangRail className="w-5 shrink-0 sm:w-6" />
+          <div className="grid flex-1 auto-rows-fr grid-cols-1 gap-3">
+            {puncak.map((e) => (
+              <div
+                key={e.id}
+                style={{ viewTransitionName: `vt-${e.id}` } as React.CSSProperties}
+                className={`h-full rounded-2xl border shadow-baris ${
+                  e.rank === 1 ? "podium-1" : e.rank === 2 ? "podium-2" : "podium-3"
+                }`}
+              >
+                <ListingCard entry={e} max={board.max} density="puncak" terfavoritId={terfavoritId} />
+              </div>
+            ))}
+          </div>
         </section>
         {middle && <div className="my-5">{middle}</div>}
         {sisa.length > 0 && (

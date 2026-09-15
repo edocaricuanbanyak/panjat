@@ -14,12 +14,7 @@ export default async function AdminMasuk({ searchParams }: { searchParams: Promi
   return (
     <PageShell>
       <div className="mx-auto max-w-sm py-10">
-        <h1
-          className="font-display text-3xl font-bold text-tinta sm:text-4xl"
-          style={{ fontStretch: "125%" }}
-        >
-          {copy.admin.masukJudul}
-        </h1>
+        <h1 className="display-md">{copy.admin.masukJudul}</h1>
         {e && (
           <p className="mt-3 rounded-lg border border-galat/40 bg-galat/10 px-3 py-2 text-sm text-galat">
             {e === "limit" ? copy.error.terlaluBanyak : copy.error.passwordSalah}

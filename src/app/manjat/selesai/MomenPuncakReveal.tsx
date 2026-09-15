@@ -77,8 +77,8 @@ export function MomenPuncakReveal({
               </div>
             </div>
             <h1
-              className="reveal mt-1 font-display text-xl font-bold text-tinta"
-              style={{ fontStretch: "120%", animationDelay: "0.45s" }}
+              className="reveal display-lg mt-1"
+              style={{ animationDelay: "0.45s" }}
             >
               {heading}
             </h1>

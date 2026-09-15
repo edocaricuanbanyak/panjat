@@ -43,12 +43,7 @@ export default async function ArsipPage() {
 
   return (
     <PageShell>
-      <h1
-        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
-        style={{ fontStretch: "125%" }}
-      >
-        {copy.arsip.judul}
-      </h1>
+      <h1 className="display-lg">{copy.arsip.judul}</h1>
 
       {juaraMingguan.length > 0 && (
         <section className="mt-6 rounded-2xl border border-emas/50 bg-gradient-to-b from-emas/12 to-kertas-1 p-4 shadow-kartu">
@@ -102,7 +97,7 @@ export default async function ArsipPage() {
         </section>
       )}
 
-      <h2 className="mt-8 font-display text-sm font-semibold uppercase tracking-wide text-tinta-redup">
+      <h2 className="masthead mt-8">
         {copy.arsip.harianJudul}
       </h2>
       {rows.length === 0 ? (

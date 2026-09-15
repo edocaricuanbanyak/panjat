@@ -21,12 +21,7 @@ export default async function PasangGratisPage() {
 
   return (
     <PageShell>
-      <h1
-        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
-        style={{ fontStretch: "125%" }}
-      >
-        Pasang gratis
-      </h1>
+      <h1 className="display-md">Pasang gratis</h1>
       <p className="mt-2 mb-6 max-w-xl text-tinta-redup">
         Listing gratis masuk Kaki Tiang di bawah listing berbayar, diurut dukungan pengunjung. Kapan
         pun bisa manjat ke papan berbayar.

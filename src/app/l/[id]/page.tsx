@@ -87,7 +87,7 @@ export default async function ListingPublikPage({
       <div className="flex items-start gap-4">
         <SiteLogo listingId={l.id} nama={l.nama} className="size-16 rounded-md text-3xl" />
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-3xl font-bold text-tinta" style={{ fontStretch: "125%" }}>
+          <h1 className="display-lg">
             {l.nama}
           </h1>
           <p className="tabular text-xs text-tinta-redup">
@@ -140,7 +140,7 @@ export default async function ListingPublikPage({
 
       {l.riwayat.length >= 2 && (
         <section className="mt-6">
-          <h2 className="mb-2 text-sm font-semibold text-tinta">Posisi terakhir</h2>
+          <h2 className="masthead mb-2">Posisi terakhir</h2>
           <div className="rounded-lg border border-garis bg-kertas-1 p-3">
             <Sparkline ranks={l.riwayat.map((p) => p.rank)} />
           </div>
@@ -149,7 +149,7 @@ export default async function ListingPublikPage({
 
       {l.serupa.length > 0 && (
         <section className="mt-6">
-          <h2 className="mb-2 text-sm font-semibold text-tinta">Serupa di kategori ini</h2>
+          <h2 className="masthead mb-2">Serupa di kategori ini</h2>
           <ul className="flex flex-col gap-2">
             {l.serupa.map((s) => (
               <li key={s.id}>

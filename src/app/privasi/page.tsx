@@ -11,12 +11,7 @@ export const dynamic = "force-dynamic";
 export default function PrivasiPage() {
   return (
     <PageShell>
-      <h1
-        className="font-display text-3xl font-bold text-tinta sm:text-4xl"
-        style={{ fontStretch: "125%" }}
-      >
-        {copy.privasi.judul}
-      </h1>
+      <h1 className="display-lg">{copy.privasi.judul}</h1>
       <div className="mt-4 flex max-w-xl flex-col gap-3 text-sm text-tinta-redup">
         {copy.privasi.butir.map(([tebal, teks]) => (
           <p key={tebal}>
