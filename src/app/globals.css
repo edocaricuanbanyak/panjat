@@ -193,6 +193,22 @@ summary {
 }
 
 /*
+ * Tiang shaft — the greased pole rendered as a rounded wooden cylinder: a
+ * horizontal gradient shadows both edges (right darkest) and lifts a highlight
+ * left-of-centre, so the rail reads as round bamboo, not a flat two-tone bar.
+ * Pairs with .sheen-licin for the cool grease glint on top.
+ */
+.tiang-shaft {
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-tiang) 66%, black) 0%,
+    color-mix(in srgb, var(--color-tiang) 92%, white) 30%,
+    var(--color-tiang) 58%,
+    color-mix(in srgb, var(--color-tiang) 56%, black) 100%
+  );
+}
+
+/*
  * Paper grain — a near-invisible warm tooth on the kertas background so large
  * empty areas read as printed stock, not a flat fill. Greyscale turbulence,
  * multiplied at low strength; a fixed 180px tile (no background-attachment:
