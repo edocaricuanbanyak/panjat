@@ -10,6 +10,7 @@ import { and, desc, eq, gt, gte, lt, ne, notInArray, sql } from "drizzle-orm";
 import type { Database } from "@/db";
 import { juaraMingguan, kategori, klikHarian, listing, moderasiLog } from "@/db/schema";
 import { WEEK_MS, favoritBoard, weekStartWIB } from "@/lib/favorit";
+import { zonedDayWindow } from "@/lib/tz";
 import { getJuaraKakiTiangMingguan } from "./sorak";
 
 export type JuaraJenis =
@@ -139,7 +140,7 @@ export interface JuaraArsip {
   deskripsi: string | null;
   kategoriNama: string | null;
   kategoriSlug: string | null;
-  /** All-time valid clicks — full info for the archive (never the paid nominal). */
+  /** The archived week's valid clicks — full info for the archive (never the paid nominal). */
   klik: number;
   metrik: number;
 }
@@ -152,6 +153,14 @@ export async function getJuaraMingguanTerbaru(db: Database): Promise<JuaraArsip[
     .orderBy(desc(juaraMingguan.minggu))
     .limit(1);
   if (!latest) return [];
+  // Scope Juara 1's displayed clicks to the *same* closed week that decided
+  // "Klik terbanyak" (whose metrik is that week's click total). Reconstruct the
+  // week window from the archive label: step ~2 days inside the closed week from
+  // its cut-off midnight, then bucket — mirrors simpanJuaraMingguan. All-time
+  // clicks here would let Juara 1 out-number the weekly "Klik terbanyak" champion.
+  const inside = new Date(zonedDayWindow(latest.minggu).start.getTime() - 2 * 24 * 60 * 60 * 1000);
+  const kStart = weekStartWIB(inside);
+  const kEnd = weekStartWIB(new Date(inside.getTime() + WEEK_MS));
   const rows = await db
     .select({
       minggu: juaraMingguan.minggu,
@@ -162,7 +171,7 @@ export async function getJuaraMingguanTerbaru(db: Database): Promise<JuaraArsip[
       deskripsi: listing.deskripsi,
       kategoriNama: kategori.nama,
       kategoriSlug: kategori.slug,
-      klik: sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian" where "klik_harian"."listing_id" = "listing"."id")`,
+      klik: sql<number>`(select coalesce(sum("klik_harian"."jumlah_valid"), 0)::int from "klik_harian" where "klik_harian"."listing_id" = "listing"."id" and "klik_harian"."tanggal" >= ${kStart} and "klik_harian"."tanggal" < ${kEnd})`,
       metrik: juaraMingguan.metrik,
     })
     .from(juaraMingguan)
