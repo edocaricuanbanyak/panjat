@@ -151,11 +151,13 @@ async function HomeBody({
               </span>
               <span className="text-tinta-redup">{copy.beranda.statOnline}</span>
             </span>
-            {/* Paid listings currently on the money board (excludes free Kaki Tiang). */}
+            {/* "di papan" = every row shown on the board: paid listings + graduated
+                Kaki Tiang champions (Rp0). Still-competing free listings live in the
+                separate Kaki Tiang tier and are not counted here. */}
             <span className="h-3.5 w-px bg-garis" aria-hidden />
             <span className="inline-flex items-center gap-1.5">
               <span className="font-semibold tabular text-tinta">
-                {formatCount(entries.length)}
+                {formatCount(entries.length + championEntries.length)}
               </span>
               <span className="text-tinta-redup">{copy.beranda.statListing}</span>
             </span>
